@@ -7,7 +7,7 @@ spring:
   datasource:
     url: ${DBMS_CONNECTION:jdbc:mysql://localhost:3306/booking_management}
     driverClassName: "com.mysql.cj.jdbc.Driver"
-    password: ${DBMS_PASSWORD:123123}
+    password: ${DBMS_PASSWORD:}
     username: ${DBMS_USERNAME:root}
   jpa:
     hibernate:
