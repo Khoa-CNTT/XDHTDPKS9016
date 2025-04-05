@@ -12,7 +12,6 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/test',
-    // beforeEnter: [authGuard],
     component: () => import('@/pages/test.vue'),
   },
   {
@@ -26,30 +25,19 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/about',
-    // beforeEnter: [authGuard],
     children: aboutRoute,
   },
   {
-    path: '/rooms',
-    // beforeEnter: [authGuard],
-    children: roomRoute,
-  },
-  {
     path: '/contact',
-    // beforeEnter: [authGuard],
     children: contactRoute,
   },
-  // {
-  //   path: '/hotels',
-  //   // beforeEnter: [authGuard],
-  //   children: hotelRoute,
-  // },
+
   {
     path: '/hotels',
     children: [
       ...hotelRoute,
       {
-        path: ':id', // Route động cho từng khách sạn
+        path: ':id', 
         name: 'HotelDetail',
         component: () => import('@/pages/hotel/hotelDetail.vue'),
       },
