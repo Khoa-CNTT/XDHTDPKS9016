@@ -27,7 +27,7 @@
         kiếm</button>
     </div>
 
-    <div class="container mx-auto p-4 pt-20">
+    <div class="container mx-auto p-4 pt-32">
       <h1 class="text-2xl text-text font-bold mb-2 uppercase">Điểm đến nổi bật</h1>
       <hr class="mb-4 border-t-2 border-text" />
       <div class="grid grid-cols-2 gap-4 mb-4">
