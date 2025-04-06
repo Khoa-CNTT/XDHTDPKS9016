@@ -1,11 +1,12 @@
 server:
   port: 8080
-  servlet:
-    context-path: /api
+api:
+  prefix: /api/v1
+
 
 spring:
   datasource:
-    url: ${DBMS_CONNECTION:jdbc:mysql://localhost:3306/booking_management}
+    url: ${DBMS_CONNECTION:jdbc:mysql://localhost:3306/booking_management?createDatabaseIfNotExist=true}
     driverClassName: "com.mysql.cj.jdbc.Driver"
     password: ${DBMS_PASSWORD:}
     username: ${DBMS_USERNAME:root}
