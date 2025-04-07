@@ -10,8 +10,10 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public enum ErrorCode {
-    STUDENTS_NOT_EXIST(40401, "Student is not found", HttpStatus.NOT_FOUND),
+    USER_NOT_EXIST(40401, "User is not found", HttpStatus.NOT_FOUND),
     UNAUTHENTICATION(40102, "Username or password is incorrect !", HttpStatus.UNAUTHORIZED),
+    USERNAME_EXISTS(40901, "Username already exists !", HttpStatus.CONFLICT),
+    EMAIL_EXISTS(40901, "Email already exists !", HttpStatus.CONFLICT),
     ;
 
     Integer code;
