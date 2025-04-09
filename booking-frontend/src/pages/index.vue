@@ -18,8 +18,7 @@
       </div>
       <div class="input-group flex flex-col">
         <label class="font-semibold">Ngày trả phòng</label>
-        <input type="date" v-mo
-        del="checkOut" class="border p-2 rounded-md" />
+        <input type="date" v-mo del="checkOut" class="border p-2 rounded-md" />
       </div>
       <div class="input-group flex flex-col">
         <label class="font-semibold">Số lượng</label>
@@ -30,26 +29,50 @@
         kiếm</button>
     </div>
     <div v-if="groupedHotels.length > 0" class="container mx-auto p-4 pt-32">
-  <div v-for="group in groupedHotels" :key="group.location" class="mb-8">
-    <h2 class="text-2xl font-bold mb-4">{{ group.location }}</h2>
+      <div v-for="group in groupedHotels" :key="group.location" class="mb-8 ">
+        <h2 class="text-2xl font-bold mb-4">{{ group.location }}</h2>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <div v-for="hotel in group.hotels" :key="hotel.id" class="border p-4 rounded shadow">
-        <img :src="hotel.image" class="w-full h-48 object-cover mb-2" />
-        <h3 class="text-lg font-bold">{{ hotel.name }}</h3>
-        <p class="text-gray-600">{{ hotel.description }}</p>
-        <button
-          class="mt-2 px-4 py-2 bg-blue-600 text-white rounded"
-          @click="goToDetail(hotel.id)"
-        >
-          Xem chi tiết
-        </button>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div v-for="hotel in group.hotels" :key="hotel.id" class="border p-4 rounded shadow">
+            <img :src="hotel.image" class="w-full h-48 object-cover mb-2" />
+            <h3 class="text-lg font-bold">{{ hotel.name }}</h3>
+            <p class="text-gray-600">{{ hotel.description }}</p>
+            <button class="mt-2 px-4 py-2 bg-blue-600 text-white rounded" @click="goToDetail(hotel.id)">
+              Xem chi tiết
+            </button>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</div>
 
-<p v-else class="text-center text-red-500 mt-4">Không tìm thấy khách sạn phù hợp</p>
+    <p v-else class="text-center text-red-500 mt-4">Không tìm thấy khách sạn phù hợp</p>
+
+    <div class="fixed bottom-6 right-6 z-50">
+      <button @click="toggleChat"
+        class="bg-blue-600 text-white p-5 rounded-full shadow-lg hover:bg-blue-500 transition-all duration-300 animate-shake">
+        <Icon icon="lucide:message-circle" class="h-8 w-8" />
+      </button>
+    </div>
+    <!-- Chat Form -->
+    <transition name="fade-slide">
+      <div v-if="showChat"
+        class="fixed bottom-20 right-6 w-80 bg-white shadow-lg rounded-lg border border-gray-200 z-50">
+        <div class="p-4 border-b font-semibold bg-blue-600 text-white rounded-t-lg">
+          Chat với chúng tôi
+          <button @click="toggleChat" class="float-right text-white font-bold">✕</button>
+        </div>
+        <div class="p-4 max-h-60 overflow-y-auto text-sm text-gray-800">
+          <p>Xin chào! Tôi có thể giúp gì cho bạn?</p>
+          <!-- Bạn có thể thêm input/chat thực tế tại đây -->
+        </div>
+        <div class="p-2 border-t">
+          <input type="text" v-model="chatMessage" placeholder="Nhập tin nhắn..."
+            class="w-full border rounded p-2 text-sm" />
+        </div>
+      </div>
+    </transition>
+
+
     <div class="container mx-auto p-4 pt-32">
       <h1 class="text-2xl text-text font-bold mb-2 uppercase">Điểm đến nổi bật</h1>
       <hr class="mb-4 border-t-2 border-text" />
@@ -76,7 +99,7 @@
       <h1 class="text-2xl text-text font-bold mb-2 uppercase">Khách sạn nổi bật</h1>
       <hr class="mb-4 border-t-2 border-text" />
       <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-        <div v-for="hotel in hotels" :key="hotel.id" class="bg-white p-3 shadow-md rounded-lg">
+        <div v-for="hotel in hotel" :key="hotel.id" class="bg-white p-3 shadow-md rounded-lg">
           <img :src="hotel.image" alt="Hotel Image" class="w-full h-48 object-cover rounded-md" />
           <div class="flex justify-between mt-2">
             <div>
@@ -111,18 +134,7 @@
         <img src="/assets/images/rooms.webp" alt="Hotel Image" class="rounded-lg shadow-lg" />
       </div>
     </div>
-    <div v-if="hotels.length > 0" class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-10">
-      <div v-for="hotel in hotels" :key="hotel.id" class="border p-4 rounded shadow">
-        <img :src="hotel.image" class="w-full h-48 object-cover mb-2" />
-        <h2 class="text-lg font-bold">{{ hotel.name }}</h2>
-        <p class="text-gray-600">{{ hotel.description }}</p>
-        <button class="mt-2 px-4 py-2 bg-blue-600 text-white rounded" @click="goToDetail(hotel.id)">
-          Xem chi tiết
-        </button>
-      </div>
-    </div>
 
-    <p v-else class="text-center text-red-500 mt-4">Không tìm thấy khách sạn phù hợp</p>
   </div>
 
 </template>
@@ -131,6 +143,12 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router'
 
+const showChat = ref(false)
+const chatMessage = ref('')
+
+function toggleChat() {
+  showChat.value = !showChat.value
+}
 const router = useRouter()
 
 const location = ref('')
@@ -146,7 +164,7 @@ const defaultHotels = [
       {
         id: 101,
         name: 'Seaside Villa',
-        image: 'https://source.unsplash.com/featured/?villa1',
+        image: "/assets/images/img-hotel-6.jpeg",
         description: 'Villa gần biển, phù hợp gia đình',
         available: true,
         maxGuests: 6,
@@ -155,7 +173,7 @@ const defaultHotels = [
       {
         id: 102,
         name: 'Beachfront Paradise',
-        image: 'https://source.unsplash.com/featured/?villa2',
+        image: "/assets/images/img-hotel-12.jpeg",
         description: 'Hướng biển, bãi tắm riêng',
         available: true,
         maxGuests: 5,
@@ -170,7 +188,7 @@ const defaultHotels = [
       {
         id: 201,
         name: 'Sunrise Hotel',
-        image: 'https://source.unsplash.com/featured/?hotel1',
+        image: "/assets/images/img-hotel-9.jpeg",
         description: 'Khách sạn trung tâm Hà Nội, tiện nghi, giá tốt',
         available: true,
         maxGuests: 4,
@@ -179,7 +197,7 @@ const defaultHotels = [
       {
         id: 202,
         name: 'Old Quarter Hotel',
-        image: 'https://source.unsplash.com/featured/?hotel2',
+        image: "/assets/images/img-hotel-10.jpeg",
         description: 'Khách sạn gần phố cổ, thuận tiện di chuyển',
         available: true,
         maxGuests: 3,
@@ -194,7 +212,7 @@ const defaultHotels = [
       {
         id: 301,
         name: 'Mountain Retreat',
-        image: 'https://source.unsplash.com/featured/?dalat1',
+        image: "/assets/images/img-hotel-8.jpeg",
         description: 'Nghỉ dưỡng trong rừng thông, yên bình',
         available: true,
         maxGuests: 2,
@@ -203,7 +221,7 @@ const defaultHotels = [
       {
         id: 302,
         name: 'Pine Valley Homestay',
-        image: 'https://source.unsplash.com/featured/?dalat2',
+        image: "/assets/images/img-hotel-7.jpeg",
         description: 'Homestay ấm cúng giữa rừng thông',
         available: true,
         maxGuests: 3,
@@ -223,10 +241,10 @@ const searchHotels = () => {
 
   for (const group of defaultHotels) {
     const filteredHotels = group.hotels.filter(hotel => {
-      const matchLocation = hotel.name.toLowerCase().includes(location.value.toLowerCase()) || 
-                            group.location.toLowerCase().includes(location.value.toLowerCase())
+      const matchLocation = hotel.name.toLowerCase().includes(location.value.toLowerCase()) ||
+        group.location.toLowerCase().includes(location.value.toLowerCase())
       const matchGuest = quantity.value <= hotel.maxGuests
-      const matchDate = checkIn.value && checkOut.value 
+      const matchDate = checkIn.value && checkOut.value
         ? hotel.dates.includes(checkIn.value) && hotel.dates.includes(checkOut.value)
         : true // nếu không chọn ngày thì bỏ qua điều kiện này
 
@@ -244,16 +262,16 @@ const searchHotels = () => {
   groupedHotels.value = results
   hotels.value = results.flatMap(g => g.hotels)
 }
-onMounted(() => {
-  hotels.value = [
-    { id: 1, name: "Hotel A", description: "Mô tả khách sạn A", image: "/assets/images/img-hotel-6.jpeg" },
-    { id: 2, name: "Hotel B", description: "Mô tả khách sạn B", image: "/assets/images/img-hotel-7.jpeg" },
-    { id: 3, name: "Hotel C", description: "Mô tả khách sạn C", image: "/assets/images/img-hotel-8.jpeg" },
-    { id: 4, name: "Hotel D", description: "Mô tả khách sạn D", image: "/assets/images/img-hotel-9.jpeg" },
-    { id: 5, name: "Hotel E", description: "Mô tả khách sạn E", image: "/assets/images/img-hotel-10.jpeg" },
-    { id: 6, name: "Hotel F", description: "Mô tả khách sạn F", image: "/assets/images/img-hotel-12.jpeg" }
-  ];
-});
+// onMounted(() => {
+//   hotels.value = [
+//     { id: 1, name: "Hotel A", description: "Mô tả khách sạn A", image: "/assets/images/img-hotel-6.jpeg" },
+//     { id: 2, name: "Hotel B", description: "Mô tả khách sạn B", image: "/assets/images/img-hotel-7.jpeg" },
+//     { id: 3, name: "Hotel C", description: "Mô tả khách sạn C", image: "/assets/images/img-hotel-8.jpeg" },
+//     { id: 4, name: "Hotel D", description: "Mô tả khách sạn D", image: "/assets/images/img-hotel-9.jpeg" },
+//     { id: 5, name: "Hotel E", description: "Mô tả khách sạn E", image: "/assets/images/img-hotel-10.jpeg" },
+//     { id: 6, name: "Hotel F", description: "Mô tả khách sạn F", image: "/assets/images/img-hotel-12.jpeg" }
+//   ];
+// });
 
 const goToDetail = (hotelId) => {
   router.push({ name: 'HotelDetail', params: { id: hotelId } })
@@ -268,14 +286,14 @@ const bottomCities = ref([
   { name: 'Hội An', image: '/assets/images/4.jpg', img: '/assets/images/coVietNam.jpg' },
   { name: 'Thừa Thiên Huế', image: '/assets/images/5.jpg', img: '/assets/images/coVietNam.jpg' },
 ]);
-// const hotels = [
-//   { id: 1, name: "Hotel A", description: "Mô tả khách sạn A", image: "/assets/images/img-hotel-6.jpeg" },
-//   { id: 2, name: "Hotel B", description: "Mô tả khách sạn B", image: "/assets/images/img-hotel-7.jpeg" },
-//   { id: 3, name: "Hotel C", description: "Mô tả khách sạn C", image: "/assets/images/img-hotel-8.jpeg" },
-//   { id: 4, name: "Hotel D", description: "Mô tả khách sạn D", image: "/assets/images/img-hotel-9.jpeg" },
-//   { id: 5, name: "Hotel E", description: "Mô tả khách sạn E", image: "/assets/images/img-hotel-10.jpeg" },
-//   { id: 6, name: "Hotel F", description: "Mô tả khách sạn F", image: "/assets/images/img-hotel-12.jpeg" }
-// ];
+const hotel = [
+  { id: 1, name: "Hotel A", description: "Mô tả khách sạn A", image: "/assets/images/img-hotel-6.jpeg" },
+  { id: 2, name: "Hotel B", description: "Mô tả khách sạn B", image: "/assets/images/img-hotel-7.jpeg" },
+  { id: 3, name: "Hotel C", description: "Mô tả khách sạn C", image: "/assets/images/img-hotel-8.jpeg" },
+  { id: 4, name: "Hotel D", description: "Mô tả khách sạn D", image: "/assets/images/img-hotel-9.jpeg" },
+  { id: 5, name: "Hotel E", description: "Mô tả khách sạn E", image: "/assets/images/img-hotel-10.jpeg" },
+  { id: 6, name: "Hotel F", description: "Mô tả khách sạn F", image: "/assets/images/img-hotel-12.jpeg" }
+];
 const about = [
   { id: 1, name: "Tìm dễ dàng", description: "Tìm trong số 5 triệu khách sạn chỉ sau vài giây.", image: "/assets/images/Search.svg" },
   { id: 2, name: "Tự tin so sánh", description: "So sánh giá phòng từ nhiều trang web cùng lúc.", image: "/assets/images/Compare.svg" },
@@ -283,4 +301,19 @@ const about = [
 ];
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped>
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: all 0.3s ease;
+}
+
+.fade-slide-enter-from {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(20px);
+}
+</style>

@@ -25,7 +25,7 @@
                     <button @click="isLoginOpen = true"
                         class="bg-text text-white px-4 py-2 rounded-lg hover:bg-blue-700">Login</button>
                 </div>
-
+                <!-- <Avatar/> -->
             </div>
 
         </header>
@@ -36,6 +36,7 @@
 import { ref } from 'vue';
 import { RouterLink } from 'vue-router';
 import login from '@/pages/auth/login.vue';
+import Avatar from '../base/Avatar.vue';
 
 const isLoginOpen = ref(false);
 </script>
