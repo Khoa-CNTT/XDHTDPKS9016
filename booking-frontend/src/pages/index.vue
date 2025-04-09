@@ -18,7 +18,8 @@
       </div>
       <div class="input-group flex flex-col">
         <label class="font-semibold">Ngày trả phòng</label>
-        <input type="date" v-model="checkOut" class="border p-2 rounded-md" />
+        <input type="date" v-mo
+        del="checkOut" class="border p-2 rounded-md" />
       </div>
       <div class="input-group flex flex-col">
         <label class="font-semibold">Số lượng</label>
