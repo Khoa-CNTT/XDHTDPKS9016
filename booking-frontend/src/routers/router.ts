@@ -11,6 +11,11 @@ const routes: RouteRecordRaw[] = [
     children: dashboardRoute,
   },
   {
+    path: '/profiles',
+    // beforeEnter: [authGuard],
+    children: profileRoute,
+  },
+  {
     path: '/test',
     component: () => import('@/pages/test.vue'),
   },
@@ -34,6 +39,7 @@ const routes: RouteRecordRaw[] = [
 
   {
     path: '/hotels',
+    name: 'Hotel',
     children: [
       ...hotelRoute,
       {
