@@ -6,6 +6,7 @@ import com.tourism.booking.model.Role;
 import com.tourism.booking.model.UserProfile;
 import com.tourism.booking.repository.IAccountRepository;
 import com.tourism.booking.repository.IRoleRepository;
+import com.tourism.booking.repository.IUserProfileRepository;
 import com.tourism.booking.service.IAccountService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -22,13 +23,16 @@ import java.util.Set;
 public class AccountService implements IAccountService {
     IAccountRepository accountRepository;
     IRoleRepository roleRepository;
+    IUserProfileRepository userProfileRepository;
 
     @Override
     public Account register(AccountRequest accountRequest) {
         if (accountRepository.existsByUsername(accountRequest.getUsername())) {
             throw new RuntimeException("Username is exists");
         }
-
+        if (userProfileRepository.existsByEmail(accountRequest.getEmail())) {
+            throw new RuntimeException("Email is exists");
+        }
         // Mã hóa password
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         String encodedPassword = passwordEncoder.encode(accountRequest.getPassword());
@@ -50,6 +54,7 @@ public class AccountService implements IAccountService {
         UserProfile userProfile = new UserProfile();
         userProfile.setEmail(accountRequest.getEmail());
         userProfile.setAccount(savedAccount);
+        userProfileRepository.save(userProfile);
 
         return savedAccount;
     }
