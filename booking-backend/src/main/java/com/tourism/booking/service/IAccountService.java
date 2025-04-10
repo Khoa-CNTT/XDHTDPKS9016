@@ -6,4 +6,6 @@ import com.tourism.booking.model.Account;
 public interface IAccountService {
     Account register(AccountRequest accountRequest);
 
+    Account getAccountByUsername(String username);
+
 }
