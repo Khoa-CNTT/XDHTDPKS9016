@@ -10,7 +10,14 @@ import java.util.Optional;
 
 public interface IUserProfileService {
     Page<UserProfile> findAll(UserSearchRequest userSearchRequest, Pageable pageable);
+
     Optional<UserProfileResponse> findById(Long id);
+
+    Optional<UserProfile> findUserProfileEntityById(Long id);
+
+    Optional<UserProfileResponse> findByAccoutId(Long id);
+
     UserProfile save(UserProfile userProfile);
+
     void deleteById(Long id);
 }

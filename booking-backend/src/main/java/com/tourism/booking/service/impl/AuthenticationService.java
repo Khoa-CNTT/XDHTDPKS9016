@@ -32,7 +32,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
-import java.util.List;
 import java.util.StringJoiner;
 import java.util.UUID;
 
@@ -53,7 +52,7 @@ public class AuthenticationService implements IAuthenticationService {
         Account acc = accountRepository.findByUsername(authenticationRequest.getUsername());
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
 
-        if(acc == null || !passwordEncoder.matches(authenticationRequest.getPassword(), acc.getPassword())) {
+        if (acc == null || !passwordEncoder.matches(authenticationRequest.getPassword(), acc.getPassword())) {
             throw new ApiException(ErrorCode.UNAUTHENTICATION);
         }
         return AuthenticationResponse.builder()
@@ -62,7 +61,7 @@ public class AuthenticationService implements IAuthenticationService {
     }
 
     @Override
-    public IntrospectResponse introspect(IntrospectRequest introspectRequest)  {
+    public IntrospectResponse introspect(IntrospectRequest introspectRequest) {
         try {
             verifyToken(introspectRequest.getToken());
             return IntrospectResponse.builder()

@@ -41,7 +41,7 @@ public class SecurityConfig {
             request
                     // Cho phép truy cập không hạn chế đối với endpoint "/student"
                     .requestMatchers(apiPrefix + "/auth/**").permitAll()
-                    .requestMatchers(apiPrefix + "/management_user/**").authenticated()
+                    .requestMatchers(apiPrefix + "/management-user/**").authenticated()
                     .anyRequest().authenticated(); // nhưng request còn lại phải được xác thực
         });
 
