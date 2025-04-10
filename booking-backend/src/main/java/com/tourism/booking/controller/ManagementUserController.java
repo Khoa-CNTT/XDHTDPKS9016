@@ -1,50 +1,54 @@
 package com.tourism.booking.controller;
 
+import com.tourism.booking.dto.page.PageReponse;
 import com.tourism.booking.dto.user.UserProfileRequest;
 import com.tourism.booking.dto.user.UserProfileResponse;
+import com.tourism.booking.dto.user.UserSearchRequest;
 import com.tourism.booking.exception.ApiException;
 import com.tourism.booking.exception.ErrorCode;
 import com.tourism.booking.mapper.IUserProfileMapper;
-import com.tourism.booking.model.Account;
 import com.tourism.booking.model.UserProfile;
-import com.tourism.booking.service.IAccountService;
 import com.tourism.booking.service.IUserProfileService;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
-import java.security.Principal;
-
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
-@PreAuthorize("hasRole('USER')")
-@RequestMapping("${api.prefix}/user-profile")
+@PreAuthorize("hasRole('ADMIN')")
+@RequestMapping("${api.prefix}/management-user")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
-public class UserProfileController {
+public class ManagementUserController {
     IUserProfileService userProfileService;
-    IAccountService accountService;
     IUserProfileMapper userProfileMapper;
 
     @GetMapping
-    public ResponseEntity<?> getUserProfile(Principal principal) {
-        Account acc = accountService.getAccountByUsername(principal.getName());
-        System.out.println(acc.getAccount_id());
-        return userProfileService.findByAccoutId(acc.getAccount_id())
+    public ResponseEntity<?> getUserProfile(UserSearchRequest userSearchRequest, Pageable pageable) {
+        return ResponseEntity.ok(new PageReponse<>(userProfileService.findAll(userSearchRequest, pageable)));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getUserProfile(@PathVariable("id") Long id) {
+        return userProfileService.findById(id)
                 .map(ResponseEntity::ok)
                 .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_EXIST));
     }
 
+    // @PreAuthorize("hasRole('ADMIN')")
+    // @PostMapping
+    // public ResponseEntity<?> createUserProfile(@RequestBody UserProfileRequest
+    // userProfileRequest) {
+    // UserProfile userProfile =
+    // userProfileMapper.UserProfileRequestToUserProfile(userProfileRequest);
+    // }
+    //
     @PutMapping("/{id}")
     public ResponseEntity<?> updateProfile(@PathVariable Long id,
-            @RequestBody UserProfileRequest userProfileRequest) {
+                                           @RequestBody UserProfileRequest userProfileRequest) {
         // Lấy thông tin UserProfile hiện tại từ database
         UserProfile existingProfile = userProfileService.findUserProfileEntityById(id)
                 .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_EXIST));
@@ -60,7 +64,13 @@ public class UserProfileController {
         UserProfile savedProfile = userProfileService.save(updatedProfile);
         UserProfileResponse response = userProfileMapper.UserProfileToUserProfileResponse(savedProfile);
         response.setUsername(existingProfile.getAccount().getUsername());
-
         return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteUserProfile(@PathVariable("id") Long id) {
+        userProfileService.findById(id).orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_EXIST));
+        userProfileService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -1,6 +1,8 @@
 import { createWebHistory, createRouter, type RouteRecordRaw } from 'vue-router'
 import { authRoute, dashboardRoute, profileRoute, quizRoute,hotelRoute,contactRoute,aboutRoute,roomRoute } from './modules'
 import { adminRoute } from './modules/admin'
+import { supplierRoute } from './modules/supplier'
+import {  } from './modules/admin'
 import { authGuard } from './auth-guard'
 const { progress } = useIndicator()
 
@@ -44,13 +46,14 @@ const routes: RouteRecordRaw[] = [
     children: [
       ...hotelRoute,
       {
-        path: ':id', 
+        path: ':id',
         name: 'HotelDetail',
         component: () => import('@/pages/hotel/hotelDetail.vue'),
       },
     ],
   },
-  adminRoute
+  adminRoute,
+  supplierRoute
 
 ]
 

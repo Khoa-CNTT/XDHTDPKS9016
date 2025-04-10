@@ -137,6 +137,6 @@ export default {
       // collections: getIconCollections("all"),
       // and the more recommended way is to use `dynamicIconsPlugin`, see below.
     }),
-      require("tailwindcss-animate")
-],
+    require('tailwindcss-animate'),
+  ],
 }
