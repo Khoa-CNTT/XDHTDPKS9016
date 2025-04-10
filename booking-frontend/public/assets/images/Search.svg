@@ -1,0 +1,32 @@
+<svg height="90px" width="100%" preserveAspectRatio="xMinYMid meet" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" id="Layer_1"
+     x="0" y="0" style="enable-background:new 0 0 45 48" version="1.1" viewBox="0 0 45 48"><style>.st1{fill:#fff}.st2{fill:#94c5e6}.st3{fill:#3b8dcf}.st4,.st5,.st7{stroke:#000;stroke-width:.5;stroke-miterlimit:10}.st4{fill:none;stroke-linecap:round;stroke-linejoin:round}.st5,.st7{fill:#bfd4e8}.st7{fill:#fff;stroke-linecap:round;stroke-linejoin:round}.st9{fill:#f59715}</style>
+    <path d="M5.43 42.75v-9.99"
+          style="fill:none;stroke:#31454c;stroke-width:.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10"/>
+    <path d="M6.86 31.89h13.46v2.22H6.86zM6.86 29.67v2.22h13.45l-3.39-2.22z" class="st1"/>
+    <path d="M6.2 34.11h14.89v8.62H6.2z" class="st2"/>
+    <path d="M2.42 34.11h9.14v8.62H2.42zM6.86 29.67l-3.4 2.22v2.22h6.79v-2.22z" class="st1"/>
+    <path d="M3.22 35.68h1.83v1.83H3.22zM8.84 35.64h1.83v1.83H8.84zM6.03 35.64h1.83v1.83H6.03z" class="st3"/>
+    <path d="M14.07 34.13h7.03v8.6H2.42v-8.62h1.04v-2.22l3.4-2.22h10.06l3.39 2.22.03 2.24M6.88 29.69l3.4 2.22M3.46 34.11H7.4"
+          class="st4"/>
+    <path d="M24.49 18.91h8.41v13.75h-8.41z" class="st5"/>
+    <path d="M20.74 18.91h8.48v13.75h-8.48z" style="fill:#fff;stroke:#000;stroke-width:.5;stroke-miterlimit:10"/>
+    <path d="M23.59 22.82h11.63v19.89H23.59z" class="st2"/>
+    <path d="M18.49 22.82h11.63v19.89H18.49z" class="st1"/>
+    <path d="M19.43 24.87h1.83v3.27h-1.83zM23.35 24.87h1.83v3.27h-1.83zM27.27 24.87h1.83v3.27h-1.83z" class="st5"/>
+    <path d="M29.75 22.85h3.53M18.49 42.71h16.72V22.85h-2.33v-3.94l-12.15.02v3.92l-2.24-.02c0-.01-.02 19.86 0 19.88zM20.6 22.85h5.49"
+          class="st4"/>
+    <path d="m30.024 27.665 1.252-.996 8.938 11.226-1.251.996z" class="st7"/>
+    <path d="m42.98 41.74-.88.7c-.62.5-1.53.39-2.03-.23l-7.14-8.97c-.5-.62-.39-1.53.23-2.03l.88-.7c.62-.5 1.53-.39 2.03.23l7.14 8.97c.5.62.39 1.53-.23 2.03z"
+          class="st7"/>
+    <ellipse cx="23.91" cy="18.05" class="st7" rx="12.92" ry="12.87" transform="rotate(-38.528 23.913 18.047)"/>
+    <ellipse cx="23.91" cy="18.05" class="st4" rx="10.4" ry="10.36" transform="rotate(-38.528 23.913 18.047)"/>
+    <defs><ellipse id="SVGID_1_" cx="24.01" cy="18.1" rx="10.4" ry="10.36" transform="rotate(-38.528 24.008 18.096)"/></defs>
+    <clipPath id="SVGID_00000176725334093049565430000010892927019356693675_"><use xlink:href="#SVGID_1_" style="overflow:visible"/></clipPath>
+    <g style="clip-path:url(#SVGID_00000176725334093049565430000010892927019356693675_)"><path d="M21.35 12.95h9.5v15.52h-9.5z" class="st2"/>
+        <path d="M17.11 12.95h9.57v15.52h-9.57z" class="st1"/>
+        <path d="M20.33 17.37h13.13v22.45H20.33z" class="st2"/>
+        <path d="M14.68 17.37h13.13v22.45H14.68z" class="st1"/>
+        <path d="M15.63 19.69h2.06v3.69h-2.06zM20.06 19.69h2.06v3.69h-2.06zM24.48 19.69h2.06v3.69h-2.06z" class="st9"/>
+        <path d="M27.28 17.4h3.99M14.57 39.82h18.88V17.4h-2.63v-4.45l-13.72.02v4.42l-2.53-.02s-.02 22.43 0 22.45zM16.96 17.4h6.2"
+              class="st4"/></g>
+    <use xlink:href="#SVGID_1_" style="overflow:visible;fill:none;stroke:#000;stroke-width:.5;stroke-miterlimit:10"/></svg>

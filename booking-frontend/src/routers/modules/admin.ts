@@ -1,7 +1,7 @@
 export const adminRoute = {
   path: '/admin',
   meta: {
-    layout: 'AdminLayout', // 👈 bắt buộc để App.vue load đúng layout
+    layout: 'AdminLayout', 
   },
   component: () => import('@/layouts/AdminLayout.vue'),
   children: [
