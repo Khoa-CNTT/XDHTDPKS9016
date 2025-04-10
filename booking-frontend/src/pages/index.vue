@@ -63,7 +63,6 @@
         </div>
         <div class="p-4 max-h-60 overflow-y-auto text-sm text-gray-800">
           <p>Xin chào! Tôi có thể giúp gì cho bạn?</p>
-          <!-- Bạn có thể thêm input/chat thực tế tại đây -->
         </div>
         <div class="p-2 border-t">
           <input type="text" v-model="chatMessage" placeholder="Nhập tin nhắn..."
@@ -227,7 +226,6 @@ const defaultHotels = [
         maxGuests: 3,
         dates: ['2025-04-10', '2025-04-13']
       },
-      // thêm 4 khách sạn nữa...
     ]
   }
 ];
@@ -236,7 +234,7 @@ const defaultHotels = [
 const groupedHotels = ref([])
 
 const searchHotels = () => {
-  groupedHotels.value = [] // clear kết quả cũ
+  groupedHotels.value = []
   const results = []
 
   for (const group of defaultHotels) {
@@ -246,7 +244,7 @@ const searchHotels = () => {
       const matchGuest = quantity.value <= hotel.maxGuests
       const matchDate = checkIn.value && checkOut.value
         ? hotel.dates.includes(checkIn.value) && hotel.dates.includes(checkOut.value)
-        : true // nếu không chọn ngày thì bỏ qua điều kiện này
+        : true
 
       return matchLocation && matchGuest && matchDate
     })
