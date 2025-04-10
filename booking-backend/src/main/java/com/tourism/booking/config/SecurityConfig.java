@@ -1,9 +1,10 @@
 package com.tourism.booking.config;
 
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -19,48 +20,68 @@ import javax.crypto.spec.SecretKeySpec;
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+
 public class SecurityConfig {
 
     @Value("${jwt.signerKey}")
     private String SIGNER_KEY;
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, IntrospectFilter introspectFilter) throws Exception {
-        httpSecurity
-                .addFilterBefore(introspectFilter, UsernamePasswordAuthenticationFilter.class)
-                .authorizeHttpRequests(request -> {
-                    request.requestMatchers("/auth/**").permitAll()
-                            .requestMatchers("/admins/**").hasRole("ADMIN")
-                            .requestMatchers("/bookings/**").hasRole("USER")
-                            .anyRequest().authenticated();
-                })
-                .csrf(AbstractHttpConfigurer::disable)
-                .oauth2ResourceServer(oauth2 ->
-                        oauth2.jwt(jwtConfigurer -> jwtConfigurer
-                                .decoder(jwtDecoder())
-                                .jwtAuthenticationConverter(jwtAuthenticationConverter())
-                        )
-                );
+    @Autowired
+    CustomJwtDecoder customJwtDecoder;
 
+    @Value("${api.prefix}")
+    private String apiPrefix;
+
+    // Định nghĩa một bean của SecurityFilterChain để cấu hình bảo mật cho ứng dụng
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
+        // Cấu hình quyền truy cập cho các yêu cầu HTTP
+        httpSecurity.authorizeHttpRequests(request -> {
+            request
+                    // Cho phép truy cập không hạn chế đối với endpoint "/student"
+                    .requestMatchers(apiPrefix + "/auth/**").permitAll()
+                    .requestMatchers(apiPrefix + "/management_user/**").authenticated()
+                    .anyRequest().authenticated(); // nhưng request còn lại phải được xác thực
+        });
+
+        // Vô hiệu hóa bảo mật CSRF (Cross-Site Request Forgery)
+        httpSecurity.csrf(AbstractHttpConfigurer::disable);
+        httpSecurity.oauth2ResourceServer(oauth2 ->
+                oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(customJwtDecoder)
+                        .jwtAuthenticationConverter(jwtAuthenticationConverter())
+                )
+        );
+        // Xây dựng và trả về đối tượng SecurityFilterChain
         return httpSecurity.build();
     }
+
     @Bean
     public JwtDecoder jwtDecoder() {
+        // Tạo khóa bí mật với thuật toán HS512
         SecretKeySpec secretKeySpec = new SecretKeySpec(SIGNER_KEY.getBytes(), "HS512");
-        return NimbusJwtDecoder.withSecretKey(secretKeySpec)
-                .macAlgorithm(MacAlgorithm.HS512)
-                .build();
+
+        // Cấu hình và tạo JwtDecoder với khóa bí mật và thuật toán mã hóa
+        return NimbusJwtDecoder
+                .withSecretKey(secretKeySpec)  // Đặt khóa bí mật
+                .macAlgorithm(MacAlgorithm.HS512)  // Chọn thuật toán HS512
+                .build();  // Xây dựng JwtDecoder
     }
+
+    //401: chưa login
+    //403: không có quyền truy cập
 
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        // Tạo JwtGrantedAuthoritiesConverter và đặt tiền tố quyền hạn
         JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
         jwtGrantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
-        jwtGrantedAuthoritiesConverter.setAuthoritiesClaimName("scope");
 
+        // Tạo JwtAuthenticationConverter và thiết lập JwtGrantedAuthoritiesConverter
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
 
+        // Trả về JwtAuthenticationConverter cấu hình sẵn
         return jwtAuthenticationConverter;
     }
 }

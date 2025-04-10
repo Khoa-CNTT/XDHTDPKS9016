@@ -1,0 +1,21 @@
+server:
+  port: 8080
+api:
+  prefix: /api/v1
+
+
+spring:
+  datasource:
+    url: ${DBMS_CONNECTION:jdbc:mysql://localhost:3306/booking_management?createDatabaseIfNotExist=true}
+    driverClassName: "com.mysql.cj.jdbc.Driver"
+    password: ${DBMS_PASSWORD:123123}
+    username: ${DBMS_USERNAME:root}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+
+jwt:
+  signerKey: "NGqcTenEeF3c21PqKhCWjAcpUNz1gJYFIZ1mbj8uFs3RmO9QlNEjLijajUO/mQse"
+  valid-duration: 6000 # in second
+  refreshable-duration: 36000 # in seconds

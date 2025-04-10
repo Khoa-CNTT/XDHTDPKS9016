@@ -18,4 +18,7 @@ public interface IAccountRepository extends JpaRepository<Account, Integer> {
                         WHERE a.username = :username
                         """, nativeQuery = true)
     List<String> findRolesByUsername(@Param("username") String username);
+
+    boolean existsByUsername(String username);
+
 }
