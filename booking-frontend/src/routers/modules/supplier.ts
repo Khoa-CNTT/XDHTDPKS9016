@@ -11,9 +11,9 @@ export const supplierRoute = {
       component: () => import('@/pages/suppliers/RoomManagement.vue'),
     },
     {
-      path: 'room-management',
-      name: 'RoomManagement',
-      component: () => import('@/pages/suppliers/RoomOrder.vue'),
+      path: 'hotel-info',
+      name: 'HotelInformation',
+      component: () => import('@/pages/suppliers/HotelProfile.vue'),
     },
     {
       path: 'service-control',
@@ -34,6 +34,16 @@ export const supplierRoute = {
       path: 'profile-settings',
       name: 'SupplierProfileSettings',
       component: () => import('@/pages/suppliers/ProfileSettings.vue'),
+    },
+    {
+      path: 'room-types',
+      name: 'SupplierRoomTypes',
+      component: () => import('@/pages/suppliers/SupplierManageRoomTypes.vue'),
+    },
+    {
+      path: 'billing',
+      name: 'SupplierBilling',
+      component: () => import('@/pages/suppliers/SupplierBilling.vue'),
     },
   ],
 }

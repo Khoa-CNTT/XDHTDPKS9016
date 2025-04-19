@@ -1,5 +1,5 @@
 import { createWebHistory, createRouter, type RouteRecordRaw } from 'vue-router'
-import { authRoute, dashboardRoute, profileRoute, quizRoute,hotelRoute,contactRoute,aboutRoute,roomRoute } from './modules'
+import { authRoute, dashboardRoute, profileRoute, quizRoute,hotelRoute,contactRoute,aboutRoute } from './modules'
 import { adminRoute } from './modules/admin'
 import { supplierRoute } from './modules/supplier'
 import {  } from './modules/admin'
@@ -49,6 +49,13 @@ const routes: RouteRecordRaw[] = [
         path: ':id',
         name: 'HotelDetail',
         component: () => import('@/pages/hotel/hotelDetail.vue'),
+        // children: [
+        //   {
+        //     path: 'booking',
+        //     name: 'BookingModal',
+        //     component: () => import('@/pages/hotel/BookingModal.vue'),
+        //   }
+        // ]
       },
     ],
   },

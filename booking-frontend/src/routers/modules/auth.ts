@@ -31,6 +31,11 @@ export const authRoute: RouteRecordRaw[] = [
         component: () => import('@/pages/auth/password/forgot.vue'),
       },
       {
+        path: 'otp',
+        name: 'otp',
+        component: () => import('@/pages/auth/password/confirm.vue'),
+      },
+      {
         path: 'reset',
         name: 'password-reset',
         component: () => import('@/pages/auth/password/reset.vue'),
