@@ -41,6 +41,7 @@ public class AccountService implements IAccountService {
         Account account = new Account();
         account.setUsername(accountRequest.getUsername());
         account.setPassword(encodedPassword);
+        account.setEmail(accountRequest.getEmail());
 
         // Set vai trò mặc định USER
         Role userRole = roleRepository.findByRoleName("USER")
