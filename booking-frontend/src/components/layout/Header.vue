@@ -22,14 +22,11 @@
                     </RouterLink>
                 </nav>
                 <div class="flex-1 flex justify-end">
-                    <button @click="isLoginOpen = true"
-                        class="bg-text text-white px-4 py-2 rounded-lg hover:bg-blue-700">Login</button>
+                    <button class="bg-text text-white px-4 py-2 rounded-lg hover:bg-blue-700">Login</button>
                 </div>
-                <!-- <Avatar/> -->
             </div>
 
         </header>
-        <login v-if="isLoginOpen" @close="isLoginOpen = false" />
     </div>
 </template>
 <script setup>

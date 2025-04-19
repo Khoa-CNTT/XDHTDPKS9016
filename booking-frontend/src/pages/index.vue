@@ -5,29 +5,49 @@
       <p class="text-lg text-white mt-2">Khám phá ngay những ưu đãi tốt nhất dành cho bạn tại <b>Booking</b>!</p>
     </div>
 
-    <div class="search-box grid grid-cols-1 md:grid-cols-5 gap-4 p-4 bg-white shadow-lg 
-    w-10/12 md:w-3/4 mx-auto absolute top-80 left-0 right-0 border border-gray-300 rounded-lg">
-      <div class="input-group flex flex-col">
-        <label class="font-semibold">Địa điểm tên khách sạn</label>
-        <input type="text" v-model="location" placeholder="Nhập địa điểm hoặc tên khách sạn"
-          class="border p-2 rounded-md" />
-      </div>
-      <div class="input-group flex flex-col">
-        <label class="font-semibold">Ngày nhận phòng</label>
-        <input type="date" v-model="checkIn" class="border p-2 rounded-md" />
-      </div>
-      <div class="input-group flex flex-col">
-        <label class="font-semibold">Ngày trả phòng</label>
-        <input type="date" v-mo del="checkOut" class="border p-2 rounded-md" />
-      </div>
-      <div class="input-group flex flex-col">
-        <label class="font-semibold">Số lượng</label>
-        <input type="number" v-model="quantity" min="1" value="1" class="border p-2 rounded-md" />
-      </div>
-      <button @click="searchHotels"
-        class="search-btn bg-orange-400 text-white py-1 px-2 text-sm rounded-md hover:bg-orange-300">Tìm
-        kiếm</button>
-    </div>
+    <div class="search-box grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-white shadow-lg 
+  w-10/12 md:w-1/2 mx-auto absolute top-80 left-0 right-0 border border-gray-300 rounded-lg">
+  
+  <!-- Địa điểm -->
+  <div class="input-group flex flex-col">
+    <label class="font-semibold mb-1">Địa điểm / Tên khách sạn</label>
+    <input type="text" v-model="location" placeholder="Ví dụ: Đà Nẵng, Khách sạn Mường Thanh"
+      class="border p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300" />
+  </div>
+
+  <!-- Loại khách sạn -->
+  <div class="input-group flex flex-col">
+    <label class="font-semibold mb-1">Loại khách sạn</label>
+    <select v-model="hotelType" class="border p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300">
+      <option value="">Tất cả</option>
+      <option value="resort">Resort</option>
+      <option value="hotel">Khách sạn</option>
+      <option value="homestay">Homestay</option>
+    </select>
+  </div>
+
+  <!-- Đánh giá sao -->
+  <div class="input-group flex flex-col">
+    <label class="font-semibold mb-1">Đánh giá</label>
+    <select v-model="rating" class="border p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300">
+      <option value="">Tất cả</option>
+      <option value="5">5 sao</option>
+      <option value="4">4 sao trở lên</option>
+      <option value="3">3 sao trở lên</option>
+    </select>
+  </div>
+
+  <!-- Nút tìm kiếm -->
+  <div class="md:col-span-3 flex justify-end">
+    <button @click="searchHotels"
+      class="w-full md:w-auto bg-orange-400 text-white py-2 px-6 rounded-md hover:bg-orange-300 transition-all">
+      Tìm kiếm
+    </button>
+  </div>
+</div>
+
+
+
     <div v-if="groupedHotels.length > 0" class="container mx-auto p-4 pt-32">
       <div v-for="group in groupedHotels" :key="group.location" class="mb-8 ">
         <h2 class="text-2xl font-bold mb-4">{{ group.location }}</h2>

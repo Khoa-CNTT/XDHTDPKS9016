@@ -37,12 +37,30 @@
                             </router-link>
                         </li>
                         <li class="nav-item">
-                            <router-link to="/supplier/room-management"
+                            <router-link to="/supplier/room-types"
                                 class="nav-link d-flex align-items-center gap-2 text-white font-bold"
                                 active-class="bg-blue-500"
                                 exact-active-class="bg-blue-600">
                                 <Icon icon="carbon:service-desk" width="24" height="24" />
-                                <p class="mb-0">Quản lý phòng</p>
+                                <p class="mb-0">Quản lý loại phòng</p>
+                            </router-link>
+                        </li>
+                        <li class="nav-item">
+                            <router-link to="/supplier/hotel-info"
+                                class="nav-link d-flex align-items-center gap-2 text-white font-bold"
+                                active-class="bg-blue-500"
+                                exact-active-class="bg-blue-600">
+                                <Icon icon="carbon:service-desk" width="24" height="24" />
+                                <p class="mb-0">Quản lý thông tin khách sạn</p>
+                            </router-link>
+                        </li>
+                        <li class="nav-item">
+                            <router-link to="/supplier/billing"
+                                class="nav-link d-flex align-items-center gap-2 text-white font-bold"
+                                active-class="bg-blue-500"
+                                exact-active-class="bg-blue-600">
+                                <Icon icon="carbon:service-desk" width="24" height="24" />
+                                <p class="mb-0">Quản lý giao dịch thanh toán</p>
                             </router-link>
                         </li>
                         <li class="nav-item">
