@@ -8,17 +8,38 @@
       </ul>
     </nav>
 
-    <aside class="main-sidebar sidebar-dark-primary elevation-4">
-      <a href="#" class="brand-link">
-        <span class="brand-text font-weight-light">AdminLTE Vue</span>
-      </a>
+    <aside class="main-sidebar bg-text elevation-4 flex-shrink-0 w-[20%] text-white font-bold">
+      <RouterLink href="#" class="brand-link">
+        <span class="brand-text text-[16px] font-bold uppercase flex items-center gap-2 text-lg text-white">
+          <Icon icon="si:home-line" class="text-white" width="30" height="30" />
+          Admin
+        </span>
+      </RouterLink>
       <div class="sidebar">
         <nav class="mt-2">
-          <ul class="nav nav-pills nav-sidebar flex-column">
+          <ul class="nav nav-pills nav-sidebar flex-column space-y-1">
             <li class="nav-item">
-              <router-link to="/admin/dashboard" class="nav-link">
-                <i class="nav-icon fas fa-tachometer-alt"></i>
-                <p>Dashboard</p>
+              <router-link to="/admin/manage-providers"
+                class="nav-link d-flex align-items-center gap-2 text-white font-bold"
+                active-class="bg-blue-500" exact-active-class="bg-blue-600">
+                <Icon icon="carbon:service-desk" width="24" height="24" />
+                <p class="mb-0">Quản lý nhà cung cấp</p>
+              </router-link>
+            </li>
+            <li class="nav-item">
+              <router-link to="/admin/manage-user"
+                class="nav-link d-flex align-items-center gap-2 text-white font-bold"
+                active-class="bg-blue-500" exact-active-class="bg-blue-600">
+                <Icon icon="material-symbols:hotel-class-rounded" width="24" height="24" />
+                <p class="mb-0">Quản lý người dùng</p>
+              </router-link>
+            </li>
+            <li class="nav-item">
+              <router-link to="/admin/statistics"
+                class="nav-link d-flex align-items-center gap-2 text-white font-bold"
+                active-class="bg-blue-500" exact-active-class="bg-blue-600">
+                <Icon icon="mdi:chart-box-outline" width="24" height="24" />
+                <p class="mb-0">Báo cáo và thống kê</p>
               </router-link>
             </li>
           </ul>
@@ -32,15 +53,24 @@
   </div>
 </template>
 
+
 <script setup>
 </script>
 
 <style>
 @import url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css');
 @import url('https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css');
+.bg-blue-500 {
+  background-color: #3B82F6; 
+}
+
+.bg-blue-600 {
+  background-color: #2563EB; 
+}
 </style>
 
 <script>
+import { Icon } from '@iconify/vue'
 const loadScript = (src) => {
   const script = document.createElement('script')
   script.src = src

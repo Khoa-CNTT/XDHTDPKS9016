@@ -6,9 +6,14 @@ export const supplierRoute = {
   component: () => import('@/layouts/SupplierLayout.vue'),
   children: [
     {
-      path: 'room-management',
+      path: 'order-room-management',
       name: 'SupplierRoomManagement',
       component: () => import('@/pages/suppliers/RoomManagement.vue'),
+    },
+    {
+      path: 'room-management',
+      name: 'RoomManagement',
+      component: () => import('@/pages/suppliers/RoomOrder.vue'),
     },
     {
       path: 'service-control',
