@@ -25,6 +25,12 @@ public class Account {
     @Column(name = "password")
     String password;
 
+    @Column(name = "email")
+    String email;
+
+    @OneToOne(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    ForgotPassword forgotPassword;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "role_account", // Tên bảng trung gian

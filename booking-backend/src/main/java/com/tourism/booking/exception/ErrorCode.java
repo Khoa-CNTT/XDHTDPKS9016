@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
     USER_NOT_EXIST(40401, "User is not found", HttpStatus.NOT_FOUND),
     HOTEL_NOT_EXIST(40402, "Hotel is not found", HttpStatus.NOT_FOUND),
+    OTP_INVALID(40001, "OTP is invalid", HttpStatus.BAD_REQUEST),
 
     UNAUTHENTICATION(40102, "Username or password is incorrect !", HttpStatus.UNAUTHORIZED),
 
