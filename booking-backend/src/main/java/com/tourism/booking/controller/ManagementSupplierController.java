@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("${api.prefix}/management-supplier")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
+@CrossOrigin("http://localhost:5173/")
 public class ManagementSupplierController {
     IHotelService hotelService;
 

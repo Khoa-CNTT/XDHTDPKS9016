@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("${api.prefix}/management-user")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
+@CrossOrigin("http://localhost:5173/")
 public class ManagementUserController {
     IUserProfileService userProfileService;
     IUserProfileMapper userProfileMapper;

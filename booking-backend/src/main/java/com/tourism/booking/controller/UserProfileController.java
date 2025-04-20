@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 @RequestMapping("${api.prefix}/user-profile")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
+@CrossOrigin("http://localhost:5173/")
 public class UserProfileController {
     IUserProfileService userProfileService;
     IAccountService accountService;
