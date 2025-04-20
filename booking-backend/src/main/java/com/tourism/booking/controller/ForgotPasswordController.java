@@ -30,6 +30,7 @@ import java.util.Random;
 @RequestMapping("${api.prefix}/forgotPassword")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
+@CrossOrigin("http://localhost:5173/")
 public class ForgotPasswordController {
 
     IAccountRepository accountRepository;
