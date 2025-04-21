@@ -1,10 +1,15 @@
-<script setup lang="ts">
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-</script>
-
+<!-- src/components/ui/Avatar.vue -->
 <template>
-  <Avatar>
-    <AvatarImage src="https://github.com/unovue.png" alt="@unovue" />
-    <AvatarFallback>CN</AvatarFallback>
-  </Avatar>
+  <div class="w-10 h-10 rounded-full overflow-hidden bg-gray-200 flex justify-center items-center">
+    <img v-if="src" :src="src" :alt="alt" class="w-full h-full object-cover" />
+    <span v-else class="text-gray-500">{{ fallback }}</span>
+  </div>
 </template>
+
+<script setup lang="ts">
+defineProps<{
+  src?: string
+  alt?: string
+  fallback?: string
+}>()
+</script>
