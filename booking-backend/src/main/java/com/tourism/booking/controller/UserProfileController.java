@@ -30,9 +30,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 @AllArgsConstructor
 @CrossOrigin(
         origins = "http://localhost:5173",
-        allowedHeaders = {"Authorization","Content-Type"},
-        methods = {RequestMethod.GET, RequestMethod.OPTIONS}
-)public class UserProfileController {
+        allowedHeaders = {"Authorization", "Content-Type"},
+        methods = {RequestMethod.GET, RequestMethod.OPTIONS})
+public class UserProfileController {
     IUserProfileService userProfileService;
     IAccountService accountService;
     IUserProfileMapper userProfileMapper;
@@ -48,7 +48,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateProfile(@PathVariable Long id,
-            @RequestBody UserProfileRequest userProfileRequest) {
+                                           @RequestBody UserProfileRequest userProfileRequest) {
         // Lấy thông tin UserProfile hiện tại từ database
         UserProfile existingProfile = userProfileService.findUserProfileEntityById(id)
                 .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_EXIST));
