@@ -48,6 +48,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> {
                     request
+                            .requestMatchers(apiPrefix + "/hotels/**").permitAll()
                             .requestMatchers(apiPrefix + "/auth/**").permitAll()
                             .requestMatchers(apiPrefix + "/forgotPassword/**").permitAll()
                             .requestMatchers(apiPrefix + "/management-user/**").authenticated()
