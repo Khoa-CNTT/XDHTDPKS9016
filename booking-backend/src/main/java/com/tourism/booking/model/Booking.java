@@ -60,5 +60,5 @@ public class Booking {
             joinColumns = @JoinColumn(name = "booking_id"),  // Khóa ngoại trỏ đến Booking
             inverseJoinColumns = @JoinColumn(name = "service_id") // Khóa ngoại trỏ đến Service
     )
-    Set<Service> services = new HashSet<>();
+    Set<Services> services = new HashSet<>();
 }

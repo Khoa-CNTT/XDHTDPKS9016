@@ -37,4 +37,11 @@ public class HotelService implements IHotelService {
     public void deleteHotel(Long hotelId) {
         hotelRepository.deleteById(hotelId);
     }
+
+    @Override
+    public Optional<Hotel> getHotelByAccountId(Long accId) {
+        return hotelRepository.findByAccountId(accId);
+    }
+
+
 }

@@ -38,4 +38,7 @@ public class Account {
             inverseJoinColumns = @JoinColumn(name = "role_id") // Cột khóa ngoại tham chiếu đến Role
     )
     Set<Role> roles = new HashSet<>();
+
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Hotel> hotels = new HashSet<>();
 }
