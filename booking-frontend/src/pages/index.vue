@@ -76,45 +76,6 @@
       Không tìm thấy khách sạn phù hợp
     </p>
 
-    <div class="fixed bottom-6 right-6 z-50">
-      <button
-        @click="toggleChat"
-        class="bg-blue-600 text-white p-5 rounded-full shadow-lg hover:bg-blue-500 transition-all duration-300 animate-shake"
-      >
-        <Icon
-          icon="lucide:message-circle"
-          class="h-8 w-8"
-        />
-      </button>
-    </div>
-    <!-- Chat Form -->
-    <transition name="fade-slide">
-      <div
-        v-if="showChat"
-        class="fixed bottom-20 right-6 w-80 bg-white shadow-lg rounded-lg border border-gray-200 z-50"
-      >
-        <div class="p-4 border-b font-semibold bg-blue-600 text-white rounded-t-lg">
-          Chat với chúng tôi
-          <button
-            @click="toggleChat"
-            class="float-right text-white font-bold"
-          >
-            ✕
-          </button>
-        </div>
-        <div class="p-4 max-h-60 overflow-y-auto text-sm text-gray-800">
-          <p>Xin chào! Tôi có thể giúp gì cho bạn?</p>
-        </div>
-        <div class="p-2 border-t">
-          <input
-            type="text"
-            v-model="chatMessage"
-            placeholder="Nhập tin nhắn..."
-            class="w-full border rounded p-2 text-sm"
-          />
-        </div>
-      </div>
-    </transition>
 
     <div class="container mx-auto p-4 pt-32">
       <h1 class="text-2xl text-text font-bold mb-2 uppercase">Điểm đến nổi bật</h1>

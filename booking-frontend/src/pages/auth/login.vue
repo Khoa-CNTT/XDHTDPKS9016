@@ -72,7 +72,7 @@ const formData = ref({
   username: '',
   password: '',
 })
-
+const authStore = useAuthStore()
 const errorMessage = ref('')
 const router = useRouter()
 const handleLogin = async () => {
@@ -81,7 +81,7 @@ const handleLogin = async () => {
     console.log('Đăng nhập thành công:', response)
     console.log('Đăng nhập thành công:', response.token)
     if (response && response.token) {
-      const authStore = useAuthStore()
+      // const authStore = useAuthStore()
       localStorage.setItem('access_token', response.token)
       await authStore.setupAuth()
       console.log('Đã lưu token vào localStorage:', localStorage.getItem('access_token'))
@@ -89,10 +89,7 @@ const handleLogin = async () => {
         autoClose: 10000,
         position: 'top-right',
       })
-      setTimeout(() => {
-        // window.location.reload();
-        router.push('/')
-      }, 3000)
+      router.push('/')
     } else {
       throw new Error('Không nhận được token từ API')
     }
@@ -105,9 +102,23 @@ const handleLogin = async () => {
     })
   }
 }
-onMounted(() => {
+// onMounted(() => {
+//   const savedToken = localStorage.getItem('access_token')
+//   console.log('Token lưu trong localStorage là:', savedToken)
+// })
+onMounted(async () => {
   const savedToken = localStorage.getItem('access_token')
   console.log('Token lưu trong localStorage là:', savedToken)
+
+  if (savedToken) {
+    try {
+      await authStore.setupAuth()
+      console.log('Đã tự động lấy lại thông tin người dùng!')
+    } catch (error) {
+      console.error('Lỗi tự động đăng nhập:', error)
+      localStorage.removeItem('access_token')
+    }
+  }
 })
 
 </script>

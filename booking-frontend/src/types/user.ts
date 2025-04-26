@@ -1,3 +1,5 @@
+import { number } from "yup"
+
 export interface IUser {
   id: string
   first_name: ''
@@ -19,4 +21,26 @@ export interface IUser {
 export interface Member {
   member: IUser
   permission: 'OWNER' | 'MEMBER'
+}
+export interface UserProfile {
+  // user_id: number;
+  full_name: string;
+  gender: string;
+  address: string;
+  email: string;
+  phone: string;
+  birth_date: string;
+  status: string | number;
+  username: string;
+}
+export interface UserInfo {
+  user_id: number;
+  full_name: string | null;
+  gender: string | null;
+  address: string | null;
+  email: string;
+  phone: string | null;
+  birth_date: string | null;
+  status: string |  number;
+  username: string;
 }
