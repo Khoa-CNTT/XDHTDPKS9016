@@ -11,4 +11,5 @@ public interface IHotelService {
     Optional<Hotel> getHotelById(Long hotelId);
     Hotel save(Hotel hotel);
     void deleteHotel(Long hotelId);
+    Optional<Hotel> getHotelByAccountId(Long hotelId);
 }
