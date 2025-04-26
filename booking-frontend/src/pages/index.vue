@@ -67,13 +67,13 @@
 
     <p v-else class="text-center text-red-500 mt-4">Không tìm thấy khách sạn phù hợp</p>
 
-    <div class="fixed bottom-6 right-6 z-50">
+    <!-- <div class="fixed bottom-6 right-6 z-50">
       <button @click="toggleChat"
         class="bg-blue-600 text-white p-5 rounded-full shadow-lg hover:bg-blue-500 transition-all duration-300 animate-shake">
         <Icon icon="lucide:message-circle" class="h-8 w-8" />
       </button>
     </div>
-    <!-- Chat Form -->
+    
     <transition name="fade-slide">
       <div v-if="showChat"
         class="fixed bottom-20 right-6 w-80 bg-white shadow-lg rounded-lg border border-gray-200 z-50">
@@ -89,7 +89,7 @@
             class="w-full border rounded p-2 text-sm" />
         </div>
       </div>
-    </transition>
+    </transition> -->
 
 
     <div class="container mx-auto p-4 pt-32">
