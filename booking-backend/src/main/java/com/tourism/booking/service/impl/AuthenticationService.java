@@ -5,10 +5,7 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-import com.tourism.booking.dto.authentication.AuthenticationRequest;
-import com.tourism.booking.dto.authentication.AuthenticationResponse;
-import com.tourism.booking.dto.authentication.IntrospectRequest;
-import com.tourism.booking.dto.authentication.IntrospectResponse;
+import com.tourism.booking.dto.authentication.*;
 import com.tourism.booking.dto.logout.LogoutRequest;
 import com.tourism.booking.exception.ApiException;
 import com.tourism.booking.exception.ErrorCode;
@@ -51,12 +48,19 @@ public class AuthenticationService implements IAuthenticationService {
     public AuthenticationResponse login(AuthenticationRequest authenticationRequest) {
         Account acc = accountRepository.findByUsername(authenticationRequest.getUsername());
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
-
+        UserAuthResponse user = accountRepository.getUserAuthResponse(authenticationRequest.getUsername());
         if (acc == null || !passwordEncoder.matches(authenticationRequest.getPassword(), acc.getPassword())) {
             throw new ApiException(ErrorCode.UNAUTHENTICATION);
         }
         return AuthenticationResponse.builder()
                 .token(generateToken(acc))
+                .user(
+                        UserAuthResponse.builder()
+                                .id(user.getId())
+                                .username(user.getUsername())
+                                .role(user.getRole())
+                                .build()
+                )
                 .build();
     }
 
