@@ -9,7 +9,6 @@
       <input
         id="search"
         v-model="searchKeyword"
-        @input="onSearchInput"
         placeholder="Nhập tên người dùng..."
         class="px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
@@ -39,15 +38,16 @@
       </CustomTable>
 
       <div class="mt-4 flex justify-center">
-        <a-pagination
-          :current="pageInfo.number + 1"
-          :page-size="pageInfo.size"
+        <Pagination
           :total="pageInfo.totalElements"
-          @change="onPageChange"
+          :items-per-page="pageInfo.size"
+          :default-page="pageInfo.number + 1"
+          @page-change="handlePageChange"
         />
       </div>
     </div>
 
+    <!-- Modal xem thông tin -->
     <div
       v-if="isViewModalVisible"
       class="fixed inset-0 bg-gray-400 bg-opacity-50 flex justify-center items-center z-50"
@@ -56,7 +56,7 @@
       <div class="bg-white p-6 rounded-lg w-1/2 max-w-3xl">
         <h3 class="text-xl font-semibold mb-4">Thông tin người dùng</h3>
         <div v-if="userToView">
-          <p><strong>Tên người dùng:</strong> {{ userToView.full_name || 'Chưa có thông tin' }}</p>
+          <p><strong>Tên người dùng:</strong> {{ userToView.full_name || '' }}</p>
           <p><strong>Email:</strong> {{ userToView.email || 'Chưa có thông tin' }}</p>
           <p><strong>Số điện thoại:</strong> {{ userToView.phone || 'Chưa có thông tin' }}</p>
           <p>
@@ -83,11 +83,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import CustomTable from '@/components/base/CustomTable.vue'
 import { getUsersApi, deleteUserApi, getUserDetailsApi } from '@/services/admin'
 import type { User } from '@/services/admin'
+import Pagination from '@/components/base/Pagination.vue'
+import { computed } from 'vue'
 
+// Định dạng ngày sinh
 const formatDate = (dateString: string) => {
   const parts = dateString.split('-')
   if (parts.length !== 3) return dateString
@@ -95,23 +98,35 @@ const formatDate = (dateString: string) => {
   return `${d}/${m}/${y}`
 }
 
-const tableHeaders = ['STT', 'Tên người dùng', 'Email', 'Số điện thoại', 'Ngày sinh', 'Hành động']
+const filteredData = computed(() => {
+  if (!searchKeyword.value) return tableData.value
+  return tableData.value.filter((row) =>
+    (row.raw.full_name || row.raw.email || '')
+      .toLowerCase()
+      .includes(searchKeyword.value.toLowerCase()),
+  )
+})
 
+const tableHeaders = ['STT', 'Tên người dùng', 'Email', 'Số điện thoại', 'Ngày sinh', 'Hành động']
 const tableData = ref<any[]>([])
+
 const searchKeyword = ref('')
 const pageInfo = ref({ number: 0, size: 10, totalElements: 0 })
+
 const isViewModalVisible = ref(false)
 const userToView = ref<User | null>(null)
 
+// Map dữ liệu
 const mapUser = (user: User, idx: number) => ({
   stt: idx + 1 + pageInfo.value.number * pageInfo.value.size,
-  tenNguoiDung: user.full_name?.trim() || user.email || '—',
+  tenNguoiDung: user.full_name?.trim() || '',  // Sửa tại đây để trả về trống nếu không có tên
   email: user.email,
   soDienThoai: user.phone || '—',
   ngaySinh: user.birth_date ? formatDate(user.birth_date) : 'Chưa xác định',
   raw: user,
 })
 
+// Fetch danh sách
 const fetchUsers = async (page = 0) => {
   const res = await getUsersApi(page, pageInfo.value.size)
   if (res?.content) {
@@ -124,26 +139,17 @@ const fetchUsers = async (page = 0) => {
   }
 }
 
+// Lần đầu load
 onMounted(() => fetchUsers())
 
-const onPageChange = (page: number) => {
-  fetchUsers(page - 1)
-}
-
-const filteredData = computed(() =>
-  tableData.value.filter((row) =>
-    row.tenNguoiDung.toLowerCase().includes(searchKeyword.value.toLowerCase()),
-  ),
-)
-
-const onSearchInput = () => {
-  fetchUsers()
+const handlePageChange = (newPage: number) => {
+  fetchUsers(newPage - 1) // Lưu ý newPage là base-1
 }
 
 const handleDelete = async (row: any) => {
   if (!confirm(`Bạn có chắc chắn muốn xóa "${row.tenNguoiDung}"?`)) return
   await deleteUserApi(row.raw.user_id)
-  fetchUsers(pageInfo.value.number)
+  fetchUsers(pageInfo.value.number) // Reload lại trang hiện tại
 }
 
 const handleView = async (row: any) => {
@@ -156,4 +162,6 @@ const closeModal = () => {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+/* Nếu cần CSS thêm thì thêm ở đây */
+</style>
