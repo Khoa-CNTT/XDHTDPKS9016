@@ -1,5 +1,7 @@
 // api/user.ts
 
+import { $api } from "@/api/ofetch"
+import {PageInfo, ManagementSupplierResponse} from "@/types/admin"
 export interface User {
   user_id: number
   full_name: string | null
@@ -66,3 +68,11 @@ export const getUserDetailsApi = async (userId: number): Promise<User> => {
     false,
   )
 }
+
+
+export const getManagementSupplier = async (): Promise<ManagementSupplierResponse> => {
+  return $api('/management-supplier', {
+    method: 'GET',
+  })
+}
+

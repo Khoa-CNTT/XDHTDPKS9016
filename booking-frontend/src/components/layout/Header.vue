@@ -24,28 +24,30 @@ const handleClickOutside = (e: Event) => {
 const router = useRouter()
 
 const handleLogout = async () => {
-  try {
-    const token = localStorage.getItem('access_token')
-console.log('Token lấy ra từ localStorage---------------------:', token)
-    if (!token) {
-      throw new Error('Không tìm thấy token trong localStorage')
+    try {
+        const token = localStorage.getItem('access_token')
+        console.log('Token lấy ra từ localStorage---------------------:', token)
+        if (!token) {
+            throw new Error('Không tìm thấy token trong localStorage')
+        }
+
+        await logoutApi({ token: token })
+
+        // Xóa token sau khi logout thành công
+        localStorage.removeItem('access_token')
+        toast.success('Đăng xuất thành công!', {
+            autoClose: 3000,
+            position: 'top-right',
+        })
+        console.log('Đang chuyển hướng tới /login')
+        router.push('/login')
+
+        window.location.reload()
+        console.log('Chuyển hướng thành công')
+    } catch (error) {
+        console.error('Lỗi khi logout:', error)
+
     }
-
-    await logoutApi({ token: token })
-
-    // Xóa token sau khi logout thành công
-    localStorage.removeItem('access_token')
-    toast.success('Đăng xuất thành công!', {
-        autoClose: 3000,
-        position: 'top-right',
-      })
-      console.log('Đang chuyển hướng tới /login')
-    router.push('login')
-    console.log('Chuyển hướng thành công')
-  } catch (error) {
-    console.error('Lỗi khi logout:', error)
-    
-  }
 }
 onMounted(() => {
     document.addEventListener('click', handleClickOutside)

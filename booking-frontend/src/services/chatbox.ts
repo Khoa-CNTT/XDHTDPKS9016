@@ -9,7 +9,7 @@ interface ChatAiResponse {
 }
 
 export const chatAiApi = async (payload: ChatAiPayload): Promise<ChatAiResponse> => {
-  return $api('http://103.69.97.39:8080/api/v1/chat/ai', {
+  return $api('/chat/ai', {
     method: 'POST',
     body: payload,
   })

@@ -1,5 +1,9 @@
 import { number } from "yup"
-
+export interface User {
+  id: number;
+  username: string;
+  role: string;
+}
 export interface IUser {
   id: string
   first_name: ''
@@ -23,7 +27,7 @@ export interface Member {
   permission: 'OWNER' | 'MEMBER'
 }
 export interface UserProfile {
-  // user_id: number;
+  user_id: number;
   full_name: string;
   gender: string;
   address: string;
@@ -32,6 +36,7 @@ export interface UserProfile {
   birth_date: string;
   status: string | number;
   username: string;
+  role: string;
 }
 export interface UserInfo {
   user_id: number;
@@ -43,4 +48,5 @@ export interface UserInfo {
   birth_date: string | null;
   status: string |  number;
   username: string;
+  role:string;
 }

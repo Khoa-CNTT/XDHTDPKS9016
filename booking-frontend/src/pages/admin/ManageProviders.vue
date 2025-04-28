@@ -113,8 +113,22 @@
   
   <script setup lang="ts">
   import CustomTable from '@/components/base/CustomTable.vue'
-  import { ref, computed } from 'vue'
-  
+  import { ref, computed,onMounted } from 'vue'
+//   import {getManagementSupplier} from '@/services/supplier'
+
+// const suppliers = ref([])
+// const fetchInfoHotel = async () => {
+//   try {
+//     const res = await getManagementSupplier()
+//     console.log('Dữ liệu nhà cung cấp:', res)
+//   } catch (error) {
+//     console.error('Lỗi khi gọi API nhà cung cấp:', error)
+//   }
+// }
+
+// onMounted(() => {
+//   fetchInfoHotel()
+// })
   const tableHeaders = ['STT', 'Tên nhà cung cấp', 'Địa chỉ', 'Số điện thoại', 'Email', 'Trạng thái', 'Hành động']
   
   const tableData = ref([
