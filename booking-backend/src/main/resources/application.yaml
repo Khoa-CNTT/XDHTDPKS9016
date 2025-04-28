@@ -1,4 +1,5 @@
 server:
+  address: 103.69.97.39
   port: 8080
 api:
   prefix: /api/v1

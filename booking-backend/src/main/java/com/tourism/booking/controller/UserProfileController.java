@@ -24,7 +24,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
-@PreAuthorize("hasRole('USER')")
+//@PreAuthorize("hasRole('USER')")
+@PreAuthorize("hasAnyRole('USER', 'ADMIN', 'SUPPLIER')")
 @RequestMapping("${api.prefix}/user-profile")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
@@ -37,14 +38,26 @@ public class UserProfileController {
     IAccountService accountService;
     IUserProfileMapper userProfileMapper;
 
+    //    @GetMapping
+//    public ResponseEntity<?> getUserProfile(Principal principal) {
+//        Account acc = accountService.getAccountByUsername(principal.getName());
+//        System.out.println(acc.getAccount_id());
+//        return userProfileService.findByAccoutId(acc.getAccount_id())
+//                .map(ResponseEntity::ok)
+//                .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_EXIST));
+//    }
     @GetMapping
     public ResponseEntity<?> getUserProfile(Principal principal) {
         Account acc = accountService.getAccountByUsername(principal.getName());
-        System.out.println(acc.getAccount_id());
+
+        if (acc == null) {
+            throw new ApiException(ErrorCode.USER_NOT_EXIST);
+        }
         return userProfileService.findByAccoutId(acc.getAccount_id())
                 .map(ResponseEntity::ok)
                 .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_EXIST));
     }
+
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateProfile(@PathVariable Long id,

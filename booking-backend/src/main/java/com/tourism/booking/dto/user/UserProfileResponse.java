@@ -20,7 +20,8 @@ public class UserProfileResponse {
     String email;
     String phone;
     @JsonFormat(pattern = "dd-MM-yyyy")
-    LocalDate birth_date;
+    LocalDate  birth_date;
     String status;
     String username;
+    private String role;
 }

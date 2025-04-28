@@ -59,6 +59,6 @@ public class UserProfileService implements IUserProfileService {
 
     @Override
     public Optional<UserProfileResponse> findByAccoutId(Long id) {
-        return userProfileRepository.findUserProfileByAccountId(id);
+        return userProfileRepository.findUserProfileAndAccount(id);
     }
 }
