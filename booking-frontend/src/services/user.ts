@@ -3,7 +3,7 @@ import type { BaseResponse } from '@/types/api'
 import type { IUser } from '@/types/user'
 import { UserProfile,UserInfo } from '@/types/user';
 
-export const getInfoApi = async (id: string): Promise<BaseResponse<UserInfo>> => {
+export const getInfoApi = async (): Promise<BaseResponse<UserInfo>> => {
   return $api('/user-profile', { method: 'GET' })
 }
 

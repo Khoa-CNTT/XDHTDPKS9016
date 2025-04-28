@@ -28,7 +28,7 @@ export const supplierRoute = {
     {
       path: 'overview-report',
       name: 'SupplierOverviewReport',
-      component: () => import('@/pages/suppliers/OverviewReport.vue.vue'),
+      component: () => import('@/pages/suppliers/OverviewReport.vue'),
     },
     {
       path: 'profile-settings',

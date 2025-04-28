@@ -46,18 +46,18 @@ export const useAuthStore = defineStore({
     // },
     async setupAuth() {
       try {
-        console.log('Bắt đầu gọi setupAuth')  // Log khi bắt đầu thực thi
-    
+        console.log('Bắt đầu gọi setupAuth') // Log khi bắt đầu thực thi
+
         const access_token = localStorage.getItem('access_token') as string
-        console.log('Access token từ localStorage:', access_token)  // Log token từ localStorage
-    
+        console.log('Access token từ localStorage:', access_token) // Log token từ localStorage
+
         if (access_token) {
           this.token.access = access_token
           console.log('Token đã được gán:', this.token.access)
-    
+
           const user = await getInfoApi()
           console.log('Dữ liệu người dùng trả về từ API:', user)
-    
+
           if (user) {
             this.user = user
             this.isLoggedIn = true

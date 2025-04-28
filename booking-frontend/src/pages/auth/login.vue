@@ -80,8 +80,8 @@ const handleLogin = async () => {
     const response = await loginApi(formData.value.username, formData.value.password)
     console.log('Đăng nhập thành công:', response)
     console.log('Đăng nhập thành công:', response.token)
+    console.log('Đăng nhập thành công:', response.user?.role)
     if (response && response.token) {
-      // const authStore = useAuthStore()
       localStorage.setItem('access_token', response.token)
       await authStore.setupAuth()
       console.log('Đã lưu token vào localStorage:', localStorage.getItem('access_token'))
@@ -89,7 +89,16 @@ const handleLogin = async () => {
         autoClose: 10000,
         position: 'top-right',
       })
-      router.push('/')
+      const role = response.user?.role;
+      if (role === 'USER') {
+        router.push('/');
+      } else if (role === 'SUPPLIER') {
+        router.push('/supplier');
+      } else if (role === 'ADMIN') {
+        router.push('/admin');
+      } else {
+        router.push('/');
+      }
     } else {
       throw new Error('Không nhận được token từ API')
     }
@@ -102,10 +111,6 @@ const handleLogin = async () => {
     })
   }
 }
-// onMounted(() => {
-//   const savedToken = localStorage.getItem('access_token')
-//   console.log('Token lưu trong localStorage là:', savedToken)
-// })
 onMounted(async () => {
   const savedToken = localStorage.getItem('access_token')
   console.log('Token lưu trong localStorage là:', savedToken)
