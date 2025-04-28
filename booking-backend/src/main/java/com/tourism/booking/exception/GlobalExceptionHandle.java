@@ -8,6 +8,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,14 +16,14 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionHandle {
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleApiException(ApiException e) {
-        ErrorCode errorCode = e.getErrorCode();
-        return ResponseEntity.status(errorCode.getStatus())
-                .body(ApiResponse.builder()
-                        .code(errorCode.getCode())
-                        .message(errorCode.getMessage())
-                        .build());
+    @ExceptionHandler(ApiException.class)
+    public ResponseEntity<ApiResponse> handleApiException(ApiException e) {
+        ErrorCode ec = e.getErrorCode();
+        ApiResponse body = ApiResponse.builder()
+                .code(ec.getCode())
+                .message(ec.getMessage())
+                .build();
+        return ResponseEntity.status(ec.getStatus()).body(body);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -40,5 +41,23 @@ public class GlobalExceptionHandle {
                 .code(4000)
                 .build());
     }
+    // 2) Bắt riêng MissingServletRequestPartException (thiếu part 'file')
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    public ResponseEntity<ApiResponse> handleMissingPart(MissingServletRequestPartException e) {
+        ApiResponse body = ApiResponse.builder()
+                .code(5000)
+                .message("Thiếu phần 'file' trong form-data.")
+                .build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
 
+    // 3) (Tùy chọn) Bắt chung mọi Exception khác
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiResponse> handleAllOtherExceptions(Exception e) {
+        ApiResponse body = ApiResponse.builder()
+                .code(5000)
+                .message("Có lỗi xảy ra trên server.")
+                .build();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
+    }
 }
