@@ -1,5 +1,5 @@
 // api/user.ts
-
+import { $api } from '@/api/ofetch'
 export interface User {
   user_id: number
   full_name: string | null
@@ -34,7 +34,7 @@ export const getUsersApi = async (
       method: 'GET',
       query: { page, pageSize },
       headers: {
-        Authorization: `Bearer eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJzcWMuY29tIiwic3ViIjoiYWRtaW4iLCJleHAiOjE3NDU0ODQ4MzYsImlhdCI6MTc0NTQ4MTIzNiwianRpIjoiMGFjYzM3NDUtNzg0OS00NGYwLWI2MmMtYWRlMWFhYzZhY2Y4Iiwic2NvcGUiOiJBRE1JTiJ9.btYMp7RqNK--hBRLKSW_GJNBhUd-793-D-OCey2Y16ptqSlx6SlfpNtxmIiU7q9RM3z2M3VV92ivu1GHsyykMg`,
+        Authorization: `Bearer eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJzcWMuY29tIiwic3ViIjoiYWRtaW4iLCJleHAiOjE3NDU4MzI2NzcsImlhdCI6MTc0NTgyOTA3NywianRpIjoiMDE2NTAwM2EtYTViNi00Yzc0LTlmNjItY2RhOGZmMTVjZjY3Iiwic2NvcGUiOiJBRE1JTiJ9.9zOQ0aRHkmFy8qGL29zKeB93gUKP3AXA0g6fZfgovsjpsPVjd8sf4ZcX9ff4dLwX_kTDgHKOg6FvGLVWTqb50Q`,
       },
     },
     false,
@@ -47,7 +47,7 @@ export const deleteUserApi = async (userId: number): Promise<void> => {
     {
       method: 'DELETE',
       headers: {
-        Authorization: `Bearer eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJzcWMuY29tIiwic3ViIjoiYWRtaW4iLCJleHAiOjE3NDU0ODQ4MzYsImlhdCI6MTc0NTQ4MTIzNiwianRpIjoiMGFjYzM3NDUtNzg0OS00NGYwLWI2MmMtYWRlMWFhYzZhY2Y4Iiwic2NvcGUiOiJBRE1JTiJ9.btYMp7RqNK--hBRLKSW_GJNBhUd-793-D-OCey2Y16ptqSlx6SlfpNtxmIiU7q9RM3z2M3VV92ivu1GHsyykMg`,
+        Authorization: `Bearer eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJzcWMuY29tIiwic3ViIjoiYWRtaW4iLCJleHAiOjE3NDU4MzI2NzcsImlhdCI6MTc0NTgyOTA3NywianRpIjoiMDE2NTAwM2EtYTViNi00Yzc0LTlmNjItY2RhOGZmMTVjZjY3Iiwic2NvcGUiOiJBRE1JTiJ9.9zOQ0aRHkmFy8qGL29zKeB93gUKP3AXA0g6fZfgovsjpsPVjd8sf4ZcX9ff4dLwX_kTDgHKOg6FvGLVWTqb50Q`,
       },
     },
     false,
@@ -60,7 +60,7 @@ export const getUserDetailsApi = async (userId: number): Promise<User> => {
     {
       method: 'GET',
       headers: {
-        Authorization: `Bearer eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJzcWMuY29tIiwic3ViIjoiYWRtaW4iLCJleHAiOjE3NDU0ODQ4MzYsImlhdCI6MTc0NTQ4MTIzNiwianRpIjoiMGFjYzM3NDUtNzg0OS00NGYwLWI2MmMtYWRlMWFhYzZhY2Y4Iiwic2NvcGUiOiJBRE1JTiJ9.btYMp7RqNK--hBRLKSW_GJNBhUd-793-D-OCey2Y16ptqSlx6SlfpNtxmIiU7q9RM3z2M3VV92ivu1GHsyykMg`,
+        Authorization: `Bearer eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJzcWMuY29tIiwic3ViIjoiYWRtaW4iLCJleHAiOjE3NDU4MzI2NzcsImlhdCI6MTc0NTgyOTA3NywianRpIjoiMDE2NTAwM2EtYTViNi00Yzc0LTlmNjItY2RhOGZmMTVjZjY3Iiwic2NvcGUiOiJBRE1JTiJ9.9zOQ0aRHkmFy8qGL29zKeB93gUKP3AXA0g6fZfgovsjpsPVjd8sf4ZcX9ff4dLwX_kTDgHKOg6FvGLVWTqb50Q`,
       },
     },
     false,
