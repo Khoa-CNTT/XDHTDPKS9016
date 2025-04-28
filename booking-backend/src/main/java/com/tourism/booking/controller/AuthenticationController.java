@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 
-@PreAuthorize("permitAll()")
 @RestController
 @RequestMapping("${api.prefix}/auth")
 @FieldDefaults(level = AccessLevel.PRIVATE)

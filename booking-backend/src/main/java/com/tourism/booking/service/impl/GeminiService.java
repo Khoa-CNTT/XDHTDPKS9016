@@ -24,9 +24,9 @@ public class GeminiService {
 
     public String generateResponse(String userMessage) {
         // Tạo context để AI hiểu được nó đang tư vấn về khách sạn
-        String prompt = "Bạn là trợ lý AI tư vấn về khách sạn và du lịch tại Việt Nam. " +
+        String prompt = "Bạn là trợ lý AI tư vấn về khách sạn, du lịch và các dịch vụ liên quan tại Việt Nam. " +
                 "Hãy trả lời câu hỏi sau một cách chi tiết và hữu ích. " +
-                "Chỉ liệt kê một vài lựa chọn nổi tiếng và phù hợp nhất, mỗi lựa chọn viết trên một dòng riêng biệt:\n" +
+                "Chỉ liệt kê một vài lựa chọn nổi tiếng và phù hợp nhất, mỗi lựa chọn bắt đầu bằng dấu gạch đầu dòng (-) và viết trên một dòng riêng biệt, không sử dụng định dạng in đậm hoặc ký tự đặc biệt:\n" +
                 userMessage;
 
 

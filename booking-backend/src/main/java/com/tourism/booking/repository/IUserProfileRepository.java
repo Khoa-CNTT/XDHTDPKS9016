@@ -15,36 +15,38 @@ public interface IUserProfileRepository
     boolean existsByEmail(String email);
 
     @Query(value = """
-            SELECT new com.tourism.booking.dto.user.UserProfileResponse(
-                u.user_id,
-                u.full_name,
-                u.gender,
-                u.address,
-                u.email,
-                u.phone,
-                u.birth_date,
-                u.status,
-                a.username)
-            FROM UserProfile u
-            JOIN u.account a
-            WHERE u.user_id = :id
-            """, nativeQuery = false)
+        SELECT new com.tourism.booking.dto.user.UserProfileResponse(
+            u.user_id,
+            u.full_name,
+            u.gender,
+            u.address,
+            u.email,
+            u.phone,
+            u.birth_date,
+            u.status,
+            a.username,
+            r.role_name) 
+        FROM UserProfile u
+        JOIN u.account a
+        JOIN a.roles r  
+        WHERE a.account_id = :id
+        """, nativeQuery = false)
     Optional<UserProfileResponse> findUserProfileAndAccount(Long id);
 
-    @Query(value = """
-            SELECT new com.tourism.booking.dto.user.UserProfileResponse(
-                u.user_id,
-                u.full_name,
-                u.gender,
-                u.address,
-                u.email,
-                u.phone,
-                u.birth_date,
-                u.status,
-                a.username)
-            FROM UserProfile u
-            JOIN u.account a
-            WHERE a.account_id = :id
-            """, nativeQuery = false)
-    Optional<UserProfileResponse> findUserProfileByAccountId(Long id);
+//    @Query(value = """
+//            SELECT new com.tourism.booking.dto.user.UserProfileResponse(
+//                u.user_id,
+//                u.full_name,
+//                u.gender,
+//                u.address,
+//                u.email,
+//                u.phone,
+//                u.birth_date,
+//                u.status,
+//                a.username)
+//            FROM UserProfile u
+//            JOIN u.account a
+//            WHERE a.account_id = :id
+//            """, nativeQuery = false)
+//    Optional<UserProfileResponse> findUserProfileByAccountId(Long id);
 }

@@ -23,4 +23,5 @@ public class UserProfileResponse {
     LocalDate birth_date;
     String status;
     String username;
+    private String role;
 }

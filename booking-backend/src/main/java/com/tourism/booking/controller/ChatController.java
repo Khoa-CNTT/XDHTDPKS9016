@@ -2,6 +2,7 @@ package com.tourism.booking.controller;
 
 import com.tourism.booking.service.impl.GeminiService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.HashMap;
 import java.util.Map;
 
+@PreAuthorize("permitAll()")
 @RestController
 @RequestMapping("${api.prefix}/chat")
 public class ChatController {

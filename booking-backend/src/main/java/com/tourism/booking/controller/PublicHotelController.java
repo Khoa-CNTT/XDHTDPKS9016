@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-@PreAuthorize("permitAll()")
 @RestController
 @RequestMapping("${api.prefix}/hotels")
 @FieldDefaults(level = AccessLevel.PRIVATE)
