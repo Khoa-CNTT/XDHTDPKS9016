@@ -24,14 +24,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
-@PreAuthorize("hasRole('USER')")
+@PreAuthorize("hasAnyRole('USER','SUPPLIER','ADMIN')")
 @RequestMapping("${api.prefix}/user-profile")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
-@CrossOrigin(
-        origins = "http://localhost:5173",
-        allowedHeaders = {"Authorization", "Content-Type"},
-        methods = {RequestMethod.GET, RequestMethod.OPTIONS})
+@CrossOrigin("http://localhost:5173/")
 public class UserProfileController {
     IUserProfileService userProfileService;
     IAccountService accountService;
@@ -58,7 +55,7 @@ public class UserProfileController {
 
         // Giữ nguyên ID và account
         updatedProfile.setUser_id(id);
-        updatedProfile.setAccount(existingProfile.getAccount());
+//        updatedProfile.setAccount(existingProfile.getAccount());
 
         // Lưu thông tin đã cập nhật
         UserProfile savedProfile = userProfileService.save(updatedProfile);
