@@ -52,7 +52,7 @@ const fetchServices = async () => {
   error.value = null;
   try {
     const res = await getServiceListApi();
-    console.log("ne:",res);
+    console.log("ne-----------:",res);
     
     services.value = res.content;
   } catch (err: any) {

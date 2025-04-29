@@ -18,7 +18,7 @@
 
         <div class="flex-1 flex flex-col justify-center items-center bg-white p-14">
           <h2 class="text-3xl font-semibold mb-6 uppercase">Đăng nhập</h2>
-          <form class="w-full max-w-md space-y-5" @submit.prevent="handleLogin">
+          <form class="w-full max-w-md space-y-5 mx-auto" @submit.prevent="handleLogin" autocomplete="off">
             <div>
               <label class="block text-lg font-bold mb-1">Tên người dùng</label>
               <input v-model="formData.username" type="text" placeholder="Enter your username" required
@@ -30,8 +30,10 @@
               <input v-model="formData.password" type="password" placeholder="6+ characters" required
                 class="w-full p-4 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400" />
             </div>
-            <RouterLink to="/password/forgot"><p class="text-right text-blue-500 cursor-pointer hover:underline">Quên mật khẩu?</p></RouterLink>
-           
+            <RouterLink to="/password/forgot">
+              <p class="text-right text-blue-500 cursor-pointer hover:underline">Quên mật khẩu?</p>
+            </RouterLink>
+
 
             <div class="flex items-center my-5">
               <div class="flex-1 border-b border-gray-300"></div>
@@ -45,7 +47,7 @@
             </div>
 
             <button type="submit"
-              class="w-full p-5 bg-blue-500 text-white rounded text-lg hover:bg-blue-600 transition">
+              class="w-full max-w-sm mx-auto block p-5 bg-blue-500 text-white rounded text-lg hover:bg-blue-600 transition">
               Đăng nhập
             </button>
 
@@ -64,10 +66,9 @@
 import { loginApi } from '@/services/auth';
 import { getInfoApi } from '@/services/user';
 import { useAuthStore } from '@/stores/auth';
-import { ref ,onMounted} from 'vue'
+import { ref, onMounted } from 'vue'
 import { toast } from 'vue3-toastify'
 import { useRouter } from 'vue-router'
-
 const formData = ref({
   username: '',
   password: '',
@@ -99,6 +100,7 @@ const handleLogin = async () => {
       } else {
         router.push('/');
       }
+    
     } else {
       throw new Error('Không nhận được token từ API')
     }
@@ -112,6 +114,8 @@ const handleLogin = async () => {
   }
 }
 onMounted(async () => {
+  formData.value.username = ''
+  formData.value.password = ''
   const savedToken = localStorage.getItem('access_token')
   console.log('Token lưu trong localStorage là:', savedToken)
 
@@ -121,7 +125,7 @@ onMounted(async () => {
       console.log('Đã tự động lấy lại thông tin người dùng!')
     } catch (error) {
       console.error('Lỗi tự động đăng nhập:', error)
-      localStorage.removeItem('access_token')
+      // localStorage.removeItem('access_token')
     }
   }
 })

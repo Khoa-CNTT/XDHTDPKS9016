@@ -3,6 +3,7 @@ const t = (val: string) => {
   return i18n.global.t(val)
 }
 
+// Kiểm tra email
 function validEmail(email: string) {
   if (email == '' || email == null || email == undefined) {
     return {
@@ -11,8 +12,9 @@ function validEmail(email: string) {
     }
   } else {
     const re =
-      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
+    // Kiểm tra định dạng email
     if (!re.test(email)) {
       return {
         mess: t('validation.em_format'),
@@ -27,26 +29,19 @@ function validEmail(email: string) {
   }
 }
 
-function validPass(pass: string, longPass?: string) {
-  if (pass == '' || pass == null || pass == undefined) {
+// Kiểm tra username
+function validUsername(username: string) {
+  if (username == '' || username == null || username == undefined) {
     return {
-      mess: t('validation.ps_blank'),
+      mess: t('validation.username_blank'),
       check: false,
     }
   } else {
-    // let re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,32}$/;
-    const re = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,32}$/
-    if (!re.test(pass)) {
-      if (!longPass) {
-        return {
-          mess: t('error_code.VAL_SIG0202'),
-          check: false,
-        }
-      } else {
-        return {
-          mess: t('validation.ps_format'),
-          check: false,
-        }
+    const re = /^[a-z0-9]{8,32}$/; // username chỉ chứa chữ thường và số, không có khoảng trắng
+    if (!re.test(username)) {
+      return {
+        mess: t('validation.username_format'),
+        check: false,
       }
     } else {
       return {
@@ -57,34 +52,48 @@ function validPass(pass: string, longPass?: string) {
   }
 }
 
-function validPassConfirm(confirmPass: string, pass: string, longPass?: string) {
+// Kiểm tra password
+function validPass(pass: string) {
+  if (pass == '' || pass == null || pass == undefined) {
+    return {
+      mess: t('validation.ps_blank'),
+      check: false,
+    }
+  } else {
+    // password phải chứa chữ hoa, chữ thường, số, ký tự đặc biệt, không có khoảng trắng, từ 8 đến 32 ký tự
+    const re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,32}$/;
+    if (!re.test(pass)) {
+      return {
+        mess: t('validation.ps_format'),
+        check: false,
+      }
+    } else {
+      return {
+        mess: '',
+        check: true,
+      }
+    }
+  }
+}
+
+// Kiểm tra confirm password
+function validPassConfirm(confirmPass: string, pass: string) {
   if (confirmPass === '' || confirmPass == null || confirmPass == undefined) {
     return {
       mess: t('validation.ps_confirm_blank'),
       check: false,
     }
-  } else if (!validPass(confirmPass).check) {
-    if (!longPass) {
-      return {
-        mess: t('error_code.VAL_SIG0202'),
-        check: false,
-      }
-    } else {
-      return {
-        mess: t('validation.ps_format'),
-        check: false,
-      }
-    }
-  } else if (confirmPass != pass) {
+  } else if (confirmPass !== pass) {
     return {
       mess: t('validation.ps_confirm_match'),
       check: false,
     }
-  } else
+  } else {
     return {
       mess: '',
       check: true,
     }
+  }
 }
 
-export { validEmail, validPass, validPassConfirm }
+export { validEmail, validUsername, validPass, validPassConfirm }

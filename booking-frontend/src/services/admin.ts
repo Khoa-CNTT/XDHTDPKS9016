@@ -36,7 +36,7 @@ export const getUsersApi = async (
       method: 'GET',
       query: { page, pageSize },
       headers: {
-        Authorization: `Bearer eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJzcWMuY29tIiwic3ViIjoiYWRtaW4iLCJleHAiOjE3NDU0ODQ4MzYsImlhdCI6MTc0NTQ4MTIzNiwianRpIjoiMGFjYzM3NDUtNzg0OS00NGYwLWI2MmMtYWRlMWFhYzZhY2Y4Iiwic2NvcGUiOiJBRE1JTiJ9.btYMp7RqNK--hBRLKSW_GJNBhUd-793-D-OCey2Y16ptqSlx6SlfpNtxmIiU7q9RM3z2M3VV92ivu1GHsyykMg`,
+        Authorization: `Bearer eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJzcWMuY29tIiwic3ViIjoiYWRtaW4iLCJleHAiOjE3NDU4NjU2NDIsImlhdCI6MTc0NTg2MjA0MiwianRpIjoiNTYxOWVjOTgtODg5YS00NmY2LWJmZmItZjM5MDEyZjVjN2E5Iiwic2NvcGUiOiJBRE1JTiJ9.jVKwrFiZ9iM3Rjf418u3mwalRpR_XLWzViKVMWQEE5lvF_NcCa18UR9hlC4zbT9-7ASz64iqCNmLA9vklxbHHA`,
       },
     },
     false,
@@ -49,7 +49,7 @@ export const deleteUserApi = async (userId: number): Promise<void> => {
     {
       method: 'DELETE',
       headers: {
-        Authorization: `Bearer eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJzcWMuY29tIiwic3ViIjoiYWRtaW4iLCJleHAiOjE3NDU0ODQ4MzYsImlhdCI6MTc0NTQ4MTIzNiwianRpIjoiMGFjYzM3NDUtNzg0OS00NGYwLWI2MmMtYWRlMWFhYzZhY2Y4Iiwic2NvcGUiOiJBRE1JTiJ9.btYMp7RqNK--hBRLKSW_GJNBhUd-793-D-OCey2Y16ptqSlx6SlfpNtxmIiU7q9RM3z2M3VV92ivu1GHsyykMg`,
+        Authorization: `Bearer eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJzcWMuY29tIiwic3ViIjoiYWRtaW4iLCJleHAiOjE3NDU4NjU2NDIsImlhdCI6MTc0NTg2MjA0MiwianRpIjoiNTYxOWVjOTgtODg5YS00NmY2LWJmZmItZjM5MDEyZjVjN2E5Iiwic2NvcGUiOiJBRE1JTiJ9.jVKwrFiZ9iM3Rjf418u3mwalRpR_XLWzViKVMWQEE5lvF_NcCa18UR9hlC4zbT9-7ASz64iqCNmLA9vklxbHHA`,
       },
     },
     false,
@@ -62,7 +62,7 @@ export const getUserDetailsApi = async (userId: number): Promise<User> => {
     {
       method: 'GET',
       headers: {
-        Authorization: `Bearer eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJzcWMuY29tIiwic3ViIjoiYWRtaW4iLCJleHAiOjE3NDU0ODQ4MzYsImlhdCI6MTc0NTQ4MTIzNiwianRpIjoiMGFjYzM3NDUtNzg0OS00NGYwLWI2MmMtYWRlMWFhYzZhY2Y4Iiwic2NvcGUiOiJBRE1JTiJ9.btYMp7RqNK--hBRLKSW_GJNBhUd-793-D-OCey2Y16ptqSlx6SlfpNtxmIiU7q9RM3z2M3VV92ivu1GHsyykMg`,
+        Authorization: `eyJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJzcWMuY29tIiwic3ViIjoiYWRtaW4iLCJleHAiOjE3NDU4NjU2NDIsImlhdCI6MTc0NTg2MjA0MiwianRpIjoiNTYxOWVjOTgtODg5YS00NmY2LWJmZmItZjM5MDEyZjVjN2E5Iiwic2NvcGUiOiJBRE1JTiJ9.jVKwrFiZ9iM3Rjf418u3mwalRpR_XLWzViKVMWQEE5lvF_NcCa18UR9hlC4zbT9-7ASz64iqCNmLA9vklxbHHA`,
       },
     },
     false,

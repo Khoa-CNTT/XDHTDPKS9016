@@ -67,7 +67,11 @@ export const fetchInstance: $Fetch = ofetch.create({
 })
 
 function createFetchOptions(options: FetchOptions, isAuthHeader: boolean) {
+  const tokenString = localStorage.getItem("access_token") 
+  console.log("-----------",tokenString);
+  
   const { token } = useAuthStore()
+  console.log('Token---------->:', token)
   if (isAuthHeader) {
     return {
       ...options,

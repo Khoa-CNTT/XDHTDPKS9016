@@ -41,9 +41,8 @@ const handleLogout = async () => {
         })
         console.log('Đang chuyển hướng tới /login')
         router.push('/login')
-
-        window.location.reload()
-        console.log('Chuyển hướng thành công')
+        window.location.reload() 
+       
     } catch (error) {
         console.error('Lỗi khi logout:', error)
 
