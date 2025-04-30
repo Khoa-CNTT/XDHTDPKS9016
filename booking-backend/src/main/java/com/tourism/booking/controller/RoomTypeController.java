@@ -1,22 +1,25 @@
 package com.tourism.booking.controller;
 
 import com.tourism.booking.dto.page.PageReponse;
+import com.tourism.booking.exception.ApiException;
+import com.tourism.booking.exception.ErrorCode;
+import com.tourism.booking.model.Account;
 import com.tourism.booking.model.Hotel;
 import com.tourism.booking.model.RoomType;
+import com.tourism.booking.service.IAccountService;
 import com.tourism.booking.service.IHotelService;
 import com.tourism.booking.service.IRoomTypeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 
-@PreAuthorize("hasRole('SUPPLIER')")
+//@PreAuthorize("hasRole('SUPPLIER')")
 @RestController
 @RequestMapping("${api.prefix}/room-types")
 @RequiredArgsConstructor
@@ -24,9 +27,13 @@ import java.security.Principal;
 public class RoomTypeController {
     private final IRoomTypeService roomTypeService;
     private final IHotelService hotelService;
+    private final IAccountService accountService;
+
 
     @GetMapping("/{id}")
     public ResponseEntity<RoomType> getRoomTypeById(@PathVariable Long id) {
+        System.out.println("line 33");
+
         return roomTypeService.getRoomTypeById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -37,22 +44,20 @@ public class RoomTypeController {
             Principal principal,
             @RequestBody RoomType roomType
     ) {
-        Long accountId = Long.parseLong(principal.getName());
-        Hotel hotel = hotelService.getHotelByAccountId(accountId)
-                .orElseThrow(() -> new RuntimeException("Hotel not found for account " + accountId));
+        Account acc = accountService.getAccountByUsername(principal.getName());
+        Hotel hotel = hotelService.getHotelByAccountId(acc.getAccount_id())
+                .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_EXIST));
         roomType.setHotel(hotel);
         RoomType saved = roomTypeService.createRoomType(roomType);
         return ResponseEntity.ok(saved);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<RoomType> updateRoomType(
-            @PathVariable Long id,
-            Principal principal,
+    public ResponseEntity<RoomType> updateRoomType(@PathVariable Long id, Principal principal,
             @RequestBody RoomType roomType
     ) {
-        Long accountId = Long.parseLong(principal.getName());
-        if (!hotelService.isOwnerOfRoomType(accountId, id)) {
+        Account acc = accountService.getAccountByUsername(principal.getName());
+        if (!hotelService.isOwnerOfRoomType(acc.getAccount_id(), id)) {
             return ResponseEntity.status(403).build();
         }
         RoomType updated = roomTypeService.updateRoomType(id, roomType);
@@ -64,8 +69,8 @@ public class RoomTypeController {
             @PathVariable Long id,
             Principal principal
     ) {
-        Long accountId = Long.parseLong(principal.getName());
-        if (!hotelService.isOwnerOfRoomType(accountId, id)) {
+        Account acc = accountService.getAccountByUsername(principal.getName());
+        if (!hotelService.isOwnerOfRoomType(acc.getAccount_id(), id)) {
             return ResponseEntity.status(403).build();
         }
         roomTypeService.deleteRoomType(id);
@@ -74,14 +79,13 @@ public class RoomTypeController {
 
 
     @GetMapping
-    public ResponseEntity<?> getMyRoomTypes(
-            Principal principal,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        Long accountId = Long.parseLong(principal.getName());
+    public ResponseEntity<?> getMyRoomTypes(Principal principal, @RequestParam(defaultValue = "0") int page,
+                                            @RequestParam(defaultValue = "10") int size) {
+        System.out.println("line 81");
+        Account acc = accountService.getAccountByUsername(principal.getName());
+        System.out.println("id: "+acc.getAccount_id());
         Pageable pageable = PageRequest.of(page, size);
-        Page<RoomType> roomTypes = roomTypeService.getRoomTypesByAccountId(accountId, pageable);
+        Page<RoomType> roomTypes = roomTypeService.getRoomTypesByAccountId(acc.getAccount_id(), pageable);
         return ResponseEntity.ok(new PageReponse<>(roomTypes)) ;
     }
 }

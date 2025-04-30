@@ -24,8 +24,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
-@PreAuthorize("hasAnyRole('USER','SUPPLIER','ADMIN')")
-@RequestMapping("${api.prefix}/user-profile")
+@RequestMapping("${api.prefix}/user-profile/")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
 @CrossOrigin("http://localhost:5173/")

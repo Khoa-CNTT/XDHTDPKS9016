@@ -50,7 +50,9 @@ public class SecurityConfig {
                     request
                             .requestMatchers(apiPrefix + "/hotels/**").permitAll()
                             .requestMatchers(apiPrefix + "/auth/**").permitAll()
+                            .requestMatchers(apiPrefix + "/user-profile/**").permitAll()
                             .requestMatchers(apiPrefix + "/forgotPassword/**").permitAll()
+                            .requestMatchers(apiPrefix+ "/room-types/**").permitAll()
                             .requestMatchers(apiPrefix + "/management-user/**").authenticated()
                             .requestMatchers(apiPrefix + "/images/**").permitAll()
                             .requestMatchers(apiPrefix + "/chat/ai").permitAll()
@@ -100,11 +102,11 @@ public class SecurityConfig {
         // Tạo JwtGrantedAuthoritiesConverter và đặt tiền tố quyền hạn
         JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
         jwtGrantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
-
+        jwtGrantedAuthoritiesConverter.setAuthoritiesClaimName("sub");
         // Tạo JwtAuthenticationConverter và thiết lập JwtGrantedAuthoritiesConverter
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
-        jwtAuthenticationConverter.setPrincipalClaimName("accountId");
+//        jwtAuthenticationConverter.setPrincipalClaimName("accountId");
 
         // Trả về JwtAuthenticationConverter cấu hình sẵn
         return jwtAuthenticationConverter;
