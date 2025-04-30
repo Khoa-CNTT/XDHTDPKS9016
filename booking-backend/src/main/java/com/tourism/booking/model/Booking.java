@@ -43,8 +43,8 @@ public class Booking {
     String status;
 
     @ManyToOne
-    @JoinColumn(name = "room_id", nullable = false)
-    Room room;
+    @JoinColumn(name = "room_type_id", nullable = false)
+    RoomType room_type;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

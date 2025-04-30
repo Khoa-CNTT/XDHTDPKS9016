@@ -40,7 +40,7 @@ public class Hotel {
     Set<Services> services = new HashSet<>();
 
     @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, orphanRemoval = true)
-    Set<Room> rooms = new HashSet<>();
+    Set<RoomType> roomTypes = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id", nullable = false)
