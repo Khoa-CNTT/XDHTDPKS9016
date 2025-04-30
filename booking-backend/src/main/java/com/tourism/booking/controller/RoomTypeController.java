@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -32,46 +33,37 @@ public class RoomTypeController {
 
     @GetMapping("/{id}")
     public ResponseEntity<RoomType> getRoomTypeById(@PathVariable Long id) {
-        System.out.println("line 33");
-
         return roomTypeService.getRoomTypeById(id)
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_EXIST));
     }
 
     @PostMapping
-    public ResponseEntity<RoomType> createRoomType(
-            Principal principal,
-            @RequestBody RoomType roomType
-    ) {
+    public ResponseEntity<RoomType> createRoomType(Principal principal, @RequestBody RoomType roomType) {
         Account acc = accountService.getAccountByUsername(principal.getName());
         Hotel hotel = hotelService.getHotelByAccountId(acc.getAccount_id())
-                .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_EXIST));
+                .orElseThrow(() -> new ApiException(ErrorCode.ROOM_NOT_EXIST));
         roomType.setHotel(hotel);
         RoomType saved = roomTypeService.createRoomType(roomType);
         return ResponseEntity.ok(saved);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<RoomType> updateRoomType(@PathVariable Long id, Principal principal,
-            @RequestBody RoomType roomType
-    ) {
+    public ResponseEntity<?> updateRoomType(@PathVariable Long id, Principal principal,
+            @RequestBody RoomType roomType) {
         Account acc = accountService.getAccountByUsername(principal.getName());
         if (!hotelService.isOwnerOfRoomType(acc.getAccount_id(), id)) {
-            return ResponseEntity.status(403).build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Room Type is not found");
         }
         RoomType updated = roomTypeService.updateRoomType(id, roomType);
         return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteRoomType(
-            @PathVariable Long id,
-            Principal principal
-    ) {
+    public ResponseEntity<?> deleteRoomType(@PathVariable Long id, Principal principal) {
         Account acc = accountService.getAccountByUsername(principal.getName());
         if (!hotelService.isOwnerOfRoomType(acc.getAccount_id(), id)) {
-            return ResponseEntity.status(403).build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Room Type is not found");
         }
         roomTypeService.deleteRoomType(id);
         return ResponseEntity.noContent().build();
@@ -81,9 +73,7 @@ public class RoomTypeController {
     @GetMapping
     public ResponseEntity<?> getMyRoomTypes(Principal principal, @RequestParam(defaultValue = "0") int page,
                                             @RequestParam(defaultValue = "10") int size) {
-        System.out.println("line 81");
         Account acc = accountService.getAccountByUsername(principal.getName());
-        System.out.println("id: "+acc.getAccount_id());
         Pageable pageable = PageRequest.of(page, size);
         Page<RoomType> roomTypes = roomTypeService.getRoomTypesByAccountId(acc.getAccount_id(), pageable);
         return ResponseEntity.ok(new PageReponse<>(roomTypes)) ;
