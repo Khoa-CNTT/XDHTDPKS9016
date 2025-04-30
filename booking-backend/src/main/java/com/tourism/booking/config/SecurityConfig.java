@@ -104,10 +104,13 @@ public class SecurityConfig {
         // Tạo JwtAuthenticationConverter và thiết lập JwtGrantedAuthoritiesConverter
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
+        jwtAuthenticationConverter.setPrincipalClaimName("accountId");
 
         // Trả về JwtAuthenticationConverter cấu hình sẵn
         return jwtAuthenticationConverter;
     }
+
+
 
 
 }

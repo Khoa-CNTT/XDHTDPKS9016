@@ -12,6 +12,7 @@ import com.tourism.booking.service.IServiceService;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,9 +37,12 @@ public class ServiceController {
     IHotelService hotelService;
 
     @GetMapping
-    public ResponseEntity<?> getAllServiceByHotelId(Pageable pageable, Principal principal) {
+    public ResponseEntity<?> getAllServiceByHotelId(Principal principal,
+                                                    @RequestParam(defaultValue = "0") int page,
+                                                    @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
         Account acc = accountService.getAccountByUsername(principal.getName());
-        return ResponseEntity.ok(new PageReponse<>(serviceService.getServicesByIdHotel(acc.getAccount_id(),pageable)));
+        return ResponseEntity.ok(new PageReponse<>(serviceService.getServicesByIdHotel(acc.getAccount_id(), pageable)));
     }
 
     @GetMapping("/{id}")

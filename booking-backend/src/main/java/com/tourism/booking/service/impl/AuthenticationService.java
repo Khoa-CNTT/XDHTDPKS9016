@@ -100,6 +100,7 @@ public class AuthenticationService implements IAuthenticationService {
                 ))
                 // Thêm một custom claim (thông tin tùy chỉnh) vào JWT, chứa thông tin về đối tượng Student
                 .claim("scope", getRoles(acc))
+                .claim("accountId", acc.getAccount_id())
                 .jwtID(UUID.randomUUID().toString())
                 .build(); // Xây dựng đối tượng JWTClaimsSet
 

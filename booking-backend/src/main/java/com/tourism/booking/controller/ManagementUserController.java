@@ -12,6 +12,7 @@ import com.tourism.booking.service.IUserProfileService;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,7 +29,10 @@ public class ManagementUserController {
     IUserProfileMapper userProfileMapper;
 
     @GetMapping
-    public ResponseEntity<?> getUserProfile(UserSearchRequest userSearchRequest, Pageable pageable) {
+    public ResponseEntity<?> getUserProfile(UserSearchRequest userSearchRequest,
+                                            @RequestParam(defaultValue = "0") int page,
+                                            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
         return ResponseEntity.ok(new PageReponse<>(userProfileService.findAll(userSearchRequest, pageable)));
     }
 

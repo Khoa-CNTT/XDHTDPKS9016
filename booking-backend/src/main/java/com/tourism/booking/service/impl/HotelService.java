@@ -44,4 +44,8 @@ public class HotelService implements IHotelService {
     }
 
 
+    @Override
+    public boolean isOwnerOfRoomType(Long accountId, Long roomTypeId) {
+        return hotelRepository.isOwnerOfRoomType(accountId, roomTypeId);
+    }
 }

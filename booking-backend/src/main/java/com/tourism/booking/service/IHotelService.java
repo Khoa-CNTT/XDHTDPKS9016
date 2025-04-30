@@ -12,4 +12,5 @@ public interface IHotelService {
     Hotel save(Hotel hotel);
     void deleteHotel(Long hotelId);
     Optional<Hotel> getHotelByAccountId(Long hotelId);
+    boolean isOwnerOfRoomType(Long accountId, Long roomTypeId);
 }

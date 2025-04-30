@@ -35,6 +35,6 @@ public class Rating {
     UserProfile user_profile;
 
     @ManyToOne
-    @JoinColumn(name = "room_id", nullable = false)
-    Room room;
+    @JoinColumn(name = "room_type_id", nullable = false)
+    RoomType room_type;
 }
