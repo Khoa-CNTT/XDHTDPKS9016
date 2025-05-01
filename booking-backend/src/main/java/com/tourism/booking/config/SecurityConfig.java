@@ -53,6 +53,7 @@ public class SecurityConfig {
                             .requestMatchers(apiPrefix + "/user-profile/**").permitAll()
                             .requestMatchers(apiPrefix + "/forgotPassword/**").permitAll()
                             .requestMatchers(apiPrefix+ "/room-types/**").permitAll()
+                            .requestMatchers(apiPrefix+ "/hotel-info/**").permitAll()
                             .requestMatchers(apiPrefix + "/management-user/**").authenticated()
                             .requestMatchers(apiPrefix + "/images/**").permitAll()
                             .requestMatchers(apiPrefix + "/chat/ai").permitAll()

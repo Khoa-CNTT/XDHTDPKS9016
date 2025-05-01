@@ -1,5 +1,6 @@
 package com.tourism.booking.service;
 
+import com.tourism.booking.dto.hotel.HotelInfoResponse;
 import com.tourism.booking.model.Hotel;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,6 +12,7 @@ public interface IHotelService {
     Optional<Hotel> getHotelById(Long hotelId);
     Hotel save(Hotel hotel);
     void deleteHotel(Long hotelId);
-    Optional<Hotel> getHotelByAccountId(Long hotelId);
+    Optional<Hotel> getHotelByAccountId(Long accountId);
     boolean isOwnerOfRoomType(Long accountId, Long roomTypeId);
+    HotelInfoResponse updateHotelInfo(Long accountId, Hotel payload);
 }
