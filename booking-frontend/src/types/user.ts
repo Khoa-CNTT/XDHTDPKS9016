@@ -50,3 +50,24 @@ export interface UserInfo {
   username: string;
   role:string;
 }
+export interface CreateUserRequest {
+  full_name: string;
+  gender: string;
+  address: string;
+  email: string;
+  phone: string;
+  birth_date: string; 
+  status: string;
+}
+
+export interface CreateUserResponse {
+  user_id: number;
+  full_name: string;
+  gender: string;
+  address: string;
+  email: string;
+  phone: string;
+  birth_date: string;
+  status: string;
+  username: string;
+}

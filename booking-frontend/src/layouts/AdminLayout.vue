@@ -80,6 +80,7 @@ const handleLogout = async () => {
 
     await logoutApi({ token })
     localStorage.removeItem('access_token')
+    authStore.$reset()
     toast.success('Đăng xuất thành công!', { autoClose: 3000, position: 'top-right' })
     router.push('/login')
   } catch (error) {

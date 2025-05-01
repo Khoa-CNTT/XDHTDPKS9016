@@ -40,7 +40,7 @@ const props = defineProps<{
 
     <TableBody>
       <TableRow v-for="(row, rowIndex) in rows" :key="rowIndex">
-        <TableCell v-for="(value, colIndex) in Object.values(row).slice(0, headers.length - 1)" :key="colIndex">
+        <TableCell v-for="(value, colIndex) in Object.values(row).slice(0, headers.length - 1)" :key="colIndex"  class="truncated-text">
           {{ value }}
         </TableCell>
 
@@ -52,4 +52,11 @@ const props = defineProps<{
     </TableBody>
   </Table>
 </template>
-
+<style scoped>
+.truncated-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; 
+  max-width: 200px; 
+}
+</style>

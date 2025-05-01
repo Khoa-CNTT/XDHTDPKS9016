@@ -124,6 +124,7 @@ const handleLogout = async () => {
         if (!token) throw new Error('Không tìm thấy token trong localStorage')
         await logoutApi({ token })
         localStorage.removeItem('access_token')
+        authStore.$reset()
         toast.success('Đăng xuất thành công!', {
             autoClose: 3000,
             position: 'top-right',
