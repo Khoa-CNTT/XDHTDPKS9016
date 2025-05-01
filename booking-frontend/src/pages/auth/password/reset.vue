@@ -9,17 +9,31 @@
       <form @submit.prevent="resetPassword" class="space-y-5">
         <div>
           <label class="block text-gray-700 font-medium mb-2">Mật khẩu mới</label>
-          <input type="password" v-model="password" placeholder="Nhập mật khẩu mới" required
-            class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400" />
+          <input 
+            type="password" 
+            v-model="password" 
+            placeholder="Nhập mật khẩu mới" 
+            :class="[
+              'w-full p-3 border rounded focus:outline-none focus:ring-2',
+              passwordError ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-400'
+            ]"
+          />
+          <p v-if="passwordError" class="text-red-500 text-sm mt-1">{{ passwordError }}</p>
         </div>
 
         <div>
           <label class="block text-gray-700 font-medium mb-2">Nhập lại mật khẩu</label>
-          <input type="password" v-model="confirmPassword" placeholder="Nhập lại mật khẩu" required
-            class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400" />
+          <input 
+            type="password" 
+            v-model="confirmPassword" 
+            placeholder="Nhập lại mật khẩu" 
+            :class="[
+              'w-full p-3 border rounded focus:outline-none focus:ring-2',
+              confirmPasswordError ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-400'
+            ]"
+          />
+          <p v-if="confirmPasswordError" class="text-red-500 text-sm mt-1">{{ confirmPasswordError }}</p>
         </div>
-
-        <p v-if="errorMessage" class="text-red-500 text-sm text-center">{{ errorMessage }}</p>
 
         <button type="submit"
           class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded font-semibold transition">
@@ -36,30 +50,40 @@ import { useRoute, useRouter } from 'vue-router'
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
 import { changePasswordApi } from '@/services/auth'
+import { validPass, validPassConfirm } from '@/utils/validate' // đường dẫn tới file bạn đã gửi
 
 const password = ref('')
 const confirmPassword = ref('')
-const errorMessage = ref('')
+const passwordError = ref('')
+const confirmPasswordError = ref('')
+
 const route = useRoute()
 const router = useRouter()
-
 const email = route.query.email
 
 async function resetPassword() {
-  errorMessage.value = ''
+  passwordError.value = ''
+  confirmPasswordError.value = ''
+
+  // Kiểm tra password
+  const passCheck = validPass(password.value)
+  if (!passCheck.check) {
+    passwordError.value = passCheck.mess
+  }
+
+  // Kiểm tra confirm password
+  const confirmCheck = validPassConfirm(confirmPassword.value, password.value)
+  if (!confirmCheck.check) {
+    confirmPasswordError.value = confirmCheck.mess
+  }
+
+  // Nếu có lỗi thì không gọi API
+  if (!passCheck.check || !confirmCheck.check) {
+    return
+  }
 
   if (!email) {
     toast.error('Không tìm thấy email để đặt lại mật khẩu.')
-    return
-  }
-
-  if (password.value.length < 6) {
-    errorMessage.value = 'Mật khẩu phải có ít nhất 6 ký tự.'
-    return
-  }
-
-  if (password.value !== confirmPassword.value) {
-    errorMessage.value = 'Mật khẩu không khớp.'
     return
   }
 
@@ -70,7 +94,7 @@ async function resetPassword() {
     })
 
     toast.success('Đặt lại mật khẩu thành công! Hãy đăng nhập lại.')
-    router.push({ name: 'login' }) // hoặc route tới trang login bạn đặt tên
+    router.push({ name: 'login' })
   } catch (err) {
     console.error('Lỗi khi đặt lại mật khẩu:', err)
     toast.error('Có lỗi xảy ra, vui lòng thử lại sau.')

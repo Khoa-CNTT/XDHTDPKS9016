@@ -1,13 +1,13 @@
 <template>
-  <div class="p-8 bg-gradient-to-r from-gray-100 to-blue-100">
+  <div v-if="hotel" class="p-8 bg-gradient-to-r from-gray-100 to-blue-100">
     <div class="container mx-auto px-8 grid grid-cols-1 md:grid-cols-3 gap-6 py-2">
       <div class="md:col-span-2 space-y-6">
         <div class="bg-white p-6 rounded-lg shadow-lg text-center">
           <h1 class="text-2xl font-bold text-text flex items-center justify-center gap-2">
-            <i class="fas fa-hotel"></i> Tên khách sạn
+            <i class="fas fa-hotel"></i> {{ hotel.name }}
           </h1>
           <p class="text-text flex items-center justify-center gap-2 mt-2">
-            <i class="fas fa-map-marker-alt"></i> Địa chỉ khách sạn
+            <i class="fas fa-map-marker-alt"></i>{{ hotel.address }}
           </p>
         </div>
         <div class="flex gap-4">
@@ -28,41 +28,31 @@
           <h2 class="text-xl font-bold text-text">Giới thiệu</h2>
           <div class="w-12 h-1 bg-text my-2"></div>
           <p class="text-text leading-relaxed">
-            La Vela Saigon Hotel là khách sạn 5 sao sang trọng, tọa lạc ngay trung tâm TP. Hồ Chí Minh, mang
-            đến không gian nghỉ dưỡng hoàn hảo với phong cách thiết kế tinh tế, đẳng cấp. Với vị trí thuận
-            lợi, du khách có thể dễ dàng di chuyển đến các địa điểm nổi tiếng như Nhà thờ Đức Bà, Chợ Bến
-            Thành hay Phố đi bộ Nguyễn Huệ.
-            <br><br>
-            Khách sạn cung cấp hệ thống phòng nghỉ đa dạng từ tiêu chuẩn đến cao cấp, mỗi phòng đều được
-            thiết kế theo phong cách hiện đại, kết hợp với nội thất sang trọng, tạo nên một không gian nghỉ
-            dưỡng thoải mái và tiện nghi. Đặc biệt, phòng có tầm nhìn bao quát thành phố, giúp du khách tận
-            hưởng khung cảnh tuyệt đẹp về đêm.
-            <br><br>
-            Một trong những điểm nhấn của La Vela Saigon Hotel chính là hồ bơi vô cực trên tầng thượng, nơi
-            du khách có thể thư giãn trong làn nước mát lạnh và chiêm ngưỡng toàn cảnh thành phố từ trên
-            cao. Ngoài ra, khách sạn còn có hệ thống nhà hàng sang trọng phục vụ các món ăn Á - Âu đa dạng,
-            quầy bar với không gian lãng mạn, trung tâm spa cao cấp giúp bạn thư giãn sau những giờ làm việc
-            căng thẳng.
-            <br><br>
-            Đối với những ai yêu thích thể thao và chăm sóc sức khỏe, phòng gym hiện đại được trang bị đầy
-            đủ thiết bị luyện tập sẽ là một lựa chọn lý tưởng. Bên cạnh đó, trung tâm hội nghị với sức chứa
-            lớn, trang bị hệ thống âm thanh, ánh sáng hiện đại sẽ là địa điểm lý tưởng để tổ chức các sự
-            kiện, hội nghị hay tiệc cưới đẳng cấp.
-            <br><br>
-            Đội ngũ nhân viên chuyên nghiệp, tận tình luôn sẵn sàng phục vụ 24/7, đảm bảo mang đến cho du
-            khách những trải nghiệm đáng nhớ nhất. Nếu bạn đang tìm kiếm một nơi lưu trú hoàn hảo với dịch
-            vụ đẳng cấp, La Vela Saigon Hotel chính là lựa chọn lý tưởng cho bạn.
+            {{ hotel.description }}
 
           </p>
-          <div class="bg-white p-6 rounded-lg shadow-lg pb-2">
+          <div class="bg-white p-6 rounded-lg shadow-lg pb-2" v-if="hotel?.services?.length">
             <h2 class="text-xl font-bold text-blue-700">Dịch vụ & Tiện ích</h2>
             <ul class="list-disc pl-5 text-gray-700">
-              <li>Hồ bơi vô cực</li>
-              <li>Trung tâm spa & gym</li>
-              <li>Nhà hàng sang trọng</li>
-              <li>Phòng hội nghị</li>
+              <li v-for="(service, index) in hotel.services" :key="index">
+                {{ service.service_name }}
+              </li>
             </ul>
           </div>
+          <!-- <div class="bg-white p-6 rounded-lg shadow-lg pb-2" v-if="hotel?.roomTypes?.length">
+            <h2 class="text-xl font-bold text-blue-700">Các loại phòng</h2>
+            <ul class="list-disc pl-5 text-gray-700">
+              <li v-for="(roomTypes, index) in hotel.roomTypes" :key="index">
+                {{ roomTypes.type_name }}
+                <p>Số lượng:{{ roomTypes.number_bed }}</p>
+                <p>Số lượng người tối đa:{{ roomTypes.maximum_people }}</p>
+                <p>Mô tả:{{ roomTypes.description }}</p>
+                <p>Phòng trống:{{ roomTypes.available_room }}</p>
+              </li>
+
+            </ul>
+          </div> -->
+
         </div>
       </div>
 
@@ -70,31 +60,26 @@
         <h2 class="text-xl font-bold text-text">Khách sạn tương tự</h2>
         <div class="w-12 h-1 bg-text my-2"></div>
         <div class="space-y-4">
-          <div class="bg-white rounded-lg shadow-md hover:scale-105 transition">
-            <img src="/assets/images/img-hotel-6.jpeg" class="w-full h-32 object-cover rounded-t-lg">
-            <h3 class="text-center text-text font-semibold p-3">Khách sạn A</h3>
+          <!-- Lặp qua danh sách khách sạn từ API -->
+          <div v-for="(hotel, index) in hotelList.slice(1, showAllHotels ? hotelList.length : 4)"
+            class="bg-white rounded-lg shadow-md hover:scale-105 transition cursor-pointer ">
+            <img :src="hotel.image || '/assets/images/img-hotel-6.jpeg'" class="w-full h-32 object-cover rounded-t-lg"
+              :alt="hotel.name">
+            <h3 class="text-center text-text font-semibold p-3">{{ hotel.name }}</h3>
+            <p class="text-center text-text font-semibold p-1">{{ hotel.address }}</p>
           </div>
-          <div class="bg-white rounded-lg shadow-md hover:scale-105 transition">
-            <img src="/assets/images/img-hotel-2.png" class="w-full h-32 object-cover rounded-t-lg">
-            <h3 class="text-center text-text font-semibold p-3">Khách sạn B</h3>
-          </div>
-          <div class="bg-white rounded-lg shadow-md hover:scale-105 transition">
-            <img src="/assets/images/img-hotel-3.png" class="w-full h-32 object-cover rounded-t-lg">
-            <h3 class="text-center text-text font-semibold p-3">Khách sạn C</h3>
-          </div>
-          <div class="bg-white rounded-lg shadow-md hover:scale-105 transition">
-            <img src="/assets/images/img-hotel-4.png" class="w-full h-32 object-cover rounded-t-lg">
-            <h3 class="text-center text-text font-semibold p-3">Khách sạn B</h3>
-          </div>
-          <div class="bg-white rounded-lg shadow-md hover:scale-105 transition">
-            <img src="/assets/images/img-hotel-5.png" class="w-full h-32 object-cover rounded-t-lg">
-            <h3 class="text-center text-text font-semibold p-3">Khách sạn C</h3>
+          <div v-if="hotelList.length > 4">
+            <button @click="toggleShowAllHotels"
+              class="w-full text-blue-600 font-semibold py-2 border-gray-300 hover:bg-gray-100">
+              {{ showAllHotels ? 'Ẩn bớt' : 'Xem thêm' }}
+            </button>
           </div>
         </div>
       </div>
+
     </div>
 
-    <div class="container mx-auto px-8 pt-4">
+    <div class="container mx-auto px-8">
       <h2 class="text-xl font-bold text-text">Phòng</h2>
       <div class="w-12 h-1 bg-blue-700 mb-6"></div>
       <swiper :modules="[Navigation, Pagination, Autoplay]" :slides-per-view="5" :space-between="16"
@@ -107,7 +92,7 @@
         </swiper-slide>
       </swiper>
     </div>
-    <div class="container mx-auto px-8 pt-4">
+    <div class="container mx-auto px-8 pt-4" v-if="hotel?.roomTypes?.length">
       <h2 class="text-xl font-bold text-text">Bảng giá phòng</h2>
       <div class="w-12 h-1 bg-blue-700 mb-6"></div>
       <table class="w-full border-collapse border border-gray-800 mt-2 text-sm md:text-base text-center">
@@ -118,42 +103,38 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="room in roomPrices" :key="room.type" class="border-b border-gray-800">
-            <td class="p-3 border border-gray-800">{{ room.type }}</td>
+          <tr v-for="(room, index) in hotel.roomTypes" :key="index" class="border-b border-gray-800">
+            <td class="p-3 border border-gray-800">{{ room.type_name }}</td>
             <td class="p-3 text-blue-700 border border-gray-800">{{ room.price }} VND</td>
           </tr>
         </tbody>
       </table>
     </div>
-    <div class="container mx-auto px-8 pt-4">
-    <div class="w-full border mt-2 text-sm md:text-base flex flex-wrap gap-6 p-6 bg-gray-100 rounded-lg">
-      <div
-        v-for="room in roomsType"
-        :key="room.id"
-        class="w-full md:w-[32%] bg-white border rounded-lg shadow-md overflow-hidden flex flex-col"
-      >
-        <img :src="room.image" :alt="room.name" class="w-full h-48 object-cover" />
-        <div class="p-4 flex flex-col justify-between h-full">
-          <div>
-            <h2 class="text-xl font-semibold mb-2 text-blue-800">{{ room.name }}</h2>
-            <p class="text-gray-600 mb-2">{{ room.description }}</p>
-            <ul class="text-sm text-gray-600 list-disc list-inside mb-4">
-              <li v-for="(feature, index) in room.features" :key="index">{{ feature }}</li>
-            </ul>
+    <div class="container mx-auto px-8 pt-4" v-if="hotel?.roomTypes?.length">
+      <h2 class="text-2xl font-bold text-blue-700 mb-4">Các loại phòng</h2>
+      <div class="w-full border text-sm md:text-base flex flex-wrap gap-6 p-6 bg-gray-100 rounded-lg">
+        <div v-for="(room, index) in hotel.roomTypes" :key="index"
+          class="w-full md:w-[32%] bg-white border rounded-lg shadow-md overflow-hidden flex flex-col">
+          <img :src="room.room_image || require('@/assets/images/room-1.jpg')" :alt="room.type_name"
+            class="w-full h-48 object-cover" />
+          <div class="p-4 flex flex-col justify-between h-full">
+            <div>
+              <h2 class="text-xl font-semibold mb-2 text-blue-800">{{ room.type_name }}</h2>
+              <p class="text-gray-600 mb-2">{{ room.description }}</p>
+              <ul class="text-sm text-gray-600 list-disc list-inside mb-4">
+                <li>🛏️ Số giường: {{ room.number_bed }}</li>
+                <li>👥 Tối đa: {{ room.maximum_people }} người</li>
+                <li>📦 Phòng trống: {{ room.available_room }}</li>
+              </ul>
+            </div>
+            <button @click="openModal(room)"
+              class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full mt-auto">
+              Đặt Phòng
+            </button>
           </div>
-          <button
-            @click="openModal(room)"
-            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full mt-auto"
-          >
-            Đặt Phòng
-          </button>
         </div>
       </div>
     </div>
-
-    <!-- Modal -->
-    <BookingModal :show="showModal" :room="selectedRoom" @close="closeModal" />
-  </div>
 
     <div class="container mx-auto px-8 pt-4">
       <h2 class="text-xl font-bold text-text">Đánh giá khách hàng</h2>
@@ -212,6 +193,63 @@
   </div>
 </template>
 <script setup>
+import { ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
+import { getHotelByIdApi } from '@/services/home';
+import { getHotelListApi } from '@/services/home';
+const route = useRoute();
+const hotel = ref(null);
+const hotelList = ref([]);
+const displayCount = ref(6);
+const isExpanded = ref(false);
+const router = useRouter();
+const showAllHotels = ref(false);
+onMounted(async () => {
+  const hotelId = route.params.id;
+  try {
+    const response = await getHotelByIdApi(hotelId);
+    hotel.value = response;
+    console.log('----////', hotel.value);
+
+  } catch (error) {
+    console.error('Error fetching hotel details:', error);
+  }
+});
+
+
+
+
+const fetchHotelList = async () => {
+  try {
+    const response = await getHotelListApi();
+    hotelList.value = response.content;
+    console.log('Hotel list response:', response.content);
+  } catch (error) {
+    console.error('Error fetching hotel list:', error);
+  }
+};
+
+const toggleShowAllHotels = () => {
+  showAllHotels.value = !showAllHotels.value;
+};
+onMounted(() => {
+  fetchHotelList();
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import BookingModal from './BookingModal.vue';
@@ -219,7 +257,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/autoplay';
-import { ref } from 'vue';
+// import { ref } from 'vue';
 const showModal = ref(false)
 const selectedRoom = ref(null)
 

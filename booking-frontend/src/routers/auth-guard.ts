@@ -9,11 +9,12 @@ export const authGuard: NavigationGuardWithThis<any> = async (to, from, next) =>
   const isLoggedIn = authStore.getIsLoggedIn
   const isPublicRoute = to.meta?.public
 
-  if (isLoggedIn) {
-    isPublicRoute ? next('/') : next()
-  } else {
-    isPublicRoute ? next() : next({ name: 'login' })
-  }
+  // if (isLoggedIn) {
+  //   isPublicRoute ? next('/') : next()
+  // } else {
+  //   isPublicRoute ? next() : next({ name: 'login' })
+  // }
+  next()
 }
 
 export const workspaceGuard: NavigationGuardWithThis<any> = async (to, from, next) => {

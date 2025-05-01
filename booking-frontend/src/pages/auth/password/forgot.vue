@@ -6,19 +6,14 @@
       <form @submit.prevent="submitEmail" class="space-y-5">
         <div>
           <label class="block text-gray-700 font-medium mb-2">Email</label>
-          <input
-            v-model="email"
-            type="email"
-            placeholder="Nhập địa chỉ email của bạn"
-            required
-            class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-          />
+          <input v-model="email"
+            :class="['w-full p-3 border rounded focus:outline-none focus:ring-2', emailError ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-400']"
+            type="email" placeholder="Nhập địa chỉ email của bạn" required />
+          <p v-if="emailError" class="text-red-500 text-sm mt-2">{{ emailError }}</p>
         </div>
 
-        <button
-          type="submit"
-          class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded font-semibold transition"
-        >
+        <button type="submit"
+          class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded font-semibold transition">
           Gửi yêu cầu đặt lại mật khẩu
         </button>
       </form>
@@ -29,31 +24,34 @@
 <script setup>
 import { ref } from 'vue'
 import { forgotPasswordApi } from '@/services/auth'
-import { toast } from 'vue3-toastify'
-import 'vue3-toastify/dist/index.css'
 import { useRouter } from 'vue-router'
+import { validEmail } from '@/utils/validate'
 
 const router = useRouter()
 const email = ref('')
+const emailError = ref('')
 
 async function submitEmail() {
-  if (!email.value) {
-    toast.error('Vui lòng nhập email.')
+  const emailValidation = validEmail(email.value)
+
+  if (!emailValidation.check) {
+    emailError.value = emailValidation.mess
     return
+  } else {
+    emailError.value = ''
   }
 
   try {
     const res = await forgotPasswordApi(encodeURIComponent(email.value))
     console.log('Phản hồi API:', res)
 
-    toast.success('Yêu cầu đặt lại mật khẩu đã được gửi tới email của bạn.')
     router.push({
       name: 'verify-otp',
       query: { email: email.value }
     })
   } catch (err) {
     console.error('Lỗi gửi yêu cầu:', err)
-    toast.error('Không thể gửi yêu cầu. Vui lòng kiểm tra lại email hoặc thử lại sau.')
+    emailError.value = 'Không thể gửi yêu cầu. Vui lòng thử lại sau.'
   }
 }
 </script>
