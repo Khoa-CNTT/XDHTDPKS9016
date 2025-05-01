@@ -74,7 +74,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useAuthStore } from '@/stores/auth';
-import { updateUserApi, getInfoApi } from '@/services/user'; 
+import { updateUserApi, getInfoApi } from '@/services/user';
 import { toast } from 'vue3-toastify';
 import { UserProfile, UserInfo } from "@/types/user";
 import { formatDateToDDMMYYYY } from '@/utils/dateUtils';
@@ -104,8 +104,8 @@ onMounted(async () => {
     try {
       await authStore.setupAuth();
       const userId = authStore.user?.user_id;
-      console.log('---------------------',userId);
-      
+      console.log('---------------------', userId);
+
       // form.value.user_id = authStore.user?.user_id ?? '';
       form.value.email = authStore.user?.email ?? '';
       form.value.username = authStore.user?.username ?? '';
@@ -138,7 +138,7 @@ const fetchUserProfile = async (id: string) => {
         address: data.address ?? '',
         email: data.email ?? '',
         phone: data.phone ?? '',
-        birth_date: formatDateToDDMMYYYY(data.birth_date ?? ''), 
+        birth_date: formatDateToDDMMYYYY(data.birth_date ?? ''),
         status: String(data.status ?? ''),
         username: data.username ?? '',
       };
@@ -174,17 +174,30 @@ const onSubmit = async () => {
       toast.error('Không tìm thấy user_id để cập nhật!');
       return;
     }
+
+    // Format ngày sinh sang đúng định dạng
     const formattedBirthDate = formatDateToDDMMYYYY(form.value.birth_date);
 
-    const response = await updateUserApi(userId, {
-      ...form.value,
-      birth_date: formattedBirthDate, 
-    });
-    if (response.data) {
+    // Chỉ lấy những trường cần thiết để gửi đi
+    const payload = {
+      full_name: form.value.full_name,
+      gender: form.value.gender,
+      address: form.value.address,
+      email: form.value.email,
+      phone: form.value.phone,
+      birth_date: formattedBirthDate,
+      status: form.value.status
+    };
+
+    const response = await updateUserApi(Number(userId), payload);
+    console.log('------>>>>>>>', response);
+
+    if (response) {
       toast.success('Cập nhật thông tin thành công!', {
         autoClose: 3000,
         position: 'top-right',
       });
+      await fetchUserProfile(String(userId));
     } else {
       toast.error('Cập nhật thất bại. Vui lòng thử lại!', {
         autoClose: 3000,
@@ -201,4 +214,5 @@ const onSubmit = async () => {
     loading.value = false;
   }
 };
+
 </script>

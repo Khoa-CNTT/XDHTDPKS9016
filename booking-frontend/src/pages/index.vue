@@ -9,59 +9,30 @@
       </p>
     </div>
     <div
-      class="search-box grid grid-cols-1 md:grid-cols-[1fr_auto] items-end gap-4 p-6 bg-white shadow-xl w-11/12 md:w-2/3 mx-auto absolute top-72 left-0 right-0 border border-gray-200 rounded-xl"
-    >
+      class="search-box grid grid-cols-1 md:grid-cols-[1fr_auto] items-end gap-4 p-6 bg-white shadow-xl w-11/12 md:w-2/3 mx-auto absolute top-72 left-0 right-0 border border-gray-200 rounded-xl">
       <!-- Input + Label -->
       <div class="flex flex-col w-full">
-        <label
-          for="location"
-          class="text-base font-medium text-gray-700 mb-2"
-          >Địa điểm / Tên khách sạn</label
-        >
-        <input
-          id="location"
-          type="text"
-          v-model="location"
-          placeholder="Ví dụ: Đà Nẵng, Khách sạn Mường Thanh"
-          class="border border-gray-300 rounded-lg px-4 py-2 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all duration-200 w-full"
-        />
+        <label for="location" class="text-base font-medium text-gray-700 mb-2">Địa điểm / Tên khách sạn</label>
+        <input id="location" type="text" v-model="location" placeholder="Ví dụ: Đà Nẵng, Khách sạn Mường Thanh"
+          class="border border-gray-300 rounded-lg px-4 py-2 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all duration-200 w-full" />
       </div>
 
-      <button
-        @click="searchHotels"
-        class="bg-orange-500 hover:bg-orange-400 text-white text-sm font-semibold px-6 py-2 rounded-lg transition-all duration-200 w-full md:w-auto"
-      >
+      <button @click="searchHotels"
+        class="bg-orange-500 hover:bg-orange-400 text-white text-sm font-semibold px-6 py-2 rounded-lg transition-all duration-200 w-full md:w-auto">
         Tìm kiếm
       </button>
     </div>
 
-    <div
-      v-if="groupedHotels.length > 0"
-      class="container mx-auto p-4 pt-32"
-    >
-      <div
-        v-for="group in groupedHotels"
-        :key="group.location"
-        class="mb-8"
-      >
+    <div v-if="groupedHotels.length > 0" class="container mx-auto p-4 pt-32">
+      <div v-for="group in groupedHotels" :key="group.location" class="mb-8">
         <h2 class="text-2xl font-bold mb-4">{{ group.location }}</h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div
-            v-for="hotel in group.hotels"
-            :key="hotel.id"
-            class="border p-4 rounded shadow"
-          >
-            <img
-              :src="hotel.image"
-              class="w-full h-48 object-cover mb-2"
-            />
+          <div v-for="hotel in group.hotels" :key="hotel.id" class="border p-4 rounded shadow">
+            <img :src="hotel.image" class="w-full h-48 object-cover mb-2" />
             <h3 class="text-lg font-bold">{{ hotel.name }}</h3>
             <p class="text-gray-600">{{ hotel.description }}</p>
-            <button
-              class="mt-2 px-4 py-2 bg-blue-600 text-white rounded"
-              @click="goToDetail(hotel.id)"
-            >
+            <button class="mt-2 px-4 py-2 bg-blue-600 text-white rounded" @click="goToDetail(hotel.id)">
               Xem chi tiết
             </button>
           </div>
@@ -69,10 +40,7 @@
       </div>
     </div>
 
-    <p
-      v-else
-      class="text-center text-red-500 mt-4"
-    >
+    <p v-else class="text-center text-red-500 mt-4">
       Không tìm thấy khách sạn phù hợp
     </p>
 
@@ -81,47 +49,19 @@
       <h1 class="text-2xl text-text font-bold mb-2 uppercase">Điểm đến nổi bật</h1>
       <hr class="mb-4 border-t-2 border-text" />
       <div class="grid grid-cols-2 gap-4 mb-4">
-        <div
-          v-for="(city, index) in topCities"
-          :key="index"
-          class="relative"
-        >
-          <img
-            :src="city.image"
-            :alt="city.name"
-            class="w-full h-48 object-cover rounded-lg"
-          />
-          <div
-            class="absolute top-0 left-0 bg-black bg-opacity-50 text-white text-sm p-1 rounded flex"
-          >
-            <img
-              :src="city.img"
-              :alt="city.name"
-              class="w-8 h-5 object-cover rounded-lg"
-            />
+        <div v-for="(city, index) in topCities" :key="index" class="relative">
+          <img :src="city.image" :alt="city.name" class="w-full h-48 object-cover rounded-lg" />
+          <div class="absolute top-0 left-0 bg-black bg-opacity-50 text-white text-sm p-1 rounded flex">
+            <img :src="city.img" :alt="city.name" class="w-8 h-5 object-cover rounded-lg" />
             {{ city.name }}
           </div>
         </div>
       </div>
       <div class="grid grid-cols-3 gap-4 pb-30">
-        <div
-          v-for="(city, index) in bottomCities"
-          :key="index"
-          class="relative"
-        >
-          <img
-            :src="city.image"
-            :alt="city.name"
-            class="w-full h-32 object-cover rounded"
-          />
-          <div
-            class="absolute top-0 left-0 bg-black bg-opacity-50 text-white text-sm p-1 rounded flex"
-          >
-            <img
-              :src="city.img"
-              :alt="city.name"
-              class="w-8 h-5 object-cover rounded-lg"
-            />
+        <div v-for="(city, index) in bottomCities" :key="index" class="relative">
+          <img :src="city.image" :alt="city.name" class="w-full h-32 object-cover rounded" />
+          <div class="absolute top-0 left-0 bg-black bg-opacity-50 text-white text-sm p-1 rounded flex">
+            <img :src="city.img" :alt="city.name" class="w-8 h-5 object-cover rounded-lg" />
             {{ city.name }}
           </div>
         </div>
@@ -131,42 +71,34 @@
       <h1 class="text-2xl text-text font-bold mb-2 uppercase">Khách sạn nổi bật</h1>
       <hr class="mb-4 border-t-2 border-text" />
       <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-        <div
-          v-for="hotel in hotel"
-          :key="hotel.id"
-          class="bg-white p-3 shadow-md rounded-lg"
-        >
-          <img
-            :src="hotel.image"
-            alt="Hotel Image"
-            class="w-full h-48 object-cover rounded-md"
-          />
+        <div v-for="(hotel, index) in hotelList.slice(0, displayCount)" :key="hotel.hotel_id"
+          class="bg-white p-3 shadow-md rounded-lg">
+          <img :src="hotel.image ? hotel.image : '/assets/images/img-hotel-12.jpeg'" alt="Hotel Image"
+            class="w-full h-48 object-cover rounded-md" />
           <div class="flex justify-between mt-2">
             <div>
               <h2 class="text-lg font-semibold">{{ hotel.name }}</h2>
-              <p class="text-sm text-gray-600">{{ hotel.description }}</p>
+              <p class="text-sm text-gray-600">{{ hotel.address }}</p>
             </div>
-            <button class="mt-2 px-4 py-2 bg-text text-white rounded-md self-start">
+            <button  @click="viewHotelDetail(hotel.hotel_id)" class="mt-2 px-4 py-2 bg-text text-white rounded-md self-start">
               Xem chi tiết
             </button>
           </div>
         </div>
+      </div>
+      <div class="flex justify-center mt-4">
+        <button @click="toggleView"
+          class="px-4 py-2 bg-blue-600 text-white rounded-full text-sm font-semibold hover:bg-blue-700 transition-all duration-200 ease-in-out">
+          {{ isExpanded ? 'Thu gọn' : 'Xem thêm' }}
+        </button>
       </div>
     </div>
 
     <div class="container mx-auto p-4 text-center">
       <hr class="mb-4 border-t-2 border-text" />
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div
-          v-for="about in about"
-          :key="about.id"
-          class="p-6 flex flex-col items-center"
-        >
-          <img
-            :src="about.image"
-            alt="Hotel Image"
-            class="w-24 h-24 object-cover rounded-full mb-4"
-          />
+        <div v-for="about in about" :key="about.id" class="p-6 flex flex-col items-center">
+          <img :src="about.image" alt="Hotel Image" class="w-24 h-24 object-cover rounded-full mb-4" />
           <h2 class="text-lg font-semibold mb-2">{{ about.name }}</h2>
           <p class="text-sm text-gray-600 mb-4">{{ about.description }}</p>
         </div>
@@ -182,19 +114,69 @@
         </p>
       </div>
       <div class="md:w-1/2 flex justify-center mt-6 md:mt-0">
-        <img
-          src=""
-          alt="Hotel Image"
-          class="rounded-lg shadow-lg"
-        />
+        <img src="" alt="Hotel Image" class="rounded-lg shadow-lg" />
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router'; // import useRouter từ vue-router
+import { getHotelListApi } from '@/services/home';
+
+const hotelList = ref([]);
+const displayCount = ref(6);
+const isExpanded = ref(false);
+
+// Khai báo router chỉ một lần
+const router = useRouter(); // Khai báo một lần duy nhất ở đây
+
+const fetchHotelList = async () => {
+  try {
+    const response = await getHotelListApi();
+    hotelList.value = response.content;
+    console.log('Hotel list response:', response.content);
+  } catch (error) {
+    console.error('Error fetching hotel list:', error);
+  }
+};
+
+const loadMore = () => {
+  displayCount.value += 6;
+};
+
+const toggleView = () => {
+  if (isExpanded.value) {
+    displayCount.value = 6;
+  } else {
+    displayCount.value += 6;
+  }
+  isExpanded.value = !isExpanded.value;
+};
+
+const viewHotelDetail = (hotelId) => {
+  console.log("Hotel ID clicked:", hotelId);
+  router.push({ name: 'HotelDetail', params: { id: hotelId } });
+};
+
+onMounted(() => {
+  fetchHotelList();
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 const showChat = ref(false)
 const chatMessage = ref('')
@@ -202,7 +184,7 @@ const chatMessage = ref('')
 function toggleChat() {
   showChat.value = !showChat.value
 }
-const router = useRouter()
+// const router = useRouter()
 
 const location = ref('')
 const checkIn = ref('')

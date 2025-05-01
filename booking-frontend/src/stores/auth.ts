@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { getInfoApi } from '@/services/user'
+import { useRouter } from 'vue-router'
 export const useAuthStore = defineStore({
   id: 'auth',
   state: () => ({
@@ -24,6 +25,7 @@ export const useAuthStore = defineStore({
       }
       location.reload()
       // router.push({ name: "login" });
+
     },
     setUser(user: any) {
       this.user = user

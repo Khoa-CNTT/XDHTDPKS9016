@@ -86,7 +86,7 @@
 import { ref, computed, onMounted } from 'vue'
 import CustomTable from '@/components/base/CustomTable.vue'
 import { getUsersApi, deleteUserApi, getUserDetailsApi } from '@/services/admin'
-import type { User } from '@/services/admin'
+import { User } from '@/types/admin'
 
 const formatDate = (dateString: string) => {
   const parts = dateString.split('-')

@@ -2,7 +2,7 @@
   <div class="card">
     <div class="card-header flex justify-between items-center">
       <button class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
-        @click="isOpenModal = true">
+      @click="showAddModal = true">
         + Thêm dịch vụ mới
       </button>
     </div>
@@ -28,8 +28,8 @@
         </template>
       </CustomTable>
     </div>
-    <ModalCreateService v-if="isOpenModal" @close="isOpenModal = false" @save="handleSaveService" />
      <ModalServiceDetail v-if="isOpenDetailModal" :service="selectedService" @close="isOpenDetailModal = false" />
+     <!-- <ModalAddService v-if="showAddModal" @close="showAddModal = false" @created="fetchServices" /> -->
   </div>
 </template>
 
@@ -38,13 +38,13 @@ import { computed, onMounted, ref } from 'vue'
 import CustomTable from '@/components/base/CustomTable.vue'
 import { getServiceListApi, getServiceByIdApi, deleteServiceApi, updateServiceApi, createServiceApi } from '@/services/supplier'
 import { ServiceRes, Service } from '@/types/supplier';
-import ModalCreateService from './ModalCreateService.vue';
+import ModalAddService from './ModalAddService.vue';
 import ModalServiceDetail from './ModalServiceDetail.vue';
-
-const isOpenModal = ref(false);
 const services = ref<Service[]>([]);
 const loading = ref(false);
 const error = ref<string | null>(null);
+  const showAddModal = ref(false)
+
 const tableHeaders = ['STT', 'Tên dịch vụ', 'Giá', 'Hình ảnh', 'Mô tả chi tiết', 'Hành động']
 
 const fetchServices = async () => {
@@ -52,7 +52,7 @@ const fetchServices = async () => {
   error.value = null;
   try {
     const res = await getServiceListApi();
-    console.log("ne:",res);
+    console.log("ne-----------:",res);
     
     services.value = res.content;
   } catch (err: any) {
@@ -92,19 +92,6 @@ const tableRows = computed(() => {
     'service_id': service.service_id
   }));
 });
-
-const handleSaveService = async (service: Service) => {
-  try {
-    console.log("Service to be created:", service); 
-    const response = await createServiceApi(service);
-    console.log('API Response:', response);
-    fetchServices();
-    isOpenModal.value = false;
-  } catch (err: any) {
-    error.value = err.message || 'Đã xảy ra lỗi khi thêm dịch vụ';
-    console.error("Error:", err);
-  }
-}
 onMounted(() => {
   fetchServices();
 });
