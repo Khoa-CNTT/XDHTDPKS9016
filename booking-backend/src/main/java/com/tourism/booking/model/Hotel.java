@@ -1,5 +1,7 @@
 package com.tourism.booking.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -35,8 +37,13 @@ public class Hotel {
     String description;
 
     @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, orphanRemoval = true)
-    Set<Service> services = new HashSet<>();
+    Set<Services> services = new HashSet<>();
 
     @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, orphanRemoval = true)
-    Set<Room> rooms = new HashSet<>();
+    Set<RoomType> roomTypes = new HashSet<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_id", nullable = false)
+    @JsonIgnore
+    Account account;
 }

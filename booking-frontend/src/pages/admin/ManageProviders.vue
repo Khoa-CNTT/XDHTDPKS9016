@@ -1,220 +1,128 @@
 <template>
-    <div class="card relative">
-      <div class="card-header flex justify-between items-center flex-wrap gap-4">
-        <div class="flex items-center">
-          <label for="search" class="mr-2">Tìm tên nhà cung cấp</label>
-          <input
-            id="search"
-            v-model="searchKeyword"
-            placeholder="Nhập tên nhà cung cấp..."
-            class="px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-        <button
-          class="bg-green-500 text-white px-4 py-2 rounded"
-          @click="handleAddSupplier"
-        >
-          Thêm nhà cung cấp +
-        </button>
+  <div class="card relative">
+    <div class="card-header flex justify-between items-center flex-wrap gap-4">
+      <div class="flex items-center">
+        <label for="search" class="mr-2">Tìm tên nhà cung cấp</label>
+        <input id="search" v-model="searchTerm" placeholder="Nhập tên nhà cung cấp..."
+          class="px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
       </div>
-  
-      <div class="card-body">
-        <CustomTable :headers="tableHeaders" :rows="filteredData">
-          <template #actions="{ row, index }">
-            <div class="flex gap-2 justify-end">
-              <button class="px-2 py-1 bg-green-500 text-white rounded" @click="handleEdit(row)">Sửa</button>
-              <button class="px-2 py-1 bg-red-500 text-white rounded" @click="handleDelete(row)">Xóa</button>
-              <button class="px-2 py-1 bg-yellow-500 text-white rounded" @click="handleToggleStatus(row)">
-                {{ row.trangThai === 'Hoạt động' ? 'Tạm dừng' : 'Hoạt động' }}
-              </button>
-              <button class="px-2 py-1 bg-blue-500 text-white rounded" @click="handleView(row)">Xem chi tiết</button>
-            </div>
-          </template>
-        </CustomTable>
-      </div>
-  
-      <!-- Nút đóng -->
-      <button
-        class="absolute top-3 right-3 text-gray-600 hover:text-red-500 text-2xl transition-transform hover:scale-125"
-      >
-        ✕
+      <button class="bg-green-500 text-white px-4 py-2 rounded" @click="showAddPopup = true">
+        Thêm nhà cung cấp +
       </button>
-  
-      <!-- Form chỉnh sửa hoặc xem chi tiết -->
-      <div v-if="showForm" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-        <div class="bg-white p-6 rounded-md w-96">
-          <h3 class="text-xl mb-4">{{ editMode ? 'Chỉnh sửa thông tin nhà cung cấp' : 'Chi tiết nhà cung cấp' }}</h3>
-          <form @submit.prevent="handleSubmit">
-            <div class="mb-4">
-              <label for="name" class="block">Tên nhà cung cấp:</label>
-              <input
-                v-model="selectedSupplier.tenNhaCungCap"
-                id="name"
-                type="text"
-                :readonly="!editMode"
-                class="w-full px-3 py-2 border rounded"
-                :disabled="!editMode"
-              />
-            </div>
-            <div class="mb-4">
-              <label for="address" class="block">Địa chỉ:</label>
-              <input
-                v-model="selectedSupplier.diaChi"
-                id="address"
-                type="text"
-                :readonly="!editMode"
-                class="w-full px-3 py-2 border rounded"
-                :disabled="!editMode"
-              />
-            </div>
-            <div class="mb-4">
-              <label for="phone" class="block">Số điện thoại:</label>
-              <input
-                v-model="selectedSupplier.soDienThoai"
-                id="phone"
-                type="text"
-                :readonly="!editMode"
-                class="w-full px-3 py-2 border rounded"
-                :disabled="!editMode"
-              />
-            </div>
-            <div class="mb-4">
-              <label for="email" class="block">Email:</label>
-              <input
-                v-model="selectedSupplier.email"
-                id="email"
-                type="email"
-                :readonly="!editMode"
-                class="w-full px-3 py-2 border rounded"
-                :disabled="!editMode"
-              />
-            </div>
-            <div class="flex gap-2 justify-end">
-              <button
-                v-if="editMode"
-                type="submit"
-                class="px-4 py-2 bg-green-500 text-white rounded"
-              >
-                Lưu
-              </button>
-              <button
-                type="button"
-                @click="closeForm"
-                class="px-4 py-2 bg-gray-500 text-white rounded"
-              >
-                Đóng
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
     </div>
-  </template>
-  
-  <script setup lang="ts">
-  import CustomTable from '@/components/base/CustomTable.vue'
-  import { ref, computed } from 'vue'
-  
-  const tableHeaders = ['STT', 'Tên nhà cung cấp', 'Địa chỉ', 'Số điện thoại', 'Email', 'Trạng thái', 'Hành động']
-  
-  const tableData = ref([
-    {
-      stt: 1,
-      tenNhaCungCap: 'Công ty A',
-      diaChi: 'Địa chỉ A',
-      soDienThoai: '0123456789',
-      email: 'cota@example.com',
-      trangThai: 'Hoạt động'
-    },
-    {
-      stt: 2,
-      tenNhaCungCap: 'Công ty B',
-      diaChi: 'Địa chỉ B',
-      soDienThoai: '0987654321',
-      email: 'cotb@example.com',
-      trangThai: 'Tạm dừng'
-    }
-  ])
-  
-  const searchKeyword = ref('')
-  const showForm = ref(false)
-  const editMode = ref(false)
-  const selectedSupplier = ref({
-    stt: 0,
-    tenNhaCungCap: '',
-    diaChi: '',
-    soDienThoai: '',
-    email: '',
-    trangThai: 'Hoạt động'
-  })
-  
-  const filteredData = computed(() => {
-    return tableData.value.filter(item => {
-      return item.tenNhaCungCap.toLowerCase().includes(searchKeyword.value.toLowerCase())
-    })
-  })
-  
-  const handleAddSupplier = () => {
-    // Mở form để thêm nhà cung cấp
-    selectedSupplier.value = {
-      stt: tableData.value.length + 1,  // Tạo STT mới cho nhà cung cấp
-      tenNhaCungCap: '',
-      diaChi: '',
-      soDienThoai: '',
-      email: '',
-      trangThai: 'Hoạt động'
-    }
-    editMode.value = true
-    showForm.value = true
+
+    <div class="card-body">
+      <CustomTable :headers="tableHeaders" :rows="formattedTableData">
+        <template #actions="{ row, index }">
+          <div class="flex gap-2 justify-end">
+            <button class="px-2 py-1 bg-green-500 text-white rounded"
+              @click="() => openEditPopup(Number(row.hotel_id))">
+              Sửa
+            </button>
+            <button class="px-2 py-1 bg-red-500 text-white rounded" @click="() => confirmDelete(Number(row.hotel_id))">
+              Xóa
+            </button>
+            <button class="px-2 py-1 bg-blue-500 text-white rounded" @click="() => openDetail(Number(row.hotel_id))">
+              Xem chi tiết
+            </button>
+          </div>
+        </template>
+      </CustomTable>
+    </div>
+    <AddSupplierPopup v-if="showAddPopup" @close="showAddPopup = false" @created="fetchInfoHotel" />
+    <SupplierDetailPopup v-if="showDetailPopup" :supplier="selectedSupplier" @close="showDetailPopup = false" />
+    <EditSupplierPopup v-if="showEditPopup" :supplier="selectedSupplier" @close="showEditPopup = false"
+      @updated="fetchInfoHotel" />
+    <DeleteConfirmModal v-if="showDeleteModal" @cancel="showDeleteModal = false" @confirm="handleDelete" />
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue'
+import CustomTable from '@/components/base/CustomTable.vue'
+import { getManagementSupplier, getSupplierByIdApi, deleteSupplierApi } from '@/services/admin'
+import SupplierDetailPopup from '@/pages/admin/SupplierDetailPopup.vue'
+import AddSupplierPopup from '@/pages/admin/AddSupplierPopup.vue'
+import EditSupplierPopup from '@/pages/admin/EditSupplierPopup.vue'
+import DeleteConfirmModal from '@/pages/admin/DeleteConfirmModal.vue'
+const showAddPopup = ref(false)
+const tableHeaders = ['STT', 'Tên nhà cung cấp', 'Hình ảnh', 'Địa chỉ', 'Số điện thoại', 'Mô tả', 'Hành động']
+
+const suppliers = ref<any[]>([])
+const searchTerm = ref('')
+const selectedSupplier = ref<any | null>(null)
+const showDetailPopup = ref(false)
+const showEditPopup = ref(false)
+const fetchInfoHotel = async () => {
+  try {
+    const res = await getManagementSupplier()
+    suppliers.value = res.content
+  } catch (error) {
+    console.error('Lỗi khi gọi API nhà cung cấp:', error)
   }
-  
-  const handleEdit = (row) => {
-    selectedSupplier.value = { ...row }
-    editMode.value = true
-    showForm.value = true
+}
+
+onMounted(() => {
+  fetchInfoHotel()
+})
+const openDetail = async (supplierId: number) => {
+  try {
+    const supplier = await getSupplierByIdApi(supplierId)
+    console.log(supplier);
+
+    selectedSupplier.value = supplier
+    showDetailPopup.value = true
+  } catch (error) {
+    console.error('Lỗi khi lấy thông tin nhà cung cấp:', error)
   }
-  
-  const handleDelete = (row) => {
-    const index = tableData.value.indexOf(row)
-    if (index !== -1) {
-      tableData.value.splice(index, 1)
-    }
+}
+const openEditPopup = async (supplierId: number) => {
+  try {
+    const supplier = await getSupplierByIdApi(supplierId)
+    selectedSupplier.value = supplier
+    showEditPopup.value = true
+  } catch (error) {
+    console.error('Lỗi khi lấy thông tin nhà cung cấp:', error)
   }
-  
-  const handleToggleStatus = (row) => {
-    row.trangThai = row.trangThai === 'Hoạt động' ? 'Tạm dừng' : 'Hoạt động'
+}
+const formattedTableData = computed(() => {
+  return suppliers.value.map((item, index) => ({
+    stt: index + 1,
+    ten: item.name,
+    hinhAnh: item.image || 'null',
+    diaChi: item.address,
+    sdt: item.hotline,
+    moTa: item.description || 'Chưa có mô tả',
+    hotel_id: item.hotel_id,
+    raw: item
+  }))
+})
+
+const showDeleteModal = ref(false)
+const deleteId = ref<number | null>(null)
+
+const confirmDelete = (id: number) => {
+  deleteId.value = id
+  showDeleteModal.value = true
+}
+
+const handleDelete = async () => {
+  if (!deleteId.value) return
+  try {
+    await deleteSupplierApi(deleteId.value)
+    await fetchInfoHotel()
+  } catch (error) {
+    console.error('Lỗi khi xóa nhà cung cấp:', error)
+  } finally {
+    showDeleteModal.value = false
+    deleteId.value = null
   }
-  
-  const handleView = (row) => {
-    selectedSupplier.value = { ...row }
-    editMode.value = false
-    showForm.value = true
-  }
-  
-  const handleSubmit = () => {
-    if (editMode.value) {
-      // Cập nhật nhà cung cấp
-      const index = tableData.value.findIndex(item => item.stt === selectedSupplier.value.stt)
-      if (index !== -1) {
-        tableData.value[index] = { ...selectedSupplier.value }
-      }
-    } else {
-      // Thêm mới nhà cung cấp
-      selectedSupplier.value.stt = tableData.value.length + 1  // Tạo STT mới cho nhà cung cấp
-      tableData.value.push({ ...selectedSupplier.value })
-    }
-    closeForm()
-  }
-  
-  const closeForm = () => {
-    showForm.value = false
-    selectedSupplier.value = {
-      stt: 0,
-      tenNhaCungCap: '',
-      diaChi: '',
-      soDienThoai: '',
-      email: '',
-      trangThai: 'Hoạt động'
-    }
-  }
-  </script>
+}
+
+const filteredData = computed(() => {
+  if (!searchTerm.value) return suppliers.value
+  return suppliers.value.filter(item =>
+    item.ten.toLowerCase().includes(searchTerm.value.toLowerCase())
+  )
+})
+</script>

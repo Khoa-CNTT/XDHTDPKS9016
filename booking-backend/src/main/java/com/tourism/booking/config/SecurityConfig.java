@@ -4,7 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -15,13 +18,17 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import javax.crypto.spec.SecretKeySpec;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-
 public class SecurityConfig {
 
     @Value("${jwt.signerKey}")
@@ -36,25 +43,44 @@ public class SecurityConfig {
     // Định nghĩa một bean của SecurityFilterChain để cấu hình bảo mật cho ứng dụng
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-        // Cấu hình quyền truy cập cho các yêu cầu HTTP
-        httpSecurity.authorizeHttpRequests(request -> {
-            request
-                    // Cho phép truy cập không hạn chế đối với endpoint "/student"
-                    .requestMatchers(apiPrefix + "/auth/**").permitAll()
-                    .requestMatchers(apiPrefix + "/forgotPassword/**").permitAll()
-                    .requestMatchers(apiPrefix + "/management-user/**").authenticated()
-                    .anyRequest().authenticated(); // nhưng request còn lại phải được xác thực
-        });
+        httpSecurity
+                .cors(Customizer.withDefaults()) // Cần có dòng này
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(request -> {
+                    request
+                            .requestMatchers(apiPrefix + "/hotels/**").permitAll()
+                            .requestMatchers(apiPrefix + "/auth/**").permitAll()
+                            .requestMatchers(apiPrefix + "/user-profile/**").permitAll()
+                            .requestMatchers(apiPrefix + "/forgotPassword/**").permitAll()
+                            .requestMatchers(apiPrefix+ "/room-types/**").permitAll()
+                            .requestMatchers(apiPrefix+ "/hotel-info/**").permitAll()
+                            .requestMatchers(apiPrefix + "/management-user/**").authenticated()
+                            .requestMatchers(apiPrefix + "/images/**").permitAll()
+                            .requestMatchers(apiPrefix + "/chat/ai").permitAll()
+                            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                            .anyRequest().authenticated(); // các request còn lại phải xác thực
+                });
 
-        // Vô hiệu hóa bảo mật CSRF (Cross-Site Request Forgery)
-        httpSecurity.csrf(AbstractHttpConfigurer::disable);
         httpSecurity.oauth2ResourceServer(oauth2 ->
-                oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(customJwtDecoder)
+                oauth2.jwt(jwtConfigurer -> jwtConfigurer
+                        .decoder(customJwtDecoder)
                         .jwtAuthenticationConverter(jwtAuthenticationConverter())
                 )
         );
-        // Xây dựng và trả về đối tượng SecurityFilterChain
+
         return httpSecurity.build();
+    }
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration cors = new CorsConfiguration();
+        cors.setAllowedOrigins(List.of("http://localhost:5173"));
+        cors.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        cors.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        cors.setAllowCredentials(true);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", cors);
+        return source;
     }
 
     @Bean
@@ -77,12 +103,17 @@ public class SecurityConfig {
         // Tạo JwtGrantedAuthoritiesConverter và đặt tiền tố quyền hạn
         JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
         jwtGrantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
-
+        jwtGrantedAuthoritiesConverter.setAuthoritiesClaimName("sub");
         // Tạo JwtAuthenticationConverter và thiết lập JwtGrantedAuthoritiesConverter
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
+//        jwtAuthenticationConverter.setPrincipalClaimName("accountId");
 
         // Trả về JwtAuthenticationConverter cấu hình sẵn
         return jwtAuthenticationConverter;
     }
+
+
+
+
 }

@@ -8,6 +8,7 @@ import com.tourism.booking.service.IHotelService;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +25,9 @@ public class ManagementSupplierController {
     IHotelService hotelService;
 
     @GetMapping
-    public ResponseEntity<?> getAllHotels(Pageable pageable) {
+    public ResponseEntity<?> getAllHotels(@RequestParam(defaultValue = "0") int page,
+                                          @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
         return ResponseEntity.ok(new PageReponse<>(hotelService.getHotels(pageable)));
     }
 

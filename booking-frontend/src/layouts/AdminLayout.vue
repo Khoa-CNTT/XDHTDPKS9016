@@ -1,84 +1,90 @@
 <template>
-  <div class="wrapper">
-    <nav class="main-header navbar navbar-expand navbar-white navbar-light">
-      <ul class="navbar-nav">
-        <li class="nav-item">
-          <a class="nav-link" data-widget="pushmenu" href="#"><i class="fas fa-bars"></i></a>
-        </li>
-      </ul>
-    </nav>
-
-    <aside class="main-sidebar bg-text elevation-4 flex-shrink-0 w-[20%] text-white font-bold">
-      <RouterLink href="#" class="brand-link">
-        <span class="brand-text text-[16px] font-bold uppercase flex items-center gap-2 text-lg text-white">
-          <Icon icon="si:home-line" class="text-white" width="30" height="30" />
-          Admin
-        </span>
+  <div class="flex h-screen overflow-hidden">
+    <!-- Sidebar -->
+    <aside class="bg-gray-800 text-white w-1/5 flex flex-col">
+      <RouterLink to="/" class="flex items-center gap-2 px-4 py-6 text-xl font-bold uppercase">
+        <Icon icon="si:home-line" width="30" height="30" />
+        Admin
       </RouterLink>
-      <div class="sidebar">
-        <nav class="mt-2">
-          <ul class="nav nav-pills nav-sidebar flex-column space-y-1">
-            <li class="nav-item">
-              <router-link to="/admin/manage-providers"
-                class="nav-link d-flex align-items-center gap-2 text-white font-bold"
-                active-class="bg-blue-500" exact-active-class="bg-blue-600">
-                <Icon icon="carbon:service-desk" width="24" height="24" />
-                <p class="mb-0">Quản lý nhà cung cấp</p>
-              </router-link>
-            </li>
-            <li class="nav-item">
-              <router-link to="/admin/manage-user"
-                class="nav-link d-flex align-items-center gap-2 text-white font-bold"
-                active-class="bg-blue-500" exact-active-class="bg-blue-600">
-                <Icon icon="material-symbols:hotel-class-rounded" width="24" height="24" />
-                <p class="mb-0">Quản lý người dùng</p>
-              </router-link>
-            </li>
-            <li class="nav-item">
-              <router-link to="/admin/statistics"
-                class="nav-link d-flex align-items-center gap-2 text-white font-bold"
-                active-class="bg-blue-500" exact-active-class="bg-blue-600">
-                <Icon icon="mdi:chart-box-outline" width="24" height="24" />
-                <p class="mb-0">Báo cáo và thống kê</p>
-              </router-link>
-            </li>
-          </ul>
-        </nav>
+
+      <nav class="flex-1 px-2 space-y-1">
+        <router-link to="/admin/manage-providers"
+          class="flex items-center gap-2 px-4 py-3 rounded-lg transition-colors duration-300 hover:bg-blue-600"
+          :class="$route.path === '/admin/manage-providers' ? 'bg-blue-500' : ''">
+          <Icon icon="carbon:service-desk" width="24" height="24" />
+          <span>Quản lý nhà cung cấp</span>
+        </router-link>
+
+        <router-link to="/admin/manage-user"
+          class="flex items-center gap-2 px-4 py-3 rounded-lg transition-colors duration-300 hover:bg-blue-600"
+          :class="$route.path === '/admin/manage-user' ? 'bg-blue-500' : ''">
+          <Icon icon="material-symbols:hotel-class-rounded" width="24" height="24" />
+          <span>Quản lý người dùng</span>
+        </router-link>
+
+        <router-link to="/admin/statistics"
+          class="flex items-center gap-2 px-4 py-3 rounded-lg transition-colors duration-300 hover:bg-blue-600"
+          :class="$route.path === '/admin/statistics' ? 'bg-blue-500' : ''">
+          <Icon icon="mdi:chart-box-outline" width="24" height="24" />
+          <span>Báo cáo và thống kê</span>
+        </router-link>
+      </nav>
+
+      <div class="p-4 mt-auto">
+        <button @click="handleLogout"
+          class="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg border border-white text-white hover:bg-white hover:text-black transition-all">
+          <Icon icon="material-symbols:logout-rounded" width="24" height="24" />
+          Đăng xuất
+        </button>
       </div>
     </aside>
 
-    <div class="content-wrapper p-3">
-      <router-view />
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col">
+      <!-- Top Bar -->
+      <nav class="bg-white px-4 py-2 flex items-center justify-between shadow">
+        <!-- Nút menu -->
+        <button class="text-gray-600 hover:text-black">
+          <i class="fas fa-bars"></i>
+        </button>
+
+        <!-- Avatar và tên người dùng -->
+        <div class="flex items-center gap-3">
+          <img src="https://i.pravatar.cc/40" alt="avatar" class="w-8 h-8 rounded-full object-cover" />
+          <span class="text-gray-800 font-semibold">{{ authStore.getUser?.username }}</span>
+        </div>
+      </nav>
+
+      <!-- Router View -->
+      <main class="flex-1 overflow-y-auto p-6 bg-gray-50">
+        <router-view />
+      </main>
     </div>
   </div>
 </template>
 
-
 <script setup>
-</script>
-
-<style>
-@import url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css');
-@import url('https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css');
-.bg-blue-500 {
-  background-color: #3B82F6; 
-}
-
-.bg-blue-600 {
-  background-color: #2563EB; 
-}
-</style>
-
-<script>
 import { Icon } from '@iconify/vue'
-const loadScript = (src) => {
-  const script = document.createElement('script')
-  script.src = src
-  script.async = true
-  document.body.appendChild(script)
-}
+import { useRouter } from 'vue-router'
+import { logoutApi } from '@/services/auth'
+import { toast } from 'vue3-toastify'
+import { useAuthStore } from '@/stores/auth'
+const authStore = useAuthStore()
+const router = useRouter()
 
-loadScript('https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.min.js')
-loadScript('https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js')
-loadScript('https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js')
+
+const handleLogout = async () => {
+  try {
+    const token = localStorage.getItem('access_token')
+    if (!token) throw new Error('Không tìm thấy token trong localStorage')
+
+    await logoutApi({ token })
+    localStorage.removeItem('access_token')
+    authStore.$reset()
+    toast.success('Đăng xuất thành công!', { autoClose: 3000, position: 'top-right' })
+    router.push('/login')
+  } catch (error) {
+    console.error('Lỗi khi logout:', error)
+  }
+}
 </script>

@@ -1,191 +1,144 @@
 <template>
     <div class="card">
-        <!-- Header: nút Thêm loại phòng mới -->
         <div class="card-header flex justify-between items-center">
-            <button class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
-                @click="openAddPopup">
+            <button @click="showModal = true"
+                class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition">
                 + Thêm loại phòng mới
             </button>
-
-            <!-- Popup thêm mới -->
-            <div v-if="isAddMode"
-                class="fixed top-0 left-0 w-full h-full bg-gray-400 bg-opacity-40 flex items-center justify-center z-50">
-                <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl p-8 relative">
-                    <h3 class="text-2xl font-bold text-center text-gray-800 mb-8">
-                        ➕ Thêm loại phòng mới
-                    </h3>
-                    <form @submit.prevent="submitAdd" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Tên loại phòng -->
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-1">Tên loại phòng</label>
-                            <input v-model="newRoom.roomName" type="text"
-                                class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-indigo-500"
-                                required />
-                        </div>
-                        <!-- Giá -->
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-1">Giá</label>
-                            <input v-model="newRoom.price" type="text"
-                                class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-indigo-500"
-                                required />
-                        </div>
-                        <!-- Tiện ích -->
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-1">Tiện ích</label>
-                            <input v-model="newRoom.amenities" type="text"
-                                class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-indigo-500"
-                                required />
-                        </div>
-                        <!-- Số lượng -->
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-1">Số lượng</label>
-                            <input v-model.number="newRoom.quantity" type="number"
-                                class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-indigo-500"
-                                required />
-                        </div>
-                        <!-- Buttons -->
-                        <div class="md:col-span-2 flex justify-end gap-4 mt-4">
-                            <button type="button" @click="cancelAdd"
-                                class="px-6 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition">
-                                Hủy
-                            </button>
-                            <button type="submit"
-                                class="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition">
-                                Thêm
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
         </div>
 
-        <!-- Body: bảng CustomTable -->
         <div class="card-body">
-            <CustomTable :headers="tableHeaders" :rows="roomData">
-                <template #actions="{ row, index }">
-                    <div class="flex gap-2 justify-end">
-                        <button class="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white text-sm rounded-md transition"
-                            @click="editRoom(row)">
-                            Sửa
-                        </button>
-                        <button class="px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-sm rounded-md transition"
-                            @click="deleteRoom(index)">
-                            Xóa
-                        </button>
-                    </div>
-                </template>
-            </CustomTable>
+            <table class="min-w-full table-auto border-collapse">
+                <thead>
+                    <tr>
+                        <th class="border px-4 py-2">STT</th>
+                        <th class="border px-4 py-2">Tên loại phòng</th>
+                        <th class="border px-4 py-2">Số lượng giường</th>
+                        <th class="border px-4 py-2">Số lượng người</th>
+                        <th class="border px-4 py-2">Giá</th>
+                        <th class="border px-4 py-2">Mô tả</th>
+                        <th class="border px-4 py-2">Hình ảnh</th>
+                        <th class="border px-4 py-2">Số lượng</th>
+                        <th class="border px-4 py-2">Trạng thái</th>
+                        <th class="border px-4 py-2">Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(row, index) in roomData" :key="index">
+                        <td class="border px-4 py-2">{{ row['STT'] }}</td>
+                        <td class="border px-4 py-2">{{ row['Tên loại phòng'] }}</td>
+                        <td class="border px-4 py-2">{{ row['Số lượng giường'] }}</td>
+                        <td class="border px-4 py-2">{{ row['Số lượng người'] }}</td>
+                        <td class="border px-4 py-2">{{ row['Giá'] }}</td>
+                        <td class="border px-4 py-2">{{ row['Mô tả'] }}</td>
+                        <td class="border px-4 py-2">
+                            <img :src="row['Hình ảnh']" alt="room" class="w-16 h-16 object-cover" />
+                        </td>
+                        <td class="border px-4 py-2">{{ row['Số lượng'] }}</td>
+                        <td class="border px-4 py-2">{{ row['Trạng thái'] }}</td>
+                        <td class="border px-4 py-2">
+                            <div class="flex gap-2 justify-end items-center">
+                                <button class="px-2 py-1 bg-blue-500 text-white text-xs rounded-md">Sửa</button>
+                                <button @click="askDelete(row['room_type_id'])"
+                                    class="px-2 py-1 bg-red-500 text-white text-xs rounded-md">
+                                    Xóa
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
 
-        <!-- Popup chỉnh sửa -->
-        <div v-if="isEditMode"
-            class="fixed top-0 left-0 w-full h-full bg-gray-400 bg-opacity-40 flex items-center justify-center z-50">
-            <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl p-8 relative">
-                <h3 class="text-2xl font-bold text-center text-gray-800 mb-8">
-                    ✏️ Chỉnh sửa loại phòng
-                </h3>
-                <form @submit.prevent="submitEdit" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Tên loại phòng -->
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Tên loại phòng</label>
-                        <input v-model="formData.roomName" type="text"
-                            class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-indigo-500" required />
-                    </div>
-                    <!-- Giá -->
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Giá</label>
-                        <input v-model="formData.price" type="text"
-                            class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-indigo-500" required />
-                    </div>
-                    <!-- Tiện ích -->
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Tiện ích</label>
-                        <input v-model="formData.amenities" type="text"
-                            class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-indigo-500" required />
-                    </div>
-                    <!-- Số lượng -->
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Số lượng</label>
-                        <input v-model.number="formData.quantity" type="number"
-                            class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-indigo-500" required />
-                    </div>
-                    <!-- Buttons -->
-                    <div class="md:col-span-2 flex justify-end gap-4 mt-4">
-                        <button type="button" @click="cancelEdit"
-                            class="px-6 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition">
-                            Hủy
-                        </button>
-                        <button type="submit"
-                            class="px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition">
-                            Cập nhật
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+        <AddRoomTypeModal :isOpen="showModal" @close="showModal = false" @added="handleRoomTypeAdded" />
+        <ConfirmDeleteModal v-if="showDeleteConfirm" @cancel="cancelDelete" @confirm="confirmDelete" />
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import CustomTable from '@/components/base/CustomTable.vue'
+import { onMounted, ref, computed } from 'vue'
+import { getRoomTypesApi, deleteRoomTypeApi } from '@/services/supplier'
+import AddRoomTypeModal from '@/pages/suppliers/AddRoomTypeModal.vue'
+import ConfirmDeleteModal from './ConfirmDeleteModal.vue'
+import type { RoomType } from '@/types/supplier'
+import { toast } from 'vue3-toastify'
 
-const tableHeaders = [
-    'STT',
-    'Tên loại phòng',
-    'Giá',
-    'Tiện ích',
-    'Số lượng',
-    'Hành động'
-]
+const roomTypes = ref<RoomType[]>([])
+const isLoading = ref(false)
+const error = ref<string | null>(null)
+const showModal = ref(false)
+const showDeleteConfirm = ref(false)
+const selectedRoomTypeId = ref<number | null>(null)
 
-const roomData = ref<Array<Record<string, any>>>([
-    { stt: 1, roomName: 'Phòng đơn', price: '500000', amenities: 'Máy lạnh, TV', quantity: 10 },
-    { stt: 2, roomName: 'Phòng đôi', price: '700000', amenities: 'Máy lạnh, TV, Tủ lạnh', quantity: 5 }
-])
-
-const isAddMode = ref(false)
-const isEditMode = ref(false)
-const newRoom = ref({ roomName: '', price: '', amenities: '', quantity: 1 })
-const formData = ref({ id: null, roomName: '', price: '', amenities: '', quantity: 1 })
-
-// Hàm mở popup thêm
-const openAddPopup = () => { isAddMode.value = true }
-const cancelAdd = () => { isAddMode.value = false }
-// Thêm loại phòng mới
-const submitAdd = () => {
-    roomData.value.push({
-        stt: roomData.value.length + 1,
-        roomName: newRoom.value.roomName,
-        price: newRoom.value.price,
-        amenities: newRoom.value.amenities,
-        quantity: newRoom.value.quantity
-    })
-    newRoom.value = { roomName: '', price: '', amenities: '', quantity: 1 }
-    isAddMode.value = false
-}
-
-// Sửa loại phòng
-const editRoom = (row: any) => {
-    formData.value = { ...row }
-    isEditMode.value = true
-}
-const cancelEdit = () => { isEditMode.value = false }
-const submitEdit = () => {
-    const idx = roomData.value.findIndex(r => r.stt === formData.value.stt)
-    if (idx > -1) {
-        roomData.value.splice(idx, 1, { ...formData.value })
+const fetchRoomTypes = async () => {
+    isLoading.value = true
+    try {
+        const response = await getRoomTypesApi()
+        roomTypes.value = response.content
+        console.log( roomTypes.value);
+        
+    } catch (err) {
+        error.value = 'Không thể tải dữ liệu loại phòng'
+        console.error(err)
+    } finally {
+        isLoading.value = false
     }
-    isEditMode.value = false
 }
 
-// Xóa loại phòng và cập nhật lại STT
-const deleteRoom = (index: number) => {
-    roomData.value.splice(index, 1)
-    roomData.value.forEach((r, i) => { r.stt = i + 1 })
+onMounted(() => {
+    fetchRoomTypes()
+})
+
+const handleRoomTypeAdded = () => {
+    showModal.value = false
+    fetchRoomTypes()
+}
+
+const roomData = computed(() => {
+    return roomTypes.value.map((room, index) => ({
+        'STT': index + 1,
+        'Tên loại phòng': room.type_name,
+        'Số lượng giường': room.number_bed,
+        'Số lượng người': room.maximum_people,
+        'Giá': `${room.price.toLocaleString()} VNĐ`,
+        'Mô tả': room.description,
+        'Hình ảnh': room.room_image,
+        'Số lượng': room.available_room,
+        'Trạng thái': room.status,
+        'Hành động': '',
+        'room_type_id': room.room_type_id,
+    }))
+})
+
+const askDelete = (id: number) => {
+    selectedRoomTypeId.value = id
+    showDeleteConfirm.value = true
+}
+
+const confirmDelete = async () => {
+    if (selectedRoomTypeId.value !== null) {
+        try {
+            await deleteRoomTypeApi(selectedRoomTypeId.value)
+            toast.error('Xóa loại phòng thành công!', {
+                autoClose: 10000,
+                position: 'top-right',
+            });
+            await fetchRoomTypes()
+        } catch (err) {
+            console.error('Xoá thất bại:', err)
+            toast.error('Xóa loại phòng thất bại!', {
+                autoClose: 10000,
+                position: 'top-right',
+            });
+        } finally {
+            showDeleteConfirm.value = false
+            selectedRoomTypeId.value = null
+        }
+    }
+}
+
+const cancelDelete = () => {
+    showDeleteConfirm.value = false
+    selectedRoomTypeId.value = null
 }
 </script>
-
-<style scoped>
-/* Thêm style tùy chỉnh nếu cần */
-</style>

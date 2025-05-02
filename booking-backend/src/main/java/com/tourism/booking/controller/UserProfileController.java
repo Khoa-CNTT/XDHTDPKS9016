@@ -24,12 +24,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
-@PreAuthorize("hasRole('USER')")
 @RequestMapping("${api.prefix}/user-profile")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
 @CrossOrigin("http://localhost:5173/")
 public class UserProfileController {
+
     IUserProfileService userProfileService;
     IAccountService accountService;
     IUserProfileMapper userProfileMapper;
@@ -45,19 +45,15 @@ public class UserProfileController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateProfile(@PathVariable Long id,
-            @RequestBody UserProfileRequest userProfileRequest) {
-        // Lấy thông tin UserProfile hiện tại từ database
+                                           @RequestBody UserProfileRequest userProfileRequest) {
         UserProfile existingProfile = userProfileService.findUserProfileEntityById(id)
                 .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_EXIST));
 
-        // Tạo đối tượng từ request
         UserProfile updatedProfile = userProfileMapper.UserProfileRequestToUserProfile(userProfileRequest);
 
-        // Giữ nguyên ID và account
         updatedProfile.setUser_id(id);
         updatedProfile.setAccount(existingProfile.getAccount());
 
-        // Lưu thông tin đã cập nhật
         UserProfile savedProfile = userProfileService.save(updatedProfile);
         UserProfileResponse response = userProfileMapper.UserProfileToUserProfileResponse(savedProfile);
         response.setUsername(existingProfile.getAccount().getUsername());

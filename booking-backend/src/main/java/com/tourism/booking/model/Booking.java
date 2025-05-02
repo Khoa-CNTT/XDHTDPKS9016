@@ -43,8 +43,8 @@ public class Booking {
     String status;
 
     @ManyToOne
-    @JoinColumn(name = "room_id", nullable = false)
-    Room room;
+    @JoinColumn(name = "room_type_id", nullable = false)
+    RoomType room_type;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -60,5 +60,5 @@ public class Booking {
             joinColumns = @JoinColumn(name = "booking_id"),  // Khóa ngoại trỏ đến Booking
             inverseJoinColumns = @JoinColumn(name = "service_id") // Khóa ngoại trỏ đến Service
     )
-    Set<Service> services = new HashSet<>();
+    Set<Services> services = new HashSet<>();
 }

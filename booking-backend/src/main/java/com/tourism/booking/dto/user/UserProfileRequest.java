@@ -24,5 +24,4 @@ public class UserProfileRequest {
     @JsonFormat(pattern = "dd-MM-yyyy")
     LocalDate birth_date;
     String status;
-    int account_id;
 }

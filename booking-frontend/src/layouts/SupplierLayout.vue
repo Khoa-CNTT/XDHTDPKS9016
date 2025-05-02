@@ -1,133 +1,137 @@
 <template>
-    <div class="wrapper">
-        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" data-widget="pushmenu" href="#"><i class="fas fa-bars"></i></a>
-                </li>
-            </ul>
-        </nav>
-
-        <aside class="main-sidebar bg-text elevation-4 flex-shrink-0 w-[20%] text-white font-bold">
-            <RouterLink href="#" class="brand-link">
-                <span class="brand-text text-[16px] font-bold uppercase flex items-center gap-2 text-lg text-white">
-                    <Icon icon="si:home-line" class="text-white" width="30" height="30" />
-                    Nhà cung cấp
-                </span>
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="bg-slate-900 w-[20%] text-white font-bold flex flex-col">
+            <RouterLink to="/" class="flex items-center gap-2 px-4 py-5 border-b border-slate-700">
+                <Icon icon="si:home-line" class="text-white" width="30" height="30" />
+                <span class="uppercase text-lg font-bold">Nhà cung cấp</span>
             </RouterLink>
-            <div class="sidebar">
-                <nav class="mt-2">
-                    <ul class="nav nav-pills nav-sidebar flex-column space-y-1">
-                        <li class="nav-item">
-                            <router-link to="/supplier/order-room-management"
-                                class="nav-link d-flex align-items-center gap-2 text-white font-bold"
-                                active-class="bg-blue-500"
-                                exact-active-class="bg-blue-600">
-                                <Icon icon="material-symbols:hotel-class-rounded" width="24" height="24" />
-                                <p class="mb-0">Quản lý đặt phòng</p>
-                            </router-link>
-                        </li>
-                        <li class="nav-item">
-                            <router-link to="/supplier/service-control"
-                                class="nav-link d-flex align-items-center gap-2 text-white font-bold"
-                                active-class="bg-blue-500"
-                                exact-active-class="bg-blue-600">
-                                <Icon icon="carbon:service-desk" width="24" height="24" />
-                                <p class="mb-0">Quản lý dịch vụ</p>
-                            </router-link>
-                        </li>
-                        <li class="nav-item">
-                            <router-link to="/supplier/room-types"
-                                class="nav-link d-flex align-items-center gap-2 text-white font-bold"
-                                active-class="bg-blue-500"
-                                exact-active-class="bg-blue-600">
-                                <Icon icon="carbon:service-desk" width="24" height="24" />
-                                <p class="mb-0">Quản lý loại phòng</p>
-                            </router-link>
-                        </li>
-                        <li class="nav-item">
-                            <router-link to="/supplier/hotel-info"
-                                class="nav-link d-flex align-items-center gap-2 text-white font-bold"
-                                active-class="bg-blue-500"
-                                exact-active-class="bg-blue-600">
-                                <Icon icon="carbon:service-desk" width="24" height="24" />
-                                <p class="mb-0">Quản lý thông tin khách sạn</p>
-                            </router-link>
-                        </li>
-                        <li class="nav-item">
-                            <router-link to="/supplier/billing"
-                                class="nav-link d-flex align-items-center gap-2 text-white font-bold"
-                                active-class="bg-blue-500"
-                                exact-active-class="bg-blue-600">
-                                <Icon icon="carbon:service-desk" width="24" height="24" />
-                                <p class="mb-0">Quản lý giao dịch thanh toán</p>
-                            </router-link>
-                        </li>
-                        <li class="nav-item">
-                            <router-link to="/supplier/review-manage"
-                                class="nav-link d-flex align-items-center gap-2 text-white font-bold"
-                                active-class="bg-blue-500"
-                                exact-active-class="bg-blue-600">
-                                <Icon icon="mdi:comment-multiple-outline" width="24" height="24" />
-                                <p class="mb-0">Quản lý bình luận</p>
-                            </router-link>
-                        </li>
-                        <li class="nav-item">
-                            <router-link to="/supplier/profile-settings"
-                                class="nav-link d-flex align-items-center gap-2 text-white font-bold"
-                                active-class="bg-blue-500"
-                                exact-active-class="bg-blue-600">
-                                <Icon icon="mdi:account-circle-outline" width="24" height="24" />
-                                <p class="mb-0">Quản lý tài khoản cá nhân</p>
-                            </router-link>
-                        </li>
-                        <li class="nav-item">
-                            <router-link to="/supplier/overview-report"
-                                class="nav-link d-flex align-items-center gap-2 text-white font-bold"
-                                active-class="bg-blue-500"
-                                exact-active-class="bg-blue-600">
-                                <Icon icon="mdi:chart-box-outline" width="24" height="24" />
-                                <p class="mb-0">Báo cáo và thống kê</p>
-                            </router-link>
-                        </li>
-                    </ul>
-                </nav>
+
+            <nav class="flex-1 overflow-y-auto px-4 mt-4">
+                <ul class="space-y-2">
+                    <li>
+                        <router-link to="/supplier/order-room-management"
+                            class="flex items-center gap-3 px-4 py-2 rounded hover:bg-blue-500 transition"
+                            active-class="bg-blue-500" exact-active-class="bg-blue-600">
+                            <Icon icon="material-symbols:hotel" width="24" height="24" />
+                            <span>Quản lý đặt phòng</span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link to="/supplier/service-control"
+                            class="flex items-center gap-3 px-4 py-2 rounded hover:bg-blue-500 transition"
+                            active-class="bg-blue-500" exact-active-class="bg-blue-600">
+                            <Icon icon="mdi:room-service-outline" width="24" height="24" />
+                            <span>Quản lý dịch vụ</span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link to="/supplier/room-types"
+                            class="flex items-center gap-3 px-4 py-2 rounded hover:bg-blue-500 transition"
+                            active-class="bg-blue-500" exact-active-class="bg-blue-600">
+                            <Icon icon="mdi:bed-outline" width="24" height="24" />
+                            <span>Quản lý loại phòng</span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link to="/supplier/hotel-info"
+                            class="flex items-center gap-3 px-4 py-2 rounded hover:bg-blue-500 transition"
+                            active-class="bg-blue-500" exact-active-class="bg-blue-600">
+                            <Icon icon="mdi:office-building-outline" width="24" height="24" />
+                            <span>Quản lý thông tin khách sạn</span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link to="/supplier/billing"
+                            class="flex items-center gap-3 px-4 py-2 rounded hover:bg-blue-500 transition"
+                            active-class="bg-blue-500" exact-active-class="bg-blue-600">
+                            <Icon icon="mdi:credit-card-outline" width="24" height="24" />
+                            <span>Quản lý giao dịch thanh toán</span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link to="/supplier/review-manage"
+                            class="flex items-center gap-3 px-4 py-2 rounded hover:bg-blue-500 transition"
+                            active-class="bg-blue-500" exact-active-class="bg-blue-600">
+                            <Icon icon="mdi:comment-text-outline" width="24" height="24" />
+                            <span>Quản lý bình luận</span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link to="/supplier/profile-settings"
+                            class="flex items-center gap-3 px-4 py-2 rounded hover:bg-blue-500 transition"
+                            active-class="bg-blue-500" exact-active-class="bg-blue-600">
+                            <Icon icon="mdi:account-cog-outline" width="24" height="24" />
+                            <span>Quản lý tài khoản cá nhân</span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link to="/supplier/overview-report"
+                            class="flex items-center gap-3 px-4 py-2 rounded hover:bg-blue-500 transition"
+                            active-class="bg-blue-500" exact-active-class="bg-blue-600">
+                            <Icon icon="mdi:chart-bar" width="24" height="24" />
+                            <span>Báo cáo và thống kê</span>
+                        </router-link>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="p-4 mt-auto">
+                <button @click="handleLogout"
+                    class="w-full flex items-center justify-center gap-2 border border-white text-white rounded-lg px-4 py-2 hover:bg-white hover:text-black transition duration-300">
+                    <Icon icon="material-symbols:logout-rounded" width="24" height="24" />
+                    Đăng xuất
+                </button>
             </div>
         </aside>
 
-        <div class="content-wrapper p-3">
-            <router-view />
+        <!-- Content -->
+        <div class="flex-1 flex flex-col">
+            <!-- Top Nav -->
+            <nav class="bg-white px-4 py-2 flex items-center justify-between shadow">
+                <!-- Nút menu -->
+                <button class="text-gray-600 hover:text-black">
+                    <i class="fas fa-bars"></i>
+                </button>
+
+                <!-- Avatar và tên người dùng -->
+                <div class="flex items-center gap-3">
+                    <img src="https://i.pravatar.cc/40" alt="avatar" class="w-8 h-8 rounded-full object-cover" />
+                    <span class="text-gray-800 font-semibold">{{ authStore.getUser?.username }}</span>
+                </div>
+            </nav>
+
+            <!-- Router View -->
+            <main class="p-4 overflow-y-auto flex-1 bg-gray-50">
+                <router-view />
+            </main>
         </div>
     </div>
 </template>
 
 <script setup>
-</script>
-
-<style scoped>
-@import url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css');
-@import url('https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css');
-
-.bg-blue-600 {
-  background-color: #1D4ED8;
-}
-
-.bg-blue-500 {
-  background-color: #3B82F6; 
-}
-</style>
-
-
-<script>
 import { Icon } from '@iconify/vue'
-const loadScript = (src) => {
-    const script = document.createElement('script')
-    script.src = src
-    script.async = true
-    document.body.appendChild(script)
-}
+import { useRouter } from 'vue-router'
+import { logoutApi } from '@/services/auth'
+import { toast } from 'vue3-toastify'
+import { useAuthStore } from '@/stores/auth'
+const authStore = useAuthStore()
+const router = useRouter()
 
-loadScript('https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.min.js')
-loadScript('https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js')
-loadScript('https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js')
+const handleLogout = async () => {
+    try {
+        const token = localStorage.getItem('access_token')
+        if (!token) throw new Error('Không tìm thấy token trong localStorage')
+        await logoutApi({ token })
+        localStorage.removeItem('access_token')
+        authStore.$reset()
+        toast.success('Đăng xuất thành công!', {
+            autoClose: 3000,
+            position: 'top-right',
+        })
+        router.push('/login')
+    } catch (error) {
+        console.error('Lỗi khi logout:', error)
+    }
+}
 </script>

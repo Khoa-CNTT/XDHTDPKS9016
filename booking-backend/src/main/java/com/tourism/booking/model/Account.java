@@ -1,5 +1,6 @@
 package com.tourism.booking.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -29,6 +30,7 @@ public class Account {
     String email;
 
     @OneToOne(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonIgnore
     ForgotPassword forgotPassword;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -38,4 +40,7 @@ public class Account {
             inverseJoinColumns = @JoinColumn(name = "role_id") // Cột khóa ngoại tham chiếu đến Role
     )
     Set<Role> roles = new HashSet<>();
+
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Hotel> hotels = new HashSet<>();
 }

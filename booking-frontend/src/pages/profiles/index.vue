@@ -1,130 +1,218 @@
 <template>
-  <div class="min-h-screen bg-gray-100 py-10 px-4">
-    <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-md p-8">
-      <div class="flex flex-col items-center mb-10">
-        <div
-          class="w-24 h-24 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-white text-3xl font-bold shadow-lg"
-        >
-          NT
-        </div>
-        <h1 class="text-xl font-semibold uppercase text-slate-800 mt-4">Hồ sơ người dùng</h1>
-      </div>
+  <div class="max-w-2xl mx-auto mt-10 p-8 bg-white rounded-xl shadow-md">
+    <h2 class="text-2xl font-bold text-center text-gray-800 mb-8">Cập nhật tài khoản cá nhân</h2>
+    <form class="space-y-6" @submit.prevent="onSubmit">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">User ID</label>
+          <input v-model="form.user_id" type="text" placeholder="User ID" 
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            readonly />
+        </div> -->
 
-      <div class="space-y-6">
-        <div
-          v-for="(field, key) in profileFields"
-          :key="key"
-          class="rounded-lg border border-gray-200 hover:-translate-y-0.5 transition-transform"
-        >
-          <div class="bg-gray-100 px-4 py-2 border-b border-gray-200">
-            <h3 class="text-sm font-semibold text-gray-600 uppercase">{{ field.label }}</h3>
-          </div>
-          <div class="flex items-center justify-between px-4 py-3">
-            <template v-if="editingField === key">
-              <input
-                v-model="editedProfile[key]"
-                type="text"
-                class="flex-1 mr-2 px-3 py-2 border rounded-md text-sm"
-              />
-              <span
-                @click="saveField(key)"
-                class="text-indigo-600 text-sm font-medium cursor-pointer mr-2"
-                >💾 Lưu</span
-              >
-              <span
-                @click="cancelEdit"
-                class="text-indigo-600 text-sm font-medium cursor-pointer"
-                >❌ Hủy</span
-              >
-            </template>
-            <template v-else>
-              <span class="text-base font-medium text-slate-700">{{ userProfile[key] }}</span>
-              <span
-                @click="editField(key)"
-                class="text-indigo-600 text-sm font-medium cursor-pointer flex items-center ml-2"
-              >
-                <svg
-                  class="w-4 h-4 mr-1"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"
-                  ></path>
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"
-                  ></path>
-                </svg>
-                Chỉnh sửa
-              </span>
-            </template>
-          </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Họ và tên</label>
+          <input v-model="form.full_name" type="text" placeholder="Nhập họ và tên"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Giới tính</label>
+          <select v-model="form.gender"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="nam">Nam</option>
+            <option value="nu">Nữ</option>
+            <!-- <option value="khac">Khác</option> -->
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Địa chỉ</label>
+          <input v-model="form.address" type="text" placeholder="Nhập địa chỉ"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <input v-model="form.email" type="email" placeholder="Nhập email" readonly
+            class="w-full px-4 py-2 bg-gray-100 text-gray-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 cursor-not-allowed" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Số điện thoại</label>
+          <input v-model="form.phone" type="text" placeholder="Nhập số điện thoại"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Ngày sinh</label>
+          <input v-model="form.birth_date" type="date"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Trạng thái</label>
+          <input v-model="form.status" type="text" placeholder="Nhập trạng thái (ví dụ: hoạt động)"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            Tên đăng nhập
+          </label>
+          <input v-model="form.username" type="text" placeholder="Tên đăng nhập" readonly
+            class="w-full px-4 py-2 bg-gray-100 text-gray-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 cursor-not-allowed" />
         </div>
       </div>
 
-      <div class="text-center mt-10">
-        <button
-          @click="saveAll"
-          class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-3 rounded-lg shadow-lg transition-transform hover:-translate-y-0.5"
-        >
-          Lưu thay đổi
-        </button>
-      </div>
-    </div>
+      <button type="submit"
+        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
+        Cập nhật
+      </button>
+    </form>
   </div>
 </template>
 
-<script>
-export default {
-  name: 'UserProfile',
-  data() {
-    return {
-      editingField: null,
-      userProfile: {
-        fullName: 'Nguyễn Phước T',
-        age: '21',
-        gender: 'Nam',
-        dob: '19/06/2003',
-        email: 'nguyenphuocth@gmail.com',
-        address: 'Nong Son Quang Nam',
-      },
-      editedProfile: {},
-      profileFields: {
-        fullName: { label: 'Họ tên' },
-        age: { label: 'Tuổi' },
-        gender: { label: 'Giới tính' },
-        dob: { label: 'Ngày sinh' },
-        email: { label: 'Email' },
-        address: { label: 'Địa chỉ' },
-      },
-    }
-  },
-  methods: {
-    editField(field) {
-      this.editingField = field
-      this.editedProfile[field] = this.userProfile[field]
-    },
-    saveField(field) {
-      this.userProfile[field] = this.editedProfile[field]
-      this.editingField = null
-    },
-    cancelEdit() {
-      this.editingField = null
-    },
-    saveAll() {
-      alert('Lưu toàn bộ thông tin thành công!')
-      console.log('Thông tin đã lưu:', this.userProfile)
-    },
-  },
-}
-</script>
+<script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import { useAuthStore } from '@/stores/auth';
+import { updateUserApi, getInfoApi } from '@/services/user';
+import { toast } from 'vue3-toastify';
+import { UserProfile, UserInfo } from "@/types/user";
+import { formatDateToDDMMYYYY } from '@/utils/dateUtils';
 
-<style scoped>
-</style>
+// Khai báo form
+const form = ref({
+  // user_id:0,
+  full_name: '',
+  gender: '',
+  address: '',
+  email: '',
+  phone: '',
+  birth_date: '',
+  status: '',
+  username: '',
+});
+
+const loading = ref(false);
+const errorMessage = ref('');
+
+const authStore = useAuthStore();
+
+// Gọi thông tin người dùng khi component được mount
+onMounted(async () => {
+  const savedToken = localStorage.getItem('access_token');
+  if (savedToken) {
+    try {
+      await authStore.setupAuth();
+      const userId = authStore.user?.user_id;
+      console.log('---------------------', userId);
+
+      // form.value.user_id = authStore.user?.user_id ?? '';
+      form.value.email = authStore.user?.email ?? '';
+      form.value.username = authStore.user?.username ?? '';
+      form.value.status = authStore.user?.status ?? '';
+
+      if (userId) {
+        await fetchUserProfile(String(userId));
+      } else {
+        console.error('Không tìm thấy user_id trong authStore.user!');
+      }
+    } catch (error) {
+      console.error('Lỗi tự động đăng nhập:', error);
+      localStorage.removeItem('access_token');
+    }
+  }
+});
+
+// Fetch thông tin người dùng từ API
+const fetchUserProfile = async (id: string) => {
+  loading.value = true;
+  try {
+    const response = await getInfoApi(id);
+    if (response.data) {
+      const data: UserInfo = response.data;
+      // Format ngày sinh tại đây
+      form.value = {
+        // user_id: data.user_id ?? 0,
+        full_name: data.full_name ?? '',
+        gender: data.gender ?? '',
+        address: data.address ?? '',
+        email: data.email ?? '',
+        phone: data.phone ?? '',
+        birth_date: formatDateToDDMMYYYY(data.birth_date ?? ''),
+        status: String(data.status ?? ''),
+        username: data.username ?? '',
+      };
+      toast.success('Lấy thông tin người dùng thành công!', {
+        autoClose: 3000,
+        position: 'top-right',
+      });
+    } else {
+      errorMessage.value = 'Không có dữ liệu người dùng.';
+      toast.error(errorMessage.value, {
+        autoClose: 3000,
+        position: 'top-right',
+      });
+    }
+  } catch (error) {
+    console.error('Lỗi khi lấy thông tin người dùng:', error);
+    errorMessage.value = 'Đã có lỗi xảy ra khi lấy thông tin người dùng!';
+    toast.error(errorMessage.value, {
+      autoClose: 3000,
+      position: 'top-right',
+    });
+  } finally {
+    loading.value = false;
+  }
+};
+
+
+const onSubmit = async () => {
+  loading.value = true;
+  try {
+    const userId = authStore.user?.user_id;
+    if (!userId) {
+      toast.error('Không tìm thấy user_id để cập nhật!');
+      return;
+    }
+
+    // Format ngày sinh sang đúng định dạng
+    const formattedBirthDate = formatDateToDDMMYYYY(form.value.birth_date);
+
+    // Chỉ lấy những trường cần thiết để gửi đi
+    const payload = {
+      full_name: form.value.full_name,
+      gender: form.value.gender,
+      address: form.value.address,
+      email: form.value.email,
+      phone: form.value.phone,
+      birth_date: formattedBirthDate,
+      status: form.value.status
+    };
+
+    const response = await updateUserApi(Number(userId), payload);
+    console.log('------>>>>>>>', response);
+
+    if (response) {
+      toast.success('Cập nhật thông tin thành công!', {
+        autoClose: 3000,
+        position: 'top-right',
+      });
+      await fetchUserProfile(String(userId));
+    } else {
+      toast.error('Cập nhật thất bại. Vui lòng thử lại!', {
+        autoClose: 3000,
+        position: 'top-right',
+      });
+    }
+  } catch (error) {
+    console.error('Lỗi khi cập nhật thông tin người dùng:', error);
+    toast.error('Có lỗi xảy ra khi cập nhật!', {
+      autoClose: 3000,
+      position: 'top-right',
+    });
+  } finally {
+    loading.value = false;
+  }
+};
+
+</script>

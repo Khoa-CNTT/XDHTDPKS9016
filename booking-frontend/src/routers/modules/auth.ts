@@ -4,7 +4,8 @@ export const authRoute: RouteRecordRaw[] = [
   {
     path: '/login',
     name: 'login',
-    component: () => import('@/pages/auth/Login.vue'),
+   
+    component: () => import('@/pages/auth/login.vue'),
     
   },
   {
@@ -13,6 +14,7 @@ export const authRoute: RouteRecordRaw[] = [
       {
         path: '',
         name: 'register',
+       
         component: () => import('@/pages/auth/register/register.vue'),
       },
       {

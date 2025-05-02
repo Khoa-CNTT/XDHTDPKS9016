@@ -1,5 +1,7 @@
 import { $api } from '@/api/ofetch'
 import type { BaseResponse } from '@/types/api'
+import { Import } from 'lucide-vue-next'
+import {User} from '@/types/user'
 
 // export const loginApi = async (
 //   username: string,
@@ -27,6 +29,7 @@ export const loginApi = async (
   password: string,
 ): Promise<{
   token: string
+  user: User;
 }> => {
   return $api(
     '/auth/login',
@@ -54,7 +57,9 @@ export const registerApi = async (data: RegisterBody): Promise<any> => {
 export const confirmEmailApi = async (token: string): Promise<any> => {
   return $api('/users/confirm', { query: { token: token } })
 }
-
+export const logoutApi = async (data: { token: string }): Promise<any> => {
+  return $api('/auth/logout', { body: data, method: 'POST' }, false)
+}
 // export const forgotPasswordApi = async (email: string): Promise<any> => {
 //   return $api('/users/forgot-password', {
 //     method: 'POST',

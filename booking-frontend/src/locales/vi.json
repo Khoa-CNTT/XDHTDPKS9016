@@ -1,1 +1,12 @@
-{}
+{
+    "validation": {
+      "em_blank": "Vui lòng nhập email.",
+      "em_format": "Email không đúng định dạng.",
+      "username_blank": "Vui lòng nhập tên người dùng.",
+      "username_format": "Tên người dùng phải từ 8 đến 32 ký tự, chỉ chứa chữ thường và số, không có khoảng trắng.",
+      "ps_blank": "Vui lòng nhập mật khẩu.",
+      "ps_format": "Mật khẩu phải từ 8 đến 32 ký tự, chứa chữ hoa, chữ thường, số và ký tự đặc biệt.",
+      "ps_confirm_blank": "Vui lòng nhập xác nhận mật khẩu.",
+      "ps_confirm_match": "Mật khẩu xác nhận không khớp với mật khẩu."
+    }
+  }
