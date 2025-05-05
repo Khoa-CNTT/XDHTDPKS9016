@@ -1,0 +1,1 @@
+ALTER TABLE booking ADD COLUMN version BIGINT DEFAULT 0;

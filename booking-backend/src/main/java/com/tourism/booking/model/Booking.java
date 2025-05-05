@@ -1,6 +1,5 @@
 package com.tourism.booking.model;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -24,6 +23,10 @@ public class Booking {
     @Column(name = "id_booking")
     Long id_booking;
 
+    @Version
+    @Column(name = "version")
+    Long version = 0L;
+
     @Column(name = "check_in_date")
     LocalDate check_in_date;
 
@@ -42,22 +45,37 @@ public class Booking {
     @Column(name = "status")
     String status;
 
-    @ManyToOne
+    // Contact information fields
+    @Column(name = "contact_name")
+    String contact_name;
+
+    @Column(name = "contact_email")
+    String contact_email;
+
+    @Column(name = "contact_phone")
+    String contact_phone;
+
+    @Column(name = "contact_address")
+    String contact_address;
+
+    @Column(name = "special_requests")
+    String special_requests;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_type_id", nullable = false)
     RoomType room_type;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     UserProfile user_profile;
 
     // Quan hệ 1-1 với Bill
-    @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     Bill bill;
 
     @ManyToMany
-    @JoinTable(
-            name = "booking_service",                // Tên bảng trung gian
-            joinColumns = @JoinColumn(name = "booking_id"),  // Khóa ngoại trỏ đến Booking
+    @JoinTable(name = "booking_service", // Tên bảng trung gian
+            joinColumns = @JoinColumn(name = "booking_id"), // Khóa ngoại trỏ đến Booking
             inverseJoinColumns = @JoinColumn(name = "service_id") // Khóa ngoại trỏ đến Service
     )
     Set<Services> services = new HashSet<>();

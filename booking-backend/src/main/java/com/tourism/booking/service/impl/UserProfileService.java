@@ -61,4 +61,10 @@ public class UserProfileService implements IUserProfileService {
     public Optional<UserProfileResponse> findByAccoutId(Long id) {
         return userProfileRepository.findUserProfileByAccountId(id);
     }
+
+    @Override
+    public Optional<UserProfile> findUserProfileByAccoutId(Long id) {
+        return userProfileRepository.findUserProfileByAccoutId(id);
+    }
+
 }
