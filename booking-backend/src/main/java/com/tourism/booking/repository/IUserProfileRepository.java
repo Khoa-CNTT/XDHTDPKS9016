@@ -47,4 +47,12 @@ public interface IUserProfileRepository
             WHERE a.account_id = :id
             """, nativeQuery = false)
     Optional<UserProfileResponse> findUserProfileByAccountId(Long id);
+
+    @Query(value = """
+            SELECT u FROM UserProfile u
+            JOIN u.account a
+            WHERE a.account_id = :id
+            """, nativeQuery = false)
+    Optional<UserProfile> findUserProfileByAccoutId(Long id);
+
 }

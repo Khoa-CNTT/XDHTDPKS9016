@@ -17,6 +17,8 @@ public interface IUserProfileService {
 
     Optional<UserProfileResponse> findByAccoutId(Long id);
 
+    Optional<UserProfile> findUserProfileByAccoutId(Long id);
+
     UserProfile save(UserProfile userProfile);
 
     void deleteById(Long id);
