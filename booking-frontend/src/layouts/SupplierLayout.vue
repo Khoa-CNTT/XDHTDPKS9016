@@ -49,14 +49,14 @@
                             <span>Quản lý giao dịch thanh toán</span>
                         </router-link>
                     </li>
-                    <li>
+                    <!-- <li>
                         <router-link to="/supplier/review-manage"
                             class="flex items-center gap-3 px-4 py-2 rounded hover:bg-blue-500 transition"
                             active-class="bg-blue-500" exact-active-class="bg-blue-600">
                             <Icon icon="mdi:comment-text-outline" width="24" height="24" />
                             <span>Quản lý bình luận</span>
                         </router-link>
-                    </li>
+                    </li> -->
                     <li>
                         <router-link to="/supplier/profile-settings"
                             class="flex items-center gap-3 px-4 py-2 rounded hover:bg-blue-500 transition"

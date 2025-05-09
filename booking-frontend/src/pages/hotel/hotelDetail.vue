@@ -65,7 +65,9 @@
             class="bg-white rounded-lg shadow-md hover:scale-105 transition cursor-pointer ">
             <img :src="hotel.image || '/assets/images/img-hotel-6.jpeg'" class="w-full h-32 object-cover rounded-t-lg"
               :alt="hotel.name">
-            <h3 class="text-center text-text font-semibold p-3">{{ hotel.name }}</h3>
+            <h3
+              class="text-center text-text font-semibold p-3 hover:text-blue-600 cursor-pointer transition-colors duration-200">
+              {{ hotel.name }}</h3>
             <p class="text-center text-text font-semibold p-1">{{ hotel.address }}</p>
           </div>
           <div v-if="hotelList.length > 4">
@@ -127,7 +129,7 @@
                 <li>📦 Phòng trống: {{ room.available_room }}</li>
               </ul>
             </div>
-            <button @click="openModal(room)"
+            <button  @click="showBookingModal = true"
               class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full mt-auto">
               Đặt Phòng
             </button>
@@ -189,21 +191,36 @@
         </ul>
       </div>
     </div>
-    <ModalBooking v-model:showModal="showModal" />
+    <BookingModal v-if="showBookingModal" :show="showBookingModal" @close="showBookingModal = false" />
+    <router-link
+  :to="{ name: 'HotelReview', params: { id: hotelId } }"
+  class="inline-block"
+>
+  <button
+    class="px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold rounded-lg shadow hover:scale-105 hover:shadow-lg transition-transform duration-200"
+  >
+    Đánh Giá
+  </button>
+</router-link>
+    <router-view />
   </div>
 </template>
 <script setup>
+import BookingModal from '@/pages/hotel/BookingModal.vue';
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { getHotelByIdApi } from '@/services/home';
 import { getHotelListApi } from '@/services/home';
+
 const route = useRoute();
 const hotel = ref(null);
 const hotelList = ref([]);
 const displayCount = ref(6);
 const isExpanded = ref(false);
 const router = useRouter();
+const showBookingModal = ref(false)
 const showAllHotels = ref(false);
+const hotelId = route.params.id
 onMounted(async () => {
   const hotelId = route.params.id;
   try {
@@ -215,9 +232,6 @@ onMounted(async () => {
     console.error('Error fetching hotel details:', error);
   }
 });
-
-
-
 
 const fetchHotelList = async () => {
   try {
@@ -249,15 +263,13 @@ onMounted(() => {
 
 
 
-
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
-import BookingModal from './BookingModal.vue';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/autoplay';
-// import { ref } from 'vue';
+
 const showModal = ref(false)
 const selectedRoom = ref(null)
 
@@ -270,7 +282,7 @@ const closeModal = () => {
   showModal.value = false
   selectedRoom.value = null
 }
-// Mảng chứa thông tin các phòng
+
 const roomsType = [
   {
     id: 1,

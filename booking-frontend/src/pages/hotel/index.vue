@@ -15,27 +15,35 @@
                         </li>
                     </ul>
                 </aside>
-
                 <section class="col-span-3 space-y-4">
-                    <article v-for="(hotel, index) in filteredHotels" :key="index"
+                    <article v-for="(hotel, index) in hotelList" :key="index"
                         class="flex bg-white shadow-md rounded-lg p-4 w-full">
-                        <img :src="hotel.image" :alt="hotel.name" class="w-60 h-40 rounded-lg mr-4">
+                        <img :src="hotel.image || '/assets/images/img-hotel-2.png'" :alt="hotel.name"
+                            class="w-60 h-40 rounded-lg mr-4" />
                         <div class="flex-1">
-                            <h2 class="text-lg font-bold text-gray-800">{{ hotel.name }}</h2>
+                            <h2
+                                class="text-lg font-bold text-gray-800 hover:text-blue-600 cursor-pointer transition-colors duration-200">
+                                {{ hotel.name }}
+                            </h2>
                             <p class="text-gray-600">{{ hotel.description }}</p>
-                            <p class="text-sm text-gray-500">Địa điểm: {{ hotel.city }}</p>
-                            <p class="text-yellow-500 text-sm">⭐ {{ hotel.rating }}/5</p>
-                            <p class="text-red-500 font-bold">Giá: {{ hotel.price }} VNĐ/đêm</p>
-                            <p class="text-green-600">✔ {{ hotel.cancellation }}</p>
-                            <p class="text-green-600">✔ {{ hotel.payment }}</p>
-                            <p class="text-gray-600">Tiện ích: {{ hotel.amenities.join(', ') }}</p>
-                            <a href="#"
+                            <p
+                                class="flex items-center text-sm text-indigo-600 bg-indigo-50 px-3 py-2 rounded-md shadow-sm w-fit">
+                                <svg class="w-4 h-4 mr-2 text-indigo-500" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd"
+                                        d="M10 2a6 6 0 00-6 6c0 4.418 6 10 6 10s6-5.582 6-10a6 6 0 00-6-6zM8 8a2 2 0 114 0 2 2 0 01-4 0z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                                Địa điểm: {{ hotel.address }}
+                            </p>
+
+                            <button  @click="viewHotelDetail(hotel.hotel_id)"
                                 class="mt-3 inline-block bg-[#1E40AF] text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
                                 Xem chi tiết
-                            </a>
+                            </button>
                         </div>
                     </article>
                 </section>
+
             </main>
         </div>
 
@@ -117,6 +125,81 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import { Navigation, Autoplay } from 'swiper/modules';
 import 'swiper/css/autoplay';
+import { useRouter } from 'vue-router';
+import { getHotelListApi } from '@/services/home';
+
+const hotelList = ref([]);
+const displayCount = ref(6);
+const isExpanded = ref(false);
+const router = useRouter();
+
+const fetchHotelList = async () => {
+    try {
+        const response = await getHotelListApi();
+        hotelList.value = response.content;
+        console.log('Hotel list response:', response.content);
+    } catch (error) {
+        console.error('Error fetching hotel list:', error);
+    }
+};
+onMounted(() => {
+    fetchHotelList();
+});
+const viewHotelDetail = (hotelId) => {
+  console.log("Hotel ID clicked:", hotelId);
+  router.push({ name: 'HotelDetail', params: { id: hotelId } });
+};
+const loadMore = () => {
+  displayCount.value += 6;
+};
+
+const toggleView = () => {
+  if (isExpanded.value) {
+    displayCount.value = 6;
+  } else {
+    displayCount.value += 6;
+  }
+  isExpanded.value = !isExpanded.value;
+};
+
+// const viewHotelDetail = (hotelId) => {
+//   console.log("Hotel ID clicked:", hotelId);
+//   router.push({ name: 'HotelDetail', params: { id: hotelId } });
+// };
+
+// onMounted(() => {
+//   fetchHotelList();
+// });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const services = ref([
     { id: 1, title: 'Spa', description: 'Thư giãn với các liệu pháp spa chuyên nghiệp.', image: '/assets/images/spa.jpg' },
     { id: 2, title: 'Massage', description: 'Massage trị liệu giúp bạn thư giãn.', image: '/assets/images/massage.jpg' },

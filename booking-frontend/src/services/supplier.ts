@@ -3,6 +3,7 @@
 import { $api } from '@/api/ofetch'
 import { ServiceResponse, AddService, Service } from "@/types/supplier"
 import { RoomTypeResponse,AddRoomType,RoomType} from "@/types/supplier"
+import { HotelInfo,HotelProfile} from "@/types/supplier"
 export const getServiceListApi = async (): Promise<ServiceResponse> => {
   return $api('/management-service', { method: 'GET' }, true);
 };
@@ -61,4 +62,32 @@ export const uploadImageApi = async (file: File): Promise<string> => {
 
 export const deleteRoomTypeApi = async (roomTypeId: number): Promise<void> => {
   await $api(`/room-types/${roomTypeId}`, { method: 'DELETE' }, true);
+};
+
+export const updateRoomTypeApi = async (
+  roomTypeId: number,
+  roomTypeData: AddRoomType
+): Promise<RoomType> => {
+  return $api(`/room-types/${roomTypeId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(roomTypeData),
+  }, true);
+};
+
+export const getInfoHotelApi = async (): Promise<HotelInfo> => {
+  return $api('/hotel-info', { method: 'GET' }, true);
+};
+
+
+export const updateHotelInfoApi = async (hotelData: HotelProfile): Promise<HotelInfo> => {
+  return $api('/hotel-info', {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(hotelData),
+  }, true);
 };
