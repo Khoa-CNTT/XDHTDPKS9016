@@ -9,13 +9,13 @@ export const hotelRoute: RouteRecordRaw[] = [
   {
     path: ':hotelId',
     component: () => import('@/pages/hotel/hotelDetail.vue'), 
-    // children: [
-    //   {
-    //     path: 'booking',
-    //     name: 'BookingModal',
-    //     component: () => import('@/pages/hotel/BookingModal.vue'),
-    //   }
-    // ]
+    children: [
+      {
+        path: 'review',
+        name: 'HotelReview',
+        component: () => import('@/pages/hotel/hotelReview.vue'),
+      },
+    ],
   }
 
 ]

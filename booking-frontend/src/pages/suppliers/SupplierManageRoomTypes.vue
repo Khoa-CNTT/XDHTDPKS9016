@@ -38,7 +38,8 @@
                         <td class="border px-4 py-2">{{ row['Trạng thái'] }}</td>
                         <td class="border px-4 py-2">
                             <div class="flex gap-2 justify-end items-center">
-                                <button class="px-2 py-1 bg-blue-500 text-white text-xs rounded-md">Sửa</button>
+                                <button @click="handleEdit(row['room_type_id'])"
+                                    class="px-2 py-1 bg-blue-500 text-white text-xs rounded-md">Sửa</button>
                                 <button @click="askDelete(row['room_type_id'])"
                                     class="px-2 py-1 bg-red-500 text-white text-xs rounded-md">
                                     Xóa
@@ -49,8 +50,9 @@
                 </tbody>
             </table>
         </div>
-
-        <AddRoomTypeModal :isOpen="showModal" @close="showModal = false" @added="handleRoomTypeAdded" />
+        <EditRoomTypeModal :isOpen="showEditModal" :roomType="selectedRoomType" @onClose="showEditModal = false"
+            @onUpdated="fetchRoomTypes" />
+        <AddRoomTypeModal :isOpen="showModal" @close="showModal = false" @added="handleRoomTypeAdded"  :fetchRoomTypes="fetchRoomTypes"/>
         <ConfirmDeleteModal v-if="showDeleteConfirm" @cancel="cancelDelete" @confirm="confirmDelete" />
     </div>
 </template>
@@ -60,23 +62,22 @@ import { onMounted, ref, computed } from 'vue'
 import { getRoomTypesApi, deleteRoomTypeApi } from '@/services/supplier'
 import AddRoomTypeModal from '@/pages/suppliers/AddRoomTypeModal.vue'
 import ConfirmDeleteModal from './ConfirmDeleteModal.vue'
-import type { RoomType } from '@/types/supplier'
+import EditRoomTypeModal from './EditRoomTypeModal.vue'
+import type { RoomType, AddRoomType } from '@/types/supplier'
 import { toast } from 'vue3-toastify'
-
+const showEditModal = ref(false)
+const selectedRoomType = ref<RoomType | null>(null)
 const roomTypes = ref<RoomType[]>([])
 const isLoading = ref(false)
 const error = ref<string | null>(null)
 const showModal = ref(false)
 const showDeleteConfirm = ref(false)
 const selectedRoomTypeId = ref<number | null>(null)
-
 const fetchRoomTypes = async () => {
     isLoading.value = true
     try {
         const response = await getRoomTypesApi()
         roomTypes.value = response.content
-        console.log( roomTypes.value);
-        
     } catch (err) {
         error.value = 'Không thể tải dữ liệu loại phòng'
         console.error(err)
@@ -119,7 +120,7 @@ const confirmDelete = async () => {
     if (selectedRoomTypeId.value !== null) {
         try {
             await deleteRoomTypeApi(selectedRoomTypeId.value)
-            toast.error('Xóa loại phòng thành công!', {
+            toast.success('Xóa loại phòng thành công!', {
                 autoClose: 10000,
                 position: 'top-right',
             });
@@ -140,5 +141,12 @@ const confirmDelete = async () => {
 const cancelDelete = () => {
     showDeleteConfirm.value = false
     selectedRoomTypeId.value = null
+}
+const handleEdit = (id: number) => {
+    const room = roomTypes.value.find(r => r.room_type_id === id)
+    if (room) {
+        selectedRoomType.value = room
+        showEditModal.value = true
+    }
 }
 </script>

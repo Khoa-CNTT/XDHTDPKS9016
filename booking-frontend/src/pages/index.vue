@@ -122,15 +122,13 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router'; // import useRouter từ vue-router
+import { useRouter } from 'vue-router'; 
 import { getHotelListApi } from '@/services/home';
 
 const hotelList = ref([]);
 const displayCount = ref(6);
 const isExpanded = ref(false);
-
-// Khai báo router chỉ một lần
-const router = useRouter(); // Khai báo một lần duy nhất ở đây
+const router = useRouter(); 
 
 const fetchHotelList = async () => {
   try {

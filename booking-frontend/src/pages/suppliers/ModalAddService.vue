@@ -1,84 +1,98 @@
 <template>
-    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-white rounded-lg w-[400px] p-6">
-            <h2 class="text-lg font-bold mb-4">Thêm dịch vụ mới</h2>
-            <form >
-                <div class="mb-4">
-                    <label class="block text-sm font-medium">Tên dịch vụ</label>
-                    <input v-model="form.service_name" type="text" class="w-full border rounded px-3 py-2 mt-1"
-                        required />
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium">Giá</label>
-                    <input v-model.number="form.service_price" type="number"
-                        class="w-full border rounded px-3 py-2 mt-1" required />
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium">Hình ảnh</label>
-                    <input type="file" @change="handleImageChange" class="w-full border rounded px-3 py-2 mt-1" />
-      
-                    <div v-if="imagePreview" class="mt-2">
-                        <img :src="imagePreview" alt="Preview" class="w-full h-auto"/>
-                    </div>
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium">Mô tả</label>
-                    <textarea v-model="form.description" class="w-full border rounded px-3 py-2 mt-1" rows="3"
-                        required></textarea>
-                </div>
-                <div class="flex justify-end gap-2">
-                    <button type="button" @click="$emit('close')" class="px-3 py-2 bg-gray-300 rounded">Hủy</button>
-                    <button type="submit" class="px-3 py-2 bg-green-600 text-white rounded">Tạo</button>
-                </div>
-            </form>
-        </div>
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center" @click="$emit('close')">
+      <div class="bg-white p-6 rounded-lg w-96 shadow-lg" @click.stop>
+        <button class="absolute top-2 right-2 text-xl" @click="$emit('close')">×</button>
+        <h2 class="text-xl font-bold text-center mb-4">Thêm Dịch Vụ Mới</h2>
+        <form @submit.prevent="submitForm">
+          <!-- Tên Dịch Vụ -->
+          <div class="mb-4">
+            <label for="service_name" class="block text-sm font-semibold text-gray-700">Tên dịch vụ</label>
+            <input v-model="form.service_name" type="text" id="service_name"
+              class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-400"
+              required placeholder="Nhập tên dịch vụ" />
+          </div>
+  
+          <!-- Giá Dịch Vụ -->
+          <div class="mb-4">
+            <label for="service_price" class="block text-sm font-semibold text-gray-700">Giá</label>
+            <input v-model="form.service_price" type="number" id="service_price"
+              class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-400"
+              required placeholder="Nhập giá dịch vụ" />
+          </div>
+  
+          <!-- Tải Ảnh -->
+          <div class="mb-4">
+            <label for="service_image" class="block text-sm font-semibold text-gray-700">Ảnh dịch vụ</label>
+            <input @change="handleFileUpload" type="file" accept="image/*"
+              class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-400" />
+            <!-- Hiển thị ảnh đã chọn -->
+            <div v-if="form.service_image" class="mt-2">
+              <img :src="form.service_image" alt="Ảnh đã chọn" class="w-32 h-auto border rounded"/>
+            </div>
+          </div>
+  
+          <!-- Mô Tả Dịch Vụ -->
+          <div class="mb-4">
+            <label for="description" class="block text-sm font-semibold text-gray-700">Mô tả chi tiết</label>
+            <textarea v-model="form.description" id="description"
+              class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-400"
+              required placeholder="Nhập mô tả dịch vụ"></textarea>
+          </div>
+  
+          <!-- Nút Hủy và Nút Thêm Dịch Vụ -->
+          <div class="flex justify-end gap-4">
+            <button @click="$emit('close')" type="button"
+              class="w-1/3 py-2 px-4 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500">
+              Hủy
+            </button>
+            <button type="submit"
+              class="w-1/3 py-2 px-4 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
+              Thêm
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
-</template>
+  </template>
+  
+  <script setup lang="ts">
+  import { ref } from 'vue';
+  import { createServiceApi, uploadImageApi } from '@/services/supplier';
+  import { AddService, Service } from '@/types/supplier';
+  const emit = defineEmits<{
+  (e: 'close'): void;
+  (e: 'serviceAdded', service: Service): void;
+}>();
 
-<script setup lang="ts">
-import { ref } from 'vue'
-import { createServiceApi } from '@/services/supplier'
+  const form = ref<AddService>({
+    service_name: '',
+    service_price: 0,
+    service_image: '',
+    description: '',
+  });
 
-const emit = defineEmits(['close', 'created'])
-
-const form = ref({
-  service_name: '',
-  service_price: 0,
-  service_image: null as File | null,
-  description: ''
-})
-
-const imagePreview = ref<string | null>(null)
-
-const handleImageChange = (event: Event) => {
-  const target = event.target as HTMLInputElement;
-  const file = target.files?.[0];
-  if (file) {
-    form.value.service_image = file;
-    const reader = new FileReader();
-    reader.onload = () => {
-      imagePreview.value = reader.result as string;
+  const handleFileUpload = async (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    const file = target.files?.[0];
+    if (file) {
+      try {
+        const uploadedUrl = await uploadImageApi(file);
+        form.value.service_image = uploadedUrl;
+        console.log('Uploaded image URL:', uploadedUrl);
+      } catch (error) {
+        console.error('Lỗi khi tải ảnh:', error);
+      }
     }
-    reader.readAsDataURL(file); 
-  }
-}
-
-
-// const handleSubmit = async () => {
-//   try {
-//     const formData = new FormData();
-//     formData.append('service_name', form.value.service_name);
-//     formData.append('service_price', String(form.value.service_price));
-//     formData.append('description', form.value.description);
-//     if (form.value.service_image) {
-//       formData.append('service_image', form.value.service_image);
-//     }
-
-//     await createServiceApi(formData);
-//     emit('created');
-//     emit('close');
-//   } catch (error) {
-//     console.error('Lỗi khi tạo dịch vụ:', error);
-//   }
-// };
-</script>
+  };
+  
+  const submitForm = async () => {
+    try {
+      const service: Service = await createServiceApi(form.value);
+      emit('serviceAdded', service);
+      emit('close');
+    } catch (error) {
+      console.error('Lỗi khi tạo dịch vụ mới:', error);
+    }
+  };
+  </script>
+  
