@@ -14,5 +14,5 @@ public interface IHotelService {
     void deleteHotel(Long hotelId);
     Optional<Hotel> getHotelByAccountId(Long accountId);
     boolean isOwnerOfRoomType(Long accountId, Long roomTypeId);
-    HotelInfoResponse updateHotelInfo(Long accountId, Hotel payload);
+    HotelInfoResponse updateHotelInfo(Long accountId, Hotel hotel);
 }
