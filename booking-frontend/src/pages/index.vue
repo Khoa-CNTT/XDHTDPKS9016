@@ -452,7 +452,7 @@ const topCities = ref([
 ])
 
 const bottomCities = ref([
-  { name: 'Đà Nẵng', image: '/assets/images/3.jpg', img: '/assets/images/coVietNam.jpg' },
+  { name: 'Hà Nội', image: '/assets/images/3.jpg', img: '/assets/images/coVietNam.jpg' },
   { name: 'Hội An', image: '/assets/images/4.jpg', img: '/assets/images/coVietNam.jpg' },
   { name: 'Thừa Thiên Huế', image: '/assets/images/5.jpg', img: '/assets/images/coVietNam.jpg' },
 ])

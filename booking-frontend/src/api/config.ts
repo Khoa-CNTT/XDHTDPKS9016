@@ -7,7 +7,7 @@
 //     refreshToken: 'refresh_token', //KEY SAVED IN LOCALSTORAGE
 //     accessToken: 'access_token',
 //   },
-//   retryStatusCodes: [401, 403],
+//   retryStatusCodes: [40F1, 403],
 // }
 export const config = {
   baseURL: import.meta.env.VITE_API_ENDPOINT,
