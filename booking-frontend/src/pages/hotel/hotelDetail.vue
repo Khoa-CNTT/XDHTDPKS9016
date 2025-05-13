@@ -168,6 +168,47 @@
         allowfullscreen></iframe>
     </div>
 
+<div class="bg-gray-100 font-sans p-5">
+    <div class="max-w-screen-lg mx-auto bg-white rounded-lg shadow p-4 flex mb-5">
+      <!-- Cột trái -->
+      <div class="w-1/4 p-2">
+        <img src="https://via.placeholder.com/200x120" alt="Main room image" class="rounded-lg w-full" />
+        <div class="flex space-x-2 mt-2">
+          <img src="https://via.placeholder.com/90x60" alt="Sub image 1" class="rounded" />
+          <img src="https://via.placeholder.com/90x60" alt="Sub image 2" class="rounded" />
+        </div>
+        <a href="#" class="text-blue-600 text-sm mt-2 inline-block">Xem ảnh và chi tiết</a>
+        <h4 class="text-lg font-semibold mb-2 mt-4">Loại phòng</h4>
+
+        <div class="mb-4">
+          <strong>Ưu tiên giường (nếu có)</strong><br />
+          <label class="block"><input type="radio" name="bed" v-model="bedOption" value="1 giường lớn" /> 1 giường lớn 🛏️</label>
+          <label class="block"><input type="radio" name="bed" v-model="bedOption" value="2 giường đơn" /> 2 giường đơn 🛏️🛏️</label>
+        </div>
+
+        <ul class="list-none space-y-1 leading-relaxed">
+          <li>📏 Diện tích phòng: 34 m²</li>
+          <li>🌇 Hướng Thành phố</li>
+          <li>🚭 Không hút thuốc</li>
+          <li>🛁 Phòng tắm vòi sen & bồn tắm</li>
+          <li><a href="#" class="text-blue-600">Các tiện ích khác</a></li>
+        </ul>
+      </div>
+
+      <!-- Cột phải -->
+      <div class="w-3/4 p-2 space-y-4 mt-4">
+        <RoomOption
+          v-for="(room, index) in rooms"
+          :key="index"
+          :room="room"
+        />
+      </div>
+    </div>
+  </div>
+
+
+
+
     <div class="container mx-auto  p-6  my-6 text-white text-center">
       <div class="bg-white text-gray-800 p-5 rounded-lg shadow-md">
         <h2 class="text-2xl font-bold tracking-wide mb-4 flex items-center justify-center gap-2">

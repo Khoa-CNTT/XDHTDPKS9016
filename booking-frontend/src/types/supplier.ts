@@ -26,7 +26,7 @@ export interface ServiceRes {
 export interface AddService {
   service_name: string;
   service_price: number;
-  service_image: string;
+  service_image: string | null;
   description: string;
 }
 
