@@ -37,7 +37,7 @@ function validUsername(username: string) {
       check: false,
     }
   } else {
-    const re = /^[a-z0-9]{8,32}$/; // username chỉ chứa chữ thường và số, không có khoảng trắng
+    const re = /^[a-zA-Z0-9]{8,32}$/; // username chỉ chứa chữ thường và số, không có khoảng trắng
     if (!re.test(username)) {
       return {
         mess: t('validation.username_format'),

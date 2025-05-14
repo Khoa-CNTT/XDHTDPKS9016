@@ -10,8 +10,8 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface IUserProfileRepository
-        extends JpaRepository<UserProfile, Long>, JpaSpecificationExecutor<UserProfile> {
+public interface IUserProfileRepository extends JpaRepository<UserProfile, Long> {
+
     boolean existsByEmail(String email);
 
     @Query(value = """
@@ -47,4 +47,12 @@ public interface IUserProfileRepository
             WHERE a.account_id = :id
             """, nativeQuery = false)
     Optional<UserProfileResponse> findUserProfileByAccountId(Long id);
+
+    @Query(value = """
+            SELECT u FROM UserProfile u
+            JOIN u.account a
+            WHERE a.account_id = :id
+            """, nativeQuery = false)
+    Optional<UserProfile> findUserProfileByAccoutId(Long id);
+
 }

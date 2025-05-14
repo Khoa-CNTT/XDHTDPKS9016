@@ -41,6 +41,11 @@ export const supplierRoute = {
       component: () => import('@/pages/suppliers/SupplierManageRoomTypes.vue'),
     },
     {
+      path: 'room-manager',
+      name: 'SupplierRoom',
+      component: () => import('@/pages/suppliers/ManageRoom.vue'),
+    },
+    {
       path: 'billing',
       name: 'SupplierBilling',
       component: () => import('@/pages/suppliers/SupplierBilling.vue'),

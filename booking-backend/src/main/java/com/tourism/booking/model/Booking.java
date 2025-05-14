@@ -1,6 +1,5 @@
 package com.tourism.booking.model;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -22,43 +21,61 @@ public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_booking")
-    Long id_booking;
+    private Long id_booking;
+
+    @Version
+    private Long version;
+
+    @Column(name = "id_booking_temp")
+    private Long id_booking_temp;
 
     @Column(name = "check_in_date")
-    LocalDate check_in_date;
+    private LocalDate check_in_date;
 
     @Column(name = "check_out_date")
-    LocalDate check_out_date;
+    private LocalDate check_out_date;
 
     @Column(name = "check_in_time")
-    LocalTime check_in_time;
+    private LocalTime check_in_time;
 
     @Column(name = "check_out_time")
-    LocalTime check_out_time;
+    private LocalTime check_out_time;
 
     @Column(name = "number_people")
-    int number_people;
+    private int number_people;
 
     @Column(name = "status")
-    String status;
+    private String status;
 
-    @ManyToOne
-    @JoinColumn(name = "room_type_id", nullable = false)
-    RoomType room_type;
+    // Contact information fields
+    @Column(name = "contact_name")
+    private String contact_name;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    UserProfile user_profile;
+    @Column(name = "contact_email")
+    private String contact_email;
+
+    @Column(name = "contact_phone")
+    private String contact_phone;
+
+    @Column(name = "contact_address")
+    private String contact_address;
+
+    @Column(name = "special_requests")
+    private String special_requests;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_room", nullable = false)
+    private Room room;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private UserProfile user_profile;
 
     // Quan hệ 1-1 với Bill
-    @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL)
-    Bill bill;
+    @OneToOne(mappedBy = "booking", fetch = FetchType.LAZY)
+    private Bill bill;
 
     @ManyToMany
-    @JoinTable(
-            name = "booking_service",                // Tên bảng trung gian
-            joinColumns = @JoinColumn(name = "booking_id"),  // Khóa ngoại trỏ đến Booking
-            inverseJoinColumns = @JoinColumn(name = "service_id") // Khóa ngoại trỏ đến Service
-    )
-    Set<Services> services = new HashSet<>();
+    @JoinTable(name = "booking_service", joinColumns = @JoinColumn(name = "booking_id"), inverseJoinColumns = @JoinColumn(name = "service_id"))
+    private Set<Services> services = new HashSet<>();
 }

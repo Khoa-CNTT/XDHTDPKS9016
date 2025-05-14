@@ -56,8 +56,7 @@
   import { createRoomTypeApi, uploadImageApi } from '@/services/supplier'
   
   const emit = defineEmits(['close', 'created','added'])
-  const props = defineProps<{ isOpen: boolean }>()
-  
+  const props = defineProps<{ isOpen: boolean, fetchRoomTypes: Function }>()
   const form = ref({
     type_name: '',
     number_bed: 1,
@@ -66,7 +65,7 @@
     description: '',
     room_image: '',
     available_room: 1,
-    status: ''
+    status: 'ACTIVE'
   })
   
   // ✅ Hàm upload ảnh và lưu URL
@@ -91,7 +90,8 @@
   const submit = async () => {
     try {
       const res = await createRoomTypeApi(form.value)
-      emit('added', res)
+      emit('created', res)
+      props.fetchRoomTypes()
       close()
     } catch (e) {
       console.error('Tạo thất bại:', e)

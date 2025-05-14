@@ -26,7 +26,7 @@ export interface ServiceRes {
 export interface AddService {
   service_name: string;
   service_price: number;
-  service_image: File | null;
+  service_image: string | null;
   description: string;
 }
 
@@ -62,4 +62,32 @@ export interface AddRoomType {
   room_image: string;
   available_room: number;
   status: 'ACTIVE' | 'INACTIVE' | string;
+}
+
+export interface SimpleService {
+  serviceName: string;
+  servicePrice: number;
+}
+
+export interface SimpleRoomType {
+  typeName: string;
+  price: number;
+}
+
+export interface HotelInfo {
+  name: string;
+  image: string;
+  address: string;
+  hotline: string;
+  description: string;
+  services: SimpleService[];
+  roomTypes: SimpleRoomType[];
+}
+
+export interface HotelProfile {
+  name: string;
+  image: string;
+  address: string;
+  hotline: string;
+  description: string;
 }

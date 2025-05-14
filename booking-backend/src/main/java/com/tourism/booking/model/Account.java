@@ -34,8 +34,7 @@ public class Account {
     ForgotPassword forgotPassword;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "role_account", // Tên bảng trung gian
+    @JoinTable(name = "role_account", // Tên bảng trung gian
             joinColumns = @JoinColumn(name = "account_id"), // Cột khóa ngoại tham chiếu đến User
             inverseJoinColumns = @JoinColumn(name = "role_id") // Cột khóa ngoại tham chiếu đến Role
     )

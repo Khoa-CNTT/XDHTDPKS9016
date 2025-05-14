@@ -106,6 +106,8 @@ const handleLogin = async () => {
 
   try {
     const response = await loginApi(formData.value.username, formData.value.password);
+    console.log('=================ta day ', response);
+    
     if (response && response.token) {
       localStorage.setItem('access_token', response.token);
       await authStore.setupAuth();

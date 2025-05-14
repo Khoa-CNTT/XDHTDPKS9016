@@ -20,9 +20,6 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long payment_id;
 
-    @Column(name = "payment_type")
-    String paymentType;
-
     @Column(name = "amount")
     BigDecimal amount;
 
@@ -32,10 +29,16 @@ public class Payment {
     @Column(name = "payment_time")
     LocalTime payment_time;
 
+    @Column(name = "payment_method")
+    String payment_method;
+
+    @Column(name = "transaction_id")
+    String transaction_id;
+
     @Column(name = "status")
     String status;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bill_id")
     Bill bill;
 }

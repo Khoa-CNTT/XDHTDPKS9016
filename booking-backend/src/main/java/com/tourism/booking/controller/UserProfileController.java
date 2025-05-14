@@ -16,7 +16,6 @@ import lombok.experimental.FieldDefaults;
 import java.security.Principal;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -45,16 +44,19 @@ public class UserProfileController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateProfile(@PathVariable Long id,
-                                           @RequestBody UserProfileRequest userProfileRequest) {
+            @RequestBody UserProfileRequest userProfileRequest) {
         UserProfile existingProfile = userProfileService.findUserProfileEntityById(id)
                 .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_EXIST));
 
-        UserProfile updatedProfile = userProfileMapper.UserProfileRequestToUserProfile(userProfileRequest);
+        existingProfile.setFull_name(userProfileRequest.getFull_name());
+        existingProfile.setGender(userProfileRequest.getGender());
+        existingProfile.setAddress(userProfileRequest.getAddress());
+        existingProfile.setEmail(userProfileRequest.getEmail());
+        existingProfile.setPhone(userProfileRequest.getPhone());
+        existingProfile.setBirth_date(userProfileRequest.getBirth_date());
+        existingProfile.setStatus(userProfileRequest.getStatus());
 
-        updatedProfile.setUser_id(id);
-        updatedProfile.setAccount(existingProfile.getAccount());
-
-        UserProfile savedProfile = userProfileService.save(updatedProfile);
+        UserProfile savedProfile = userProfileService.save(existingProfile);
         UserProfileResponse response = userProfileMapper.UserProfileToUserProfileResponse(savedProfile);
         response.setUsername(existingProfile.getAccount().getUsername());
 
