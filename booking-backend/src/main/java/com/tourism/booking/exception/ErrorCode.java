@@ -17,6 +17,7 @@ public enum ErrorCode {
     OTP_INVALID(40001, "OTP is invalid", HttpStatus.BAD_REQUEST),
 
     UNAUTHENTICATION(40102, "Username or password is incorrect !", HttpStatus.UNAUTHORIZED),
+    FORBIDDEN(40103, "You don't have permission to access this resource", HttpStatus.FORBIDDEN),
 
     USERNAME_EXISTS(40901, "Username already exists !", HttpStatus.CONFLICT),
     EMAIL_EXISTS(40901, "Email already exists !", HttpStatus.CONFLICT),

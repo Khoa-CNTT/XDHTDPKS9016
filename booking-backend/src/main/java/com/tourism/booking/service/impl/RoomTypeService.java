@@ -31,13 +31,9 @@ public class RoomTypeService implements IRoomTypeService {
         return roomTypeRepository.findById(id)
                 .map(existing -> {
                     existing.setType_name(roomType.getType_name());
-                    existing.setNumber_bed(roomType.getNumber_bed());
-                    existing.setMaximum_people(roomType.getMaximum_people());
-                    existing.setPrice(roomType.getPrice());
                     existing.setDescription(roomType.getDescription());
+                    existing.setNumber_room(roomType.getNumber_room());
                     existing.setRoom_image(roomType.getRoom_image());
-                    existing.setAvailable_room(roomType.getAvailable_room());
-                    existing.setStatus(roomType.getStatus());
                     return roomTypeRepository.save(existing);
                 })
                 .orElseThrow(() -> new RuntimeException("RoomType not found with id: " + id));

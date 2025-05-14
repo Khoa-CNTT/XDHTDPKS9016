@@ -1,13 +1,10 @@
 package com.tourism.booking.controller;
 
 import com.tourism.booking.dto.booking.RoomTypeDTO;
-import com.tourism.booking.service.impl.RoomTypeBookingService;
-import com.tourism.booking.service.impl.RoomTypeService;
+import com.tourism.booking.service.IRoomTypeBookingService;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +17,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 
 public class RoomTypeBookingController {
-     RoomTypeBookingService roomTypeService;
+    IRoomTypeBookingService roomTypeService;
 
     /**
      * API lấy chi tiết loại phòng theo ID

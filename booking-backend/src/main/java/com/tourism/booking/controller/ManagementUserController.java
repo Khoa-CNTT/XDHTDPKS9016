@@ -12,14 +12,13 @@ import com.tourism.booking.service.IUserProfileService;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@PreAuthorize("hasRole('ADMIN')")
 @RequestMapping("${api.prefix}/management-user")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
@@ -29,11 +28,11 @@ public class ManagementUserController {
     IUserProfileMapper userProfileMapper;
 
     @GetMapping
-    public ResponseEntity<?> getUserProfile(UserSearchRequest userSearchRequest,
-                                            @RequestParam(defaultValue = "0") int page,
-                                            @RequestParam(defaultValue = "10") int size) {
+    public ResponseEntity<?> getUserProfile(@RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return ResponseEntity.ok(new PageReponse<>(userProfileService.findAll(userSearchRequest, pageable)));
+        Page<UserProfileResponse> userProfiles = userProfileService.findAll(pageable);
+        return ResponseEntity.ok(new PageReponse<>(userProfiles));
     }
 
     @GetMapping("/{id}")
@@ -43,30 +42,24 @@ public class ManagementUserController {
                 .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_EXIST));
     }
 
-    // @PreAuthorize("hasRole('ADMIN')")
-    // @PostMapping
-    // public ResponseEntity<?> createUserProfile(@RequestBody UserProfileRequest
-    // userProfileRequest) {
-    // UserProfile userProfile =
-    // userProfileMapper.UserProfileRequestToUserProfile(userProfileRequest);
-    // }
-    //
     @PutMapping("/{id}")
     public ResponseEntity<?> updateProfile(@PathVariable Long id,
-                                           @RequestBody UserProfileRequest userProfileRequest) {
+            @RequestBody UserProfileRequest userProfileRequest) {
         // Lấy thông tin UserProfile hiện tại từ database
         UserProfile existingProfile = userProfileService.findUserProfileEntityById(id)
                 .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_EXIST));
 
-        // Tạo đối tượng từ request
-        UserProfile updatedProfile = userProfileMapper.UserProfileRequestToUserProfile(userProfileRequest);
-
-        // Giữ nguyên ID và account
-        updatedProfile.setUser_id(id);
-        updatedProfile.setAccount(existingProfile.getAccount());
+        // Cập nhật thông tin từ request vào đối tượng hiện có
+        existingProfile.setFull_name(userProfileRequest.getFull_name());
+        existingProfile.setGender(userProfileRequest.getGender());
+        existingProfile.setAddress(userProfileRequest.getAddress());
+        existingProfile.setEmail(userProfileRequest.getEmail());
+        existingProfile.setPhone(userProfileRequest.getPhone());
+        existingProfile.setBirth_date(userProfileRequest.getBirth_date());
+        existingProfile.setStatus(userProfileRequest.getStatus());
 
         // Lưu thông tin đã cập nhật
-        UserProfile savedProfile = userProfileService.save(updatedProfile);
+        UserProfile savedProfile = userProfileService.save(existingProfile);
         UserProfileResponse response = userProfileMapper.UserProfileToUserProfileResponse(savedProfile);
         response.setUsername(existingProfile.getAccount().getUsername());
         return ResponseEntity.ok(response);

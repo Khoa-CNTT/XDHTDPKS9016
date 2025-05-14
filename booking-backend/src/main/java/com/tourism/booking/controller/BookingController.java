@@ -7,10 +7,9 @@ import com.tourism.booking.model.Account;
 import com.tourism.booking.model.Hotel;
 import com.tourism.booking.model.UserProfile;
 import com.tourism.booking.service.IAccountService;
+import com.tourism.booking.service.IBookingService;
 import com.tourism.booking.service.IHotelService;
-import com.tourism.booking.service.impl.BookingService;
-import com.tourism.booking.service.impl.RoomTypeBookingService;
-import com.tourism.booking.service.impl.UserProfileService;
+import com.tourism.booking.service.IUserProfileService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -21,14 +20,11 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.util.StringUtils;
 
 import java.security.Principal;
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Arrays;
+import java.util.*;
 
 @RestController
 @RequestMapping("${api.prefix}/bookings")
@@ -37,18 +33,14 @@ import java.util.Arrays;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class BookingController {
 
-    BookingService bookingService;
+    IBookingService bookingService;
     PaymentController paymentController;
     IAccountService accountService;
-    UserProfileService userProfileService;
+    IUserProfileService userProfileService;
     IHotelService hotelService;
 
     private static final Logger logger = LoggerFactory.getLogger(BookingController.class);
 
-    /**
-     * API lấy danh sách booking theo khoảng thời gian và trạng thái
-     * Nghiệp vụ: Lọc booking cho UI quản lý
-     */
     @GetMapping("/filter")
     public ResponseEntity<List<BookingResponseDTO>> getBookingsByFilter(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkInFrom,
@@ -66,49 +58,107 @@ public class BookingController {
         }
     }
 
-    /**
-     * API Step 1: Khởi tạo booking với thông tin phòng và dịch vụ
-     * Nghiệp vụ: Người dùng chọn phòng và dịch vụ, lưu tạm thời
-     */
     @PostMapping("/initialize")
-    public ResponseEntity<BookingResponseDTO> initializeBooking(@RequestBody BookingRequestDTO request,
+    public ResponseEntity<BookingResponseDTO> initializeBooking(
+            @RequestBody BookingRequestDTO request,
             Principal principal) {
-        BookingResponseDTO booking = bookingService.initializeBooking(request, principal);
-        return new ResponseEntity<>(booking, HttpStatus.CREATED);
+        logger.info("Initializing booking with request: {}", request);
+
+        try {
+            validateInitializeRequest(request);
+
+            BookingResponseDTO booking = bookingService.initializeBooking(request, principal);
+            logger.info("Booking initialized successfully with ID: {}", booking.getBookingId());
+
+            return new ResponseEntity<>(booking, HttpStatus.CREATED);
+        } catch (IllegalArgumentException e) {
+            logger.error("Invalid request data: {}", e.getMessage());
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            logger.error("Error initializing booking: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
-    /**
-     * API Step 2: Cập nhật thông tin liên hệ và trả về link thanh toán VNPay
-     * Nghiệp vụ: Người dùng nhập thông tin liên hệ và chuyển sang thanh toán VNPay
-     */
     @PostMapping("/contact-info-payment")
     public ResponseEntity<?> updateContactInfoWithPayment(
             @RequestBody ContactInfoDTO contactInfo) {
-        try {
-            // Cập nhật thông tin liên hệ
-            BookingResponseDTO booking = bookingService.updateContactInfo(contactInfo);
+        logger.info("Updating contact info for booking: {}", contactInfo.getBookingId());
 
-            // Lấy URL thanh toán VNPay
-            ResponseEntity<String> paymentResponse = paymentController.createBookingPayment(booking.getBookingId());
+        try {
+            validateContactInfo(contactInfo);
+
+            BookingResponseDTO booking = bookingService.updateContactInfo(contactInfo);
+            Long bookingId = booking.getBookingId();
+
+            ResponseEntity<String> paymentResponse = paymentController.createBookingPayment(bookingId);
             String paymentUrl = paymentResponse.getBody();
 
-            // Trả về cả thông tin booking và URL thanh toán
+            if (paymentUrl == null) {
+                throw new RuntimeException("Failed to generate payment URL");
+            }
+
             Map<String, Object> response = new HashMap<>();
             response.put("booking", booking);
             response.put("paymentUrl", paymentUrl);
 
+            logger.info("Contact info updated and payment URL generated for booking: {}", bookingId);
             return ResponseEntity.ok(response);
+        } catch (EntityNotFoundException e) {
+            logger.error("Booking not found: {}", e.getMessage());
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Booking not found: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
         } catch (Exception e) {
-            Map<String, Object> errorResponse = new HashMap<>();
+            logger.error("Error processing contact info update: {}", e.getMessage());
+            Map<String, String> errorResponse = new HashMap<>();
             errorResponse.put("error", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
 
-    /**
-     * API lấy danh sách booking của một người dùng
-     * Nghiệp vụ: Hiển thị lịch sử đặt phòng cho người dùng
-     */
+    private void validateInitializeRequest(BookingRequestDTO request) {
+        List<String> errors = new ArrayList<>();
+
+        if (request.getRoomId() == null) {
+            errors.add("Room ID is required");
+        }
+        if (request.getCheckInDate() == null) {
+            errors.add("Check-in date is required");
+        }
+        if (request.getCheckOutDate() == null) {
+            errors.add("Check-out date is required");
+        }
+        if (request.getNumberPeople() <= 0) {
+            errors.add("Number of people must be greater than 0");
+        }
+
+        if (!errors.isEmpty()) {
+            throw new IllegalArgumentException(String.join(", ", errors));
+        }
+    }
+
+    private void validateContactInfo(ContactInfoDTO contactInfo) {
+        List<String> errors = new ArrayList<>();
+
+        if (contactInfo.getBookingId() == null) {
+            errors.add("Booking ID is required");
+        }
+        if (StringUtils.isEmpty(contactInfo.getContactName())) {
+            errors.add("Contact name is required");
+        }
+        if (StringUtils.isEmpty(contactInfo.getContactEmail())) {
+            errors.add("Contact email is required");
+        }
+        if (StringUtils.isEmpty(contactInfo.getContactPhone())) {
+            errors.add("Contact phone is required");
+        }
+
+        if (!errors.isEmpty()) {
+            throw new IllegalArgumentException(String.join(", ", errors));
+        }
+    }
+
     @GetMapping("/user")
     public ResponseEntity<List<BookingResponseDTO>> getBookingsByUserId(Principal principal) {
         try {
@@ -123,10 +173,6 @@ public class BookingController {
         }
     }
 
-    /**
-     * API lấy danh sách booking của một khách sạn
-     * Nghiệp vụ: Hiển thị danh sách đặt phòng cho quản lý khách sạn
-     */
     @GetMapping("/hotel")
     public ResponseEntity<List<BookingResponseDTO>> getBookingsByHotelId(Principal principal) {
         Account acc = accountService.getAccountByUsername(principal.getName());
@@ -136,10 +182,6 @@ public class BookingController {
         return ResponseEntity.ok(bookings);
     }
 
-    /**
-     * API lấy danh sách booking theo trạng thái của một khách sạn
-     * Nghiệp vụ: Lọc danh sách đặt phòng theo trạng thái cho quản lý khách sạn
-     */
     @GetMapping("/hotel/status/{status}")
     public ResponseEntity<List<BookingResponseDTO>> getBookingsByHotelIdAndStatus(Principal principal,
             @PathVariable String status) {
@@ -150,16 +192,11 @@ public class BookingController {
         return ResponseEntity.ok(bookings);
     }
 
-    /**
-     * API cập nhật trạng thái booking
-     * Nghiệp vụ: Xác nhận hoặc hủy booking từ phía khách sạn
-     */
     @PutMapping("/{id}/status")
     public ResponseEntity<?> updateBookingStatus(
             @PathVariable Long id,
             @RequestParam String status) {
         try {
-            // Kiểm tra tham số status hợp lệ
             if (!isValidBookingStatus(status)) {
                 return ResponseEntity
                         .badRequest()
@@ -181,7 +218,6 @@ public class BookingController {
         }
     }
 
-    // Helper method để kiểm tra status hợp lệ
     private boolean isValidBookingStatus(String status) {
         return Arrays.asList("PENDING", "CONFIRMED", "COMPLETED", "CANCELLED", "PAID").contains(status);
     }

@@ -1,6 +1,7 @@
 package com.tourism.booking.repository;
 
 import com.tourism.booking.model.Booking;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -10,55 +11,87 @@ import java.util.List;
 
 public interface IBookingRepository extends JpaRepository<Booking, Long> {
 
-    // @Query(value = """
-    // select b.* from booking b
-    // join booking_management.user_profile up on up.user_id = b.user_id
-    // where b.user_id = :userId
-    // """, nativeQuery = true)
-    @Query("SELECT DISTINCT b FROM Booking b " +
-            "LEFT JOIN FETCH b.room_type " +
-            "LEFT JOIN FETCH b.user_profile " +
-            "LEFT JOIN FETCH b.bill " +
-            "WHERE b.user_profile.user_id = :userId")
-    List<Booking> findByUserProfileId(@Param("userId") Long userId);
+        @Query("SELECT DISTINCT b FROM Booking b " +
+                        "LEFT JOIN FETCH b.room " +
+                        "LEFT JOIN FETCH b.user_profile " +
+                        "LEFT JOIN FETCH b.bill " +
+                        "WHERE b.user_profile.user_id = :userId")
+        List<Booking> findByUserProfileUserId(@Param("userId") Long userId);
 
-    @Query("SELECT DISTINCT b FROM Booking b " +
-            "JOIN FETCH b.room_type rt " +
-            "JOIN FETCH rt.hotel h " +
-            "WHERE h.hotel_id = :hotelId")
-    List<Booking> findByHotelId(@Param("hotelId") Long hotelId);
+        @Query("SELECT DISTINCT b FROM Booking b " +
+                        "JOIN FETCH b.room r " +
+                        "JOIN FETCH r.room_type rt " +
+                        "JOIN FETCH rt.hotel h " +
+                        "WHERE h.hotel_id = :hotelId")
+        List<Booking> findByRoomRoomTypeHotelHotelId(@Param("hotelId") Long hotelId);
 
-    @Query("SELECT DISTINCT b FROM Booking b " +
-            "JOIN FETCH b.room_type rt " +
-            "JOIN FETCH rt.hotel h " +
-            "WHERE h.hotel_id = :hotelId AND b.status = :status")
-    List<Booking> findByHotelIdAndStatus(@Param("hotelId") Long hotelId, @Param("status") String status);
+        @Query("SELECT b FROM Booking b WHERE b.room.room_type.hotel.hotel_id = :hotelId AND b.status = :status")
+        List<Booking> findByRoomRoomTypeHotelHotelIdAndStatus(Long hotelId, String status);
 
-    @Query("SELECT DISTINCT b FROM Booking b " +
-            "JOIN FETCH b.room_type rt " +
-            "JOIN FETCH rt.hotel h " +
-            "WHERE (:checkInFrom IS NULL OR b.check_in_date >= :checkInFrom) " +
-            "AND (:checkInTo IS NULL OR b.check_in_date <= :checkInTo) " +
-            "AND (:checkOutFrom IS NULL OR b.check_out_date >= :checkOutFrom) " +
-            "AND (:checkOutTo IS NULL OR b.check_out_date <= :checkOutTo) " +
-            "AND b.status = :status")
-    List<Booking> findByDateRangeAndStatus(
-            @Param("checkInFrom") LocalDate checkInFrom,
-            @Param("checkInTo") LocalDate checkInTo,
-            @Param("checkOutFrom") LocalDate checkOutFrom,
-            @Param("checkOutTo") LocalDate checkOutTo,
-            @Param("status") String status);
+        @Query("SELECT DISTINCT b FROM Booking b " +
+                        "JOIN FETCH b.room r " +
+                        "JOIN FETCH r.room_type rt " +
+                        "WHERE (:checkInFrom IS NULL OR b.check_in_date >= :checkInFrom) " +
+                        "AND (:checkInTo IS NULL OR b.check_in_date <= :checkInTo) " +
+                        "AND (:checkOutFrom IS NULL OR b.check_out_date >= :checkOutFrom) " +
+                        "AND (:checkOutTo IS NULL OR b.check_out_date <= :checkOutTo) " +
+                        "AND b.status = :status")
+        List<Booking> findByStatusAndDateRange(
+                        @Param("status") String status,
+                        @Param("checkInFrom") LocalDate checkInFrom,
+                        @Param("checkInTo") LocalDate checkInTo,
+                        @Param("checkOutFrom") LocalDate checkOutFrom,
+                        @Param("checkOutTo") LocalDate checkOutTo);
 
-    @Query("SELECT DISTINCT b FROM Booking b " +
-            "JOIN FETCH b.room_type rt " +
-            "JOIN FETCH rt.hotel h " +
-            "WHERE (:checkInFrom IS NULL OR b.check_in_date >= :checkInFrom) " +
-            "AND (:checkInTo IS NULL OR b.check_in_date <= :checkInTo) " +
-            "AND (:checkOutFrom IS NULL OR b.check_out_date >= :checkOutFrom) " +
-            "AND (:checkOutTo IS NULL OR b.check_out_date <= :checkOutTo)")
-    List<Booking> findByDateRange(
-            @Param("checkInFrom") LocalDate checkInFrom,
-            @Param("checkInTo") LocalDate checkInTo,
-            @Param("checkOutFrom") LocalDate checkOutFrom,
-            @Param("checkOutTo") LocalDate checkOutTo);
+        @Query("SELECT DISTINCT b FROM Booking b " +
+                        "JOIN FETCH b.room r " +
+                        "JOIN FETCH r.room_type rt " +
+                        "WHERE (:checkInFrom IS NULL OR b.check_in_date >= :checkInFrom) " +
+                        "AND (:checkInTo IS NULL OR b.check_in_date <= :checkInTo) " +
+                        "AND (:checkOutFrom IS NULL OR b.check_out_date >= :checkOutFrom) " +
+                        "AND (:checkOutTo IS NULL OR b.check_out_date <= :checkOutTo)")
+        List<Booking> findByDateRange(
+                        @Param("checkInFrom") LocalDate checkInFrom,
+                        @Param("checkInTo") LocalDate checkInTo,
+                        @Param("checkOutFrom") LocalDate checkOutFrom,
+                        @Param("checkOutTo") LocalDate checkOutTo);
+
+        @Query("SELECT DISTINCT b FROM Booking b WHERE b.status = :status")
+        List<Booking> findByStatus(@Param("status") String status);
+
+        @Query("SELECT DISTINCT b FROM Booking b " +
+                        "JOIN FETCH b.room r " +
+                        "WHERE b.status = :status AND b.check_in_date BETWEEN :from AND :to")
+        List<Booking> findByStatusAndCheckInDateBetween(
+                        @Param("status") String status,
+                        @Param("from") LocalDate from,
+                        @Param("to") LocalDate to);
+
+        @Query("SELECT DISTINCT b FROM Booking b " +
+                        "JOIN FETCH b.room r " +
+                        "WHERE b.status = :status AND b.check_out_date BETWEEN :from AND :to")
+        List<Booking> findByStatusAndCheckOutDateBetween(
+                        @Param("status") String status,
+                        @Param("from") LocalDate from,
+                        @Param("to") LocalDate to);
+
+        @Query("SELECT DISTINCT b FROM Booking b " +
+                        "JOIN FETCH b.room r " +
+                        "WHERE b.check_in_date BETWEEN :from AND :to")
+        List<Booking> findByCheckInDateBetween(
+                        @Param("from") LocalDate from,
+                        @Param("to") LocalDate to);
+
+        @Query("SELECT DISTINCT b FROM Booking b " +
+                        "JOIN FETCH b.room r " +
+                        "WHERE b.check_out_date BETWEEN :from AND :to")
+        List<Booking> findByCheckOutDateBetween(
+                        @Param("from") LocalDate from,
+                        @Param("to") LocalDate to);
+
+        @Query("SELECT b FROM Booking b WHERE b.id_booking_temp = :tempId")
+        Booking findByIdBookingTempId(@Param("tempId") Long tempId);
+
+        @Query("SELECT b FROM Booking b ORDER BY b.id_booking DESC")
+        List<Booking> findRecentBookings(Pageable pageable);
 }

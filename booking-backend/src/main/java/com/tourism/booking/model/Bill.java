@@ -22,6 +22,9 @@ public class Bill {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long bill_id;
 
+    @Version
+    private Long version;
+
     @Column(name = "total_amount")
     BigDecimal total_amount;
 
@@ -35,10 +38,9 @@ public class Bill {
     LocalTime print_time;
 
     @OneToOne
-    @JoinColumn(name = "id_booking") // Tên cột khóa ngoại trong bảng Bill
+    @JoinColumn(name = "id_booking")
     Booking booking;
 
-    // Quan hệ 1-n với Payment
-    @OneToMany(mappedBy = "bill", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "bill")
     List<Payment> payments = new ArrayList<>();
 }

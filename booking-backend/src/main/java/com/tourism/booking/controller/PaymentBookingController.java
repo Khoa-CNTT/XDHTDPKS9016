@@ -2,7 +2,7 @@ package com.tourism.booking.controller;
 
 import com.tourism.booking.dto.booking.PaymentRequestDTO;
 import com.tourism.booking.dto.booking.PaymentResponseDTO;
-import com.tourism.booking.service.impl.PaymentService;
+import com.tourism.booking.service.IPaymentService;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AccessLevel;
@@ -24,7 +24,7 @@ import java.util.Arrays;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PaymentBookingController {
-    PaymentService paymentService;
+    IPaymentService paymentService;
     private static final Logger logger = LoggerFactory.getLogger(PaymentBookingController.class);
 
     /**
@@ -87,13 +87,13 @@ public class PaymentBookingController {
      * API xử lý thanh toán cho luồng 3 bước
      * Nghiệp vụ: Hoàn tất booking và tạo thanh toán
      */
-    @PostMapping("/booking/{bookingId}/finalize")
-    public ResponseEntity<PaymentResponseDTO> processPaymentWithFinalization(
-            @PathVariable Long bookingId,
-            @RequestBody PaymentRequestDTO request) {
-        PaymentResponseDTO payment = paymentService.processPaymentWithBookingFinalization(request, bookingId);
-        return new ResponseEntity<>(payment, HttpStatus.CREATED);
-    }
+//    @PostMapping("/booking/{bookingId}/finalize")
+//    public ResponseEntity<PaymentResponseDTO> processPaymentWithFinalization(
+//            @PathVariable Long bookingId,
+//            @RequestBody PaymentRequestDTO request) {
+//        PaymentResponseDTO payment = paymentService.processPaymentWithBookingFinalization(request, bookingId);
+//        return new ResponseEntity<>(payment, HttpStatus.CREATED);
+//    }
 
     /**
      * API xử lý thanh toán
