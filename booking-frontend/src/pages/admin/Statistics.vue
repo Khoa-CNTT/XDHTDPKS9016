@@ -3,36 +3,31 @@
     <div class="card-header flex justify-between items-center">
       <!-- Tab Container -->
       <div class="tabs flex gap-4">
-  <button :class="{'active': currentTab === 'user'}" @click="currentTab = 'user'" class="tab-button">User</button>
-  <button :class="{'active': currentTab === 'supplier'}" @click="currentTab = 'supplier'" class="tab-button">Nhà Cung Cấp</button>
-</div>
+        <button :class="{ 'active': currentTab === 'user' }" @click="currentTab = 'user'" class="tab-button">User</button>
+        <button :class="{ 'active': currentTab === 'supplier' }" @click="currentTab = 'supplier'" class="tab-button">Nhà
+          Cung Cấp</button>
+      </div>
     </div>
 
     <div class="card-body w-full h-auto">
       <!-- Nội dung User -->
       <div v-show="currentTab === 'user'" class="grid grid-cols-1 gap-6 w-full">
-         <!-- BarChart: Số người dùng mới đăng ký theo quý -->
-         <div class="p-4 border rounded shadow-sm h-96 w-full">
-          <BarChart
-            :chart-data="newUserByQuarterChartData"
-            :chart-options="newUserByQuarterChartOptions"
-          />
+        <!-- BarChart: Số người dùng mới đăng ký theo quý -->
+        <div class="p-4 border rounded shadow-sm h-96 w-full">
+          <BarChart :chart-data="newUserByQuarterChartData" :chart-options="newUserByQuarterChartOptions" />
         </div>
         <!-- LineChart: Trạng thái người dùng -->
         <div class="p-4 border rounded shadow-sm h-96 w-full">
           <LineChart :chartData="quarterlyUserChartData" :chartOptions="quarterlyUserChartOptions" />
         </div>
 
-       
+
       </div>
 
       <!-- Nội dung Nhà Cung Cấp -->
       <div v-show="currentTab === 'supplier'" class="grid grid-cols-1 gap-6 w-full">
         <div class="p-4 border rounded shadow-sm w-full">
-          <BarChart
-            :chart-data="newSupplierByQuarterChartData"
-            :chart-options="newSupplierByQuarterChartOptions"
-          />
+          <BarChart :chart-data="newSupplierByQuarterChartData" :chart-options="newSupplierByQuarterChartOptions" />
         </div>
         <div class="p-4 border rounded shadow-sm h-96 w-full">
           <LineChart :chartData="quarterlySupplierChartData" :chartOptions="quarterlySupplierChartOptions" />
@@ -48,14 +43,14 @@
 import { ref } from 'vue';
 import LineChart from '@/components/base/LineChart.vue';
 import BarChart from '@/components/base/BarChart.vue';
-const currentTab = ref('user'); 
+const currentTab = ref('user');
 
 const quarterlyUserChartData = {
-  labels: ['Q1 Năm 1', 'Q2 Năm 1', 'Q3 Năm 1', 'Q4 Năm 1', 
-           'Q1 Năm 2', 'Q2 Năm 2', 'Q3 Năm 2', 'Q4 Năm 2',
-           'Q1 Năm 3', 'Q2 Năm 3', 'Q3 Năm 3', 'Q4 Năm 3',
-           'Q1 Năm 4', 'Q2 Năm 4', 'Q3 Năm 4', 'Q4 Năm 4',
-           'Q1 Năm 5', 'Q2 Năm 5', 'Q3 Năm 5', 'Q4 Năm 5'],
+  labels: ['Q1 Năm 1', 'Q2 Năm 1', 'Q3 Năm 1', 'Q4 Năm 1',
+    'Q1 Năm 2', 'Q2 Năm 2', 'Q3 Năm 2', 'Q4 Năm 2',
+    'Q1 Năm 3', 'Q2 Năm 3', 'Q3 Năm 3', 'Q4 Năm 3',
+    'Q1 Năm 4', 'Q2 Năm 4', 'Q3 Năm 4', 'Q4 Năm 4',
+    'Q1 Năm 5', 'Q2 Năm 5', 'Q3 Năm 5', 'Q4 Năm 5'],
   datasets: [
     {
       label: 'Hoạt động',
@@ -86,7 +81,7 @@ const quarterlyUserChartData = {
 
 const quarterlyUserChartOptions = {
   responsive: true,
-  maintainAspectRatio: false,  
+  maintainAspectRatio: false,
   plugins: {
     title: {
       display: true,
@@ -96,23 +91,23 @@ const quarterlyUserChartOptions = {
   scales: {
     x: {
       ticks: {
-        maxRotation: 45, 
+        maxRotation: 45,
         minRotation: 30,
       },
     },
     y: {
-      beginAtZero: true, 
+      beginAtZero: true,
     },
   },
 }
 
 // Dữ liệu cho biểu đồ Nhà Cung Cấp theo quý trong 5 năm
 const quarterlySupplierChartData = {
-  labels: ['Q1 Năm 1', 'Q2 Năm 1', 'Q3 Năm 1', 'Q4 Năm 1', 
-           'Q1 Năm 2', 'Q2 Năm 2', 'Q3 Năm 2', 'Q4 Năm 2',
-           'Q1 Năm 3', 'Q2 Năm 3', 'Q3 Năm 3', 'Q4 Năm 3',
-           'Q1 Năm 4', 'Q2 Năm 4', 'Q3 Năm 4', 'Q4 Năm 4',
-           'Q1 Năm 5', 'Q2 Năm 5', 'Q3 Năm 5', 'Q4 Năm 5'],
+  labels: ['Q1 Năm 1', 'Q2 Năm 1', 'Q3 Năm 1', 'Q4 Năm 1',
+    'Q1 Năm 2', 'Q2 Năm 2', 'Q3 Năm 2', 'Q4 Năm 2',
+    'Q1 Năm 3', 'Q2 Năm 3', 'Q3 Năm 3', 'Q4 Năm 3',
+    'Q1 Năm 4', 'Q2 Năm 4', 'Q3 Năm 4', 'Q4 Năm 4',
+    'Q1 Năm 5', 'Q2 Năm 5', 'Q3 Năm 5', 'Q4 Năm 5'],
   datasets: [
     {
       label: 'Hoạt động',
@@ -143,7 +138,7 @@ const quarterlySupplierChartData = {
 
 const quarterlySupplierChartOptions = {
   responsive: true,
-  maintainAspectRatio: false,  
+  maintainAspectRatio: false,
   plugins: {
     title: {
       display: true,
@@ -261,26 +256,26 @@ const newSupplierByQuarterChartOptions = {
 
 </script>
 
-  
-  <style scoped>
+
+<style scoped>
 .card-body {
-  width: 100%; 
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: flex-start;
   height: 100vh;
-  padding:20px;
+  padding: 20px;
 }
 
 .card-body .grid {
-  width: 100%; 
-  max-width: 100vw; 
+  width: 100%;
+  max-width: 100vw;
 }
 
 .card-body .h-96 {
-  height: 60vh; 
-  width: 78vw;  
-  margin-top: 0; 
+  height: 60vh;
+  width: 78vw;
+  margin-top: 0;
 }
 
 .tab-button {
@@ -295,16 +290,13 @@ const newSupplierByQuarterChartOptions = {
 
 
 .tab-button.active {
-  background-color: #36a2eb; 
-  color: white; 
-  border-color: #1d7ed2; 
+  background-color: #36a2eb;
+  color: white;
+  border-color: #1d7ed2;
 }
 
 
 .tab-button:hover {
   background-color: #e0e0e0;
 }
-
-  </style>
-  
-  
+</style>

@@ -1,14 +1,9 @@
 <template>
     <div class="flex h-screen">
-        <!-- Sidebar -->
-        <aside class="bg-slate-900 w-[20%] text-white font-bold flex flex-col">
-            <RouterLink to="/" class="flex items-center gap-2 px-4 py-5 border-b border-slate-700">
-                <Icon icon="si:home-line" class="text-white" width="30" height="30" />
-                <span class="uppercase text-lg font-bold">Nhà cung cấp</span>
-            </RouterLink>
-
+       
+        <aside class="bg-gray-800 w-[20%] text-white font-bold flex flex-col">
             <nav class="flex-1 overflow-y-auto px-4 mt-4">
-                <ul class="space-y-2">
+                <ul class="space-y-2 p-4">
                     <li>
                         <router-link to="/supplier/order-room-management"
                             class="flex items-center gap-3 px-4 py-2 rounded hover:bg-blue-500 transition"
@@ -31,6 +26,14 @@
                             active-class="bg-blue-500" exact-active-class="bg-blue-600">
                             <Icon icon="mdi:bed-outline" width="24" height="24" />
                             <span>Quản lý loại phòng</span>
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link to="/supplier/room-manager"
+                            class="flex items-center gap-3 px-4 py-2 rounded hover:bg-blue-500 transition"
+                            active-class="bg-blue-500" exact-active-class="bg-blue-600">
+                            <Icon icon="mdi:hotel" width="24" height="24" />
+                            <span>Quản lý phòng</span>
                         </router-link>
                     </li>
                     <li>
@@ -85,24 +88,24 @@
             </div>
         </aside>
 
-        <!-- Content -->
+       
         <div class="flex-1 flex flex-col">
-            <!-- Top Nav -->
+        
             <nav class="bg-white px-4 py-2 flex items-center justify-between shadow">
-                <!-- Nút menu -->
+             
                 <button class="text-gray-600 hover:text-black">
                     <i class="fas fa-bars"></i>
                 </button>
 
-                <!-- Avatar và tên người dùng -->
+                
                 <div class="flex items-center gap-3">
                     <img src="https://i.pravatar.cc/40" alt="avatar" class="w-8 h-8 rounded-full object-cover" />
                     <span class="text-gray-800 font-semibold">{{ authStore.getUser?.username }}</span>
                 </div>
             </nav>
 
-            <!-- Router View -->
-            <main class="p-4 overflow-y-auto flex-1 bg-gray-50">
+    
+            <main class="overflow-y-auto">
                 <router-view />
             </main>
         </div>
@@ -135,3 +138,4 @@ const handleLogout = async () => {
     }
 }
 </script>
+
