@@ -4,7 +4,6 @@ import com.tourism.booking.service.impl.ServiceBookingService;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,10 +19,6 @@ public class ServiceBookingController {
 
      ServiceBookingService serviceService;
 
-    /**
-     * API lấy danh sách dịch vụ theo khách sạn
-     * Nghiệp vụ: Hiển thị danh sách dịch vụ có thể thêm khi đặt phòng
-     */
     @GetMapping("/hotel/{hotelId}")
     public ResponseEntity<?> getServicesByHotelId(@PathVariable Long hotelId) {
         List<ServiceDTO> services = serviceService.getServicesByHotelId(hotelId);

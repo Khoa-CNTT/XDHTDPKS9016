@@ -1,5 +1,6 @@
 package com.tourism.booking.dto.booking;
 
+import com.tourism.booking.dto.user.UserProfileResponse;
 import lombok.Data;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -18,6 +19,7 @@ public class BookingResponseDTO {
     private HotelDTO hotel;
     private Set<ServiceDTO> services;
     private BillDTO bill;
+    private UserProfileResponse user;
 
     // Contact information
     private String contactName;
@@ -27,5 +29,5 @@ public class BookingResponseDTO {
     private String specialRequests;
 
     // Thông tin UI quản lý
-    private String statusDisplay; // Hiển thị trạng thái đẹp hơn: "Chờ xác nhận", "Đã xác nhận", "Hoàn tất"
+    private String statusDisplay;
 }

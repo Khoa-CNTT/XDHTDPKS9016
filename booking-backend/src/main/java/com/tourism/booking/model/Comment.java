@@ -34,7 +34,5 @@ public class Comment {
     @JoinColumn(name = "user_id", nullable = false)
     UserProfile user_profile;
 
-    @ManyToOne
-    @JoinColumn(name = "room_type_id", nullable = false)
-    RoomType room_type;
+
 }

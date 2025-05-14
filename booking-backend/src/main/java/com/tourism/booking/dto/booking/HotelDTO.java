@@ -5,10 +5,9 @@ import lombok.Data;
 @Data
 public class HotelDTO {
     private Long hotelId;
-    private String hotelName;
+    private String name;
     private String address;
-    private String phone;
     private String email;
-    private String imageUrl;
-    private int starRating;
+    private String phone;
+    private String description;
 }

@@ -1,18 +1,17 @@
 package com.tourism.booking.service.impl;
 
-import com.tourism.booking.config.UserProfileSpecification;
 import com.tourism.booking.dto.user.UserProfileResponse;
-import com.tourism.booking.dto.user.UserSearchRequest;
 import com.tourism.booking.model.UserProfile;
 import com.tourism.booking.repository.IUserProfileRepository;
 import com.tourism.booking.service.IUserProfileService;
+import com.tourism.booking.mapper.IUserProfileMapper;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -22,19 +21,13 @@ import java.util.Optional;
 public class UserProfileService implements IUserProfileService {
 
     IUserProfileRepository userProfileRepository;
+    IUserProfileMapper userProfileMapper;
 
     @Override
-    public Page<UserProfile> findAll(UserSearchRequest userSearchRequest, Pageable pageable) {
-        Specification<UserProfile> specification = Specification
-                .where(UserProfileSpecification.hasName(userSearchRequest.getFull_name())
-                        .and(UserProfileSpecification.hasDobFrom(userSearchRequest.getDobFrom()))
-                        .and(UserProfileSpecification.hasDobTo(userSearchRequest.getDobTo()))
-                        .and(UserProfileSpecification.hasGender(userSearchRequest.getGender()))
-                        .and(UserProfileSpecification.hasEmail(userSearchRequest.getEmail()))
-                        .and(UserProfileSpecification.hasPhone(userSearchRequest.getPhone()))
-
-                );
-        return userProfileRepository.findAll(specification, pageable);
+    @Transactional(readOnly = true)
+    public Page<UserProfileResponse> findAll(Pageable pageable) {
+        Page<UserProfile> userProfiles = userProfileRepository.findAll(pageable);
+        return userProfiles.map(userProfileMapper::UserProfileToUserProfileResponse);
     }
 
     @Override
@@ -66,5 +59,4 @@ public class UserProfileService implements IUserProfileService {
     public Optional<UserProfile> findUserProfileByAccoutId(Long id) {
         return userProfileRepository.findUserProfileByAccoutId(id);
     }
-
 }

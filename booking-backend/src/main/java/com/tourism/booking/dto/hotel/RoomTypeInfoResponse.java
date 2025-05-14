@@ -4,10 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class RoomTypeInfoResponse {
-    String typeName;
-    double price;
-}
+//@Data
+//@NoArgsConstructor
+//@AllArgsConstructor
+//public class RoomTypeInfoResponse {
+//    String typeName;
+//    double price;
+//}

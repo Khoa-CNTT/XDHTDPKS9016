@@ -19,6 +19,6 @@ public class HotelInfoResponse {
     String hotline;
     String description;
     List<ServiceInfoResponse> services;
-    List<RoomTypeInfoResponse> roomTypes;
+//    List<RoomTypeInfoResponse> roomTypes;
 
 }

@@ -40,10 +40,9 @@ public class ServiceBookingService {
 
     private ServiceDTO convertToDTO(Services service) {
         ServiceDTO dto = new ServiceDTO();
-        dto.setServiceId(service.getService_id());
-        dto.setServiceName(service.getService_name());
-        dto.setServicePrice(service.getService_price());
-        dto.setServiceImage(service.getService_image());
+        dto.setId(service.getService_id());
+        dto.setName(service.getService_name());
+        dto.setPrice(service.getService_price());
         dto.setDescription(service.getDescription());
         return dto;
     }

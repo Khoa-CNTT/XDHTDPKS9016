@@ -47,21 +47,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> {
                     request
-                            .requestMatchers(apiPrefix + "/hotels/**").permitAll()
-                            .requestMatchers(apiPrefix + "/auth/**").permitAll()
-                            .requestMatchers(apiPrefix + "/user-profile/**").permitAll()
-                            .requestMatchers(apiPrefix + "/forgotPassword/**").permitAll()
-                            .requestMatchers(apiPrefix + "/room-types/**").permitAll()
-                            .requestMatchers(apiPrefix + "/hotel-info/**").permitAll()
-                            .requestMatchers(apiPrefix + "/management-user/**").authenticated()
-                            .requestMatchers(apiPrefix + "/images/**").permitAll()
-                            .requestMatchers(apiPrefix + "/bookings/**").permitAll()
-                            .requestMatchers(apiPrefix + "/booking/**").permitAll()
-                            .requestMatchers(apiPrefix + "/roomtypes/**").permitAll()
-                            .requestMatchers(apiPrefix + "/services/**").permitAll()
-                            .requestMatchers(apiPrefix + "/payments/**").permitAll()
-                            .requestMatchers(apiPrefix + "/payment/**").permitAll()
-                            .requestMatchers(apiPrefix + "/chat/ai").permitAll()
+                            .requestMatchers(apiPrefix + "/**").permitAll()
                             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                             .anyRequest().authenticated(); // các request còn lại phải xác thực
                 });

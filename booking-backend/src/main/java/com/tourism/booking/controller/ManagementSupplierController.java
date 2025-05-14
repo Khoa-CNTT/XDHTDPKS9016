@@ -1,10 +1,13 @@
 package com.tourism.booking.controller;
 
+import com.tourism.booking.dto.hotel.CreateHotelRequest;
+import com.tourism.booking.dto.hotel.UpdateHotelRequest;
 import com.tourism.booking.dto.page.PageReponse;
 import com.tourism.booking.exception.ApiException;
 import com.tourism.booking.exception.ErrorCode;
 import com.tourism.booking.model.Hotel;
 import com.tourism.booking.service.IHotelService;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -16,7 +19,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@PreAuthorize("hasRole('ADMIN')")
 @RequestMapping("${api.prefix}/management-supplier")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
@@ -26,7 +28,7 @@ public class ManagementSupplierController {
 
     @GetMapping
     public ResponseEntity<?> getAllHotels(@RequestParam(defaultValue = "0") int page,
-                                          @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
         return ResponseEntity.ok(new PageReponse<>(hotelService.getHotels(pageable)));
     }
@@ -39,15 +41,13 @@ public class ManagementSupplierController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createHotel(@RequestBody Hotel hotel) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(hotelService.save(hotel));
+    public ResponseEntity<?> createHotel(@Valid @RequestBody CreateHotelRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(hotelService.createHotel(request));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateHotel(@PathVariable("id") Long id, @RequestBody Hotel hotel) {
-        hotelService.getHotelById(id).orElseThrow(() -> new ApiException(ErrorCode.HOTEL_NOT_EXIST));
-        hotel.setHotel_id(id);
-        return ResponseEntity.ok(hotelService.save(hotel));
+    public ResponseEntity<?> updateHotel(@PathVariable("id") Long id, @Valid @RequestBody UpdateHotelRequest request) {
+        return ResponseEntity.ok(hotelService.updateBasicHotelInfo(id, request));
     }
 
     @DeleteMapping("/{id}")

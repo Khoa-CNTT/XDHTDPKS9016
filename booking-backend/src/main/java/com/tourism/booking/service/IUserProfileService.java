@@ -9,7 +9,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.Optional;
 
 public interface IUserProfileService {
-    Page<UserProfile> findAll(UserSearchRequest userSearchRequest, Pageable pageable);
+    Page<UserProfileResponse> findAll(Pageable pageable);
 
     Optional<UserProfileResponse> findById(Long id);
 

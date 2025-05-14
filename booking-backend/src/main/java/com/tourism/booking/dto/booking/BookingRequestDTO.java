@@ -13,6 +13,7 @@ public class BookingRequestDTO {
     private LocalTime checkOutTime;
     private int numberPeople;
     private Long roomTypeId;
+    private Long roomId;
     // private Long userId;
     private Set<Long> serviceIds;
 }
