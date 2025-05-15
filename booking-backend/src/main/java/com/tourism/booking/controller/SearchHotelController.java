@@ -9,6 +9,7 @@ import java.util.List;
 @RestController
 @RequestMapping("${api.prefix}/hotels")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@CrossOrigin(origins = "*")
 public class SearchHotelController {
 
     SearchHotelService searchHotelService;

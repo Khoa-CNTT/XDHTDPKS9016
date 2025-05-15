@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("${api.prefix}/payment")
+@CrossOrigin(origins = "*")
 public class PaymentController {
 
     private static final Logger logger = LoggerFactory.getLogger(PaymentController.class);
