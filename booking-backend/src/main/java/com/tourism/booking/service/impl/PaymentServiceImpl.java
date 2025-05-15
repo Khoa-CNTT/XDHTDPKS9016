@@ -125,7 +125,6 @@ public class PaymentServiceImpl implements IPaymentService {
                 payment.setPayment_time(LocalTime.now());
             }
 
-            // Save payment
             payment = paymentRepository.save(payment);
             logger.info("Payment saved successfully with id: {} for booking: {}",
                     payment.getPayment_id(), payment.getBookingId());
