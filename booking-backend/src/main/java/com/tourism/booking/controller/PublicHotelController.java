@@ -4,22 +4,28 @@ import com.tourism.booking.dto.page.PageReponse;
 import com.tourism.booking.dto.publicHotel.HotelDetailPublicDTO;
 import com.tourism.booking.exception.ApiException;
 import com.tourism.booking.exception.ErrorCode;
+import com.tourism.booking.service.IHotelService;
 import com.tourism.booking.service.IPublicHotelService;
-import lombok.RequiredArgsConstructor;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 
+@PreAuthorize("permitAll()")
 @RestController
 @RequestMapping("${api.prefix}/hotels")
-@CrossOrigin(origins = "http://localhost:5173")
-@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@AllArgsConstructor
+@CrossOrigin(origins = "*")
 public class PublicHotelController {
-    private final IPublicHotelService hotelService;
+    IPublicHotelService hotelService;
 
 
     @GetMapping
@@ -43,3 +49,4 @@ public class PublicHotelController {
                 .orElseThrow(() -> new ApiException(ErrorCode.HOTEL_NOT_EXIST));
     }
 }
+

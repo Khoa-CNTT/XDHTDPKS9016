@@ -15,7 +15,6 @@ import java.util.Optional;
 public class RoomTypeService implements IRoomTypeService {
     private final IRoomTypeRepository roomTypeRepository;
 
-
     @Override
     public Optional<RoomType> getRoomTypeById(Long id) {
         return roomTypeRepository.findById(id);

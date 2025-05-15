@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Set;
 
 public interface IBookingService {
+    BookingResponseDTO createBooking(BookingRequestDTO bookingRequest);
+
     BookingResponseDTO getBookingById(Long id);
 
     Booking getBookingEntityById(Long id);

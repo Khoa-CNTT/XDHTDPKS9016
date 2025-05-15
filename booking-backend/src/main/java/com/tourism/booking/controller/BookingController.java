@@ -3,6 +3,8 @@ package com.tourism.booking.controller;
 import com.tourism.booking.dto.booking.BookingRequestDTO;
 import com.tourism.booking.dto.booking.BookingResponseDTO;
 import com.tourism.booking.dto.booking.ContactInfoDTO;
+import com.tourism.booking.dto.booking.RoomBookingRequest;
+import com.tourism.booking.dto.booking.RoomSelectionDTO;
 import com.tourism.booking.model.Account;
 import com.tourism.booking.model.Hotel;
 import com.tourism.booking.model.UserProfile;
@@ -26,9 +28,11 @@ import java.security.Principal;
 import java.time.LocalDate;
 import java.util.*;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("${api.prefix}/bookings")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "*")
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class BookingController {
@@ -120,17 +124,26 @@ public class BookingController {
     private void validateInitializeRequest(BookingRequestDTO request) {
         List<String> errors = new ArrayList<>();
 
-        if (request.getRoomId() == null) {
-            errors.add("Room ID is required");
-        }
         if (request.getCheckInDate() == null) {
             errors.add("Check-in date is required");
         }
         if (request.getCheckOutDate() == null) {
             errors.add("Check-out date is required");
         }
-        if (request.getNumberPeople() <= 0) {
+        if (request.getNumberOfPeople() <= 0) {
             errors.add("Number of people must be greater than 0");
+        }
+        if (request.getRoomSelections() == null || request.getRoomSelections().isEmpty()) {
+            errors.add("At least one room must be selected");
+        } else {
+            for (RoomSelectionDTO room : request.getRoomSelections()) {
+                if (room.getNumberOfRooms() == null || room.getNumberOfRooms() <= 0) {
+                    errors.add("Number of rooms must be greater than 0");
+                }
+                if (room.getRoomTypeId() == null && room.getRoomId() == null) {
+                    errors.add("Either roomTypeId or roomId must be specified");
+                }
+            }
         }
 
         if (!errors.isEmpty()) {
@@ -220,5 +233,21 @@ public class BookingController {
 
     private boolean isValidBookingStatus(String status) {
         return Arrays.asList("PENDING", "CONFIRMED", "COMPLETED", "CANCELLED", "PAID").contains(status);
+    }
+
+    @PostMapping
+    public ResponseEntity<BookingResponseDTO> createBooking(@Valid @RequestBody BookingRequestDTO bookingRequest) {
+        BookingResponseDTO response = bookingService.createBooking(bookingRequest);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<BookingResponseDTO> getBookingById(@PathVariable Long id) {
+        return ResponseEntity.ok(bookingService.getBookingById(id));
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<BookingResponseDTO>> getUserBookings(@PathVariable Long userId) {
+        return ResponseEntity.ok(bookingService.getBookingsByUserId(userId));
     }
 }

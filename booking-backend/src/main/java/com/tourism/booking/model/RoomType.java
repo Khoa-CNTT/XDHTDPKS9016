@@ -43,6 +43,7 @@ public class RoomType {
     @JsonIgnore
     Hotel hotel;
 
-    @OneToMany(mappedBy = "room_type", cascade = CascadeType.ALL)
-    Set<Room> room = new HashSet<>();
+    @OneToMany(mappedBy = "room_type", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    Set<Room> rooms = new HashSet<>();
 }

@@ -12,24 +12,31 @@ import java.util.List;
 public interface IBookingRepository extends JpaRepository<Booking, Long> {
 
         @Query("SELECT DISTINCT b FROM Booking b " +
-                        "LEFT JOIN FETCH b.room " +
+                        "LEFT JOIN FETCH b.bookingRooms br " +
                         "LEFT JOIN FETCH b.user_profile " +
                         "LEFT JOIN FETCH b.bill " +
                         "WHERE b.user_profile.user_id = :userId")
         List<Booking> findByUserProfileUserId(@Param("userId") Long userId);
 
         @Query("SELECT DISTINCT b FROM Booking b " +
-                        "JOIN FETCH b.room r " +
+                        "JOIN FETCH b.bookingRooms br " +
+                        "JOIN FETCH br.room r " +
                         "JOIN FETCH r.room_type rt " +
                         "JOIN FETCH rt.hotel h " +
                         "WHERE h.hotel_id = :hotelId")
         List<Booking> findByRoomRoomTypeHotelHotelId(@Param("hotelId") Long hotelId);
 
-        @Query("SELECT b FROM Booking b WHERE b.room.room_type.hotel.hotel_id = :hotelId AND b.status = :status")
+        @Query("SELECT DISTINCT b FROM Booking b " +
+                        "JOIN b.bookingRooms br " +
+                        "JOIN br.room r " +
+                        "JOIN r.room_type rt " +
+                        "JOIN rt.hotel h " +
+                        "WHERE h.hotel_id = :hotelId AND b.status = :status")
         List<Booking> findByRoomRoomTypeHotelHotelIdAndStatus(Long hotelId, String status);
 
         @Query("SELECT DISTINCT b FROM Booking b " +
-                        "JOIN FETCH b.room r " +
+                        "JOIN FETCH b.bookingRooms br " +
+                        "JOIN FETCH br.room r " +
                         "JOIN FETCH r.room_type rt " +
                         "WHERE (:checkInFrom IS NULL OR b.check_in_date >= :checkInFrom) " +
                         "AND (:checkInTo IS NULL OR b.check_in_date <= :checkInTo) " +
@@ -44,7 +51,8 @@ public interface IBookingRepository extends JpaRepository<Booking, Long> {
                         @Param("checkOutTo") LocalDate checkOutTo);
 
         @Query("SELECT DISTINCT b FROM Booking b " +
-                        "JOIN FETCH b.room r " +
+                        "JOIN FETCH b.bookingRooms br " +
+                        "JOIN FETCH br.room r " +
                         "JOIN FETCH r.room_type rt " +
                         "WHERE (:checkInFrom IS NULL OR b.check_in_date >= :checkInFrom) " +
                         "AND (:checkInTo IS NULL OR b.check_in_date <= :checkInTo) " +
@@ -60,7 +68,8 @@ public interface IBookingRepository extends JpaRepository<Booking, Long> {
         List<Booking> findByStatus(@Param("status") String status);
 
         @Query("SELECT DISTINCT b FROM Booking b " +
-                        "JOIN FETCH b.room r " +
+                        "JOIN FETCH b.bookingRooms br " +
+                        "JOIN FETCH br.room r " +
                         "WHERE b.status = :status AND b.check_in_date BETWEEN :from AND :to")
         List<Booking> findByStatusAndCheckInDateBetween(
                         @Param("status") String status,
@@ -68,7 +77,8 @@ public interface IBookingRepository extends JpaRepository<Booking, Long> {
                         @Param("to") LocalDate to);
 
         @Query("SELECT DISTINCT b FROM Booking b " +
-                        "JOIN FETCH b.room r " +
+                        "JOIN FETCH b.bookingRooms br " +
+                        "JOIN FETCH br.room r " +
                         "WHERE b.status = :status AND b.check_out_date BETWEEN :from AND :to")
         List<Booking> findByStatusAndCheckOutDateBetween(
                         @Param("status") String status,
@@ -76,14 +86,16 @@ public interface IBookingRepository extends JpaRepository<Booking, Long> {
                         @Param("to") LocalDate to);
 
         @Query("SELECT DISTINCT b FROM Booking b " +
-                        "JOIN FETCH b.room r " +
+                        "JOIN FETCH b.bookingRooms br " +
+                        "JOIN FETCH br.room r " +
                         "WHERE b.check_in_date BETWEEN :from AND :to")
         List<Booking> findByCheckInDateBetween(
                         @Param("from") LocalDate from,
                         @Param("to") LocalDate to);
 
         @Query("SELECT DISTINCT b FROM Booking b " +
-                        "JOIN FETCH b.room r " +
+                        "JOIN FETCH b.bookingRooms br " +
+                        "JOIN FETCH br.room r " +
                         "WHERE b.check_out_date BETWEEN :from AND :to")
         List<Booking> findByCheckOutDateBetween(
                         @Param("from") LocalDate from,
