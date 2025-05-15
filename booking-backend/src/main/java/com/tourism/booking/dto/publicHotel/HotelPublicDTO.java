@@ -10,6 +10,7 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class HotelPublicDTO {
+    Long hotel_id;
     String name;
     String image;
     String address;

@@ -6,7 +6,9 @@ import com.tourism.booking.model.Hotel;
 import com.tourism.booking.repository.IPublicHotelRepository;
 import com.tourism.booking.repository.IRoomRepository;
 import com.tourism.booking.service.IPublicHotelService;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -18,9 +20,10 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PublicHotelService implements IPublicHotelService {
-    private final IPublicHotelRepository hotelRepository;
-    private final IRoomRepository roomRepository;
+    IPublicHotelRepository hotelRepository;
+    IRoomRepository roomRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -68,7 +71,7 @@ public class PublicHotelService implements IPublicHotelService {
 
                     // 3) Build DTO tổng
                     return HotelDetailPublicDTO.builder()
-                            .id(hotel.getHotel_id())
+                            .hotel_id(hotel.getHotel_id())
                             .name(hotel.getName())
                             .image(hotel.getImage())
                             .address(hotel.getAddress())
@@ -88,6 +91,7 @@ public class PublicHotelService implements IPublicHotelService {
 
     private HotelPublicDTO toDto(Hotel h) {
         return HotelPublicDTO.builder()
+                .hotel_id(h.getHotel_id())
                 .name(h.getName())
                 .image(h.getImage())
                 .address(h.getAddress())

@@ -15,12 +15,15 @@ public class SearchHotelService {
     public SearchHotelService(ISearchHotelRepository findHotelRepository) {
         this.searchHotelRepository = findHotelRepository;
     }
-    public List<SearchHotelResponse> searchHotels(String name, String address) {
-        List<Hotel> hotels = searchHotelRepository.searchByNameAndAddress(name, address);
+    public List<SearchHotelResponse> searchHotels(String name) {
+        List<Hotel> hotels = searchHotelRepository.searchByNameAndAddress(name);
         return hotels.stream().map(hotel -> new SearchHotelResponse(
+                hotel.getHotel_id(),
                 hotel.getName(),
                 hotel.getImage(),
-                hotel.getAddress()
+                hotel.getAddress(),
+                hotel.getHotline(),
+                hotel.getDescription()
         )).collect(Collectors.toList());
     }
 }

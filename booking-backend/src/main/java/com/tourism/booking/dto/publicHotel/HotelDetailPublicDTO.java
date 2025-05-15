@@ -11,7 +11,7 @@ import java.util.List;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class HotelDetailPublicDTO {
-    Long id;
+    Long hotel_id;
     String name;
     String image;
     String address;

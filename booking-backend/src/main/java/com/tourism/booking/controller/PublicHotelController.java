@@ -4,7 +4,6 @@ import com.tourism.booking.dto.page.PageReponse;
 import com.tourism.booking.dto.publicHotel.HotelDetailPublicDTO;
 import com.tourism.booking.exception.ApiException;
 import com.tourism.booking.exception.ErrorCode;
-import com.tourism.booking.service.IHotelService;
 import com.tourism.booking.service.IPublicHotelService;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -21,12 +20,11 @@ import java.time.LocalDate;
 @PreAuthorize("permitAll()")
 @RestController
 @RequestMapping("${api.prefix}/hotels")
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
 @CrossOrigin(origins = "*")
 public class PublicHotelController {
     IPublicHotelService hotelService;
-
 
     @GetMapping
     public ResponseEntity<?> getHotels(@RequestParam(defaultValue = "0") int page,
