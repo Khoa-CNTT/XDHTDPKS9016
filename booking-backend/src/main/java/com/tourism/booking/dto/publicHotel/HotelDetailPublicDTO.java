@@ -1,20 +1,22 @@
-package com.tourism.booking.dto.hotel;
+package com.tourism.booking.dto.publicHotel;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
+import java.util.List;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class SearchHotelResponse {
+public class HotelDetailPublicDTO {
     Long hotel_id;
     String name;
     String image;
     String address;
     String hotline;
     String description;
+    List<ServicePublicDTO> services;
+    List<RoomTypePublicDTO> roomTypes;
 }

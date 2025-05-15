@@ -20,8 +20,7 @@ public class SearchHotelController {
 
     @GetMapping("/search")
     public List<SearchHotelResponse> searchHotels(
-            @RequestParam(defaultValue = "") String name,
-            @RequestParam(defaultValue = "") String address) {
-        return searchHotelService.searchHotels(name, address);
+            @RequestParam(defaultValue = "") String name) {
+        return searchHotelService.searchHotels(name);
     }
 }

@@ -1,16 +1,15 @@
-package com.tourism.booking.dto.hotel;
+package com.tourism.booking.dto.publicHotel;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class SearchHotelResponse {
+public class HotelPublicDTO {
     Long hotel_id;
     String name;
     String image;
