@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -33,4 +34,13 @@ public interface IRoomTypeRepository extends JpaRepository<RoomType, Long> {
                         WHERE r.hotel_id = :hotelId AND r.available_room > 0
                         """, nativeQuery = true)
         List<RoomType> findAvailableRoomTypesByHotelId(Long hotelId);
+
+        @Query("SELECT rt FROM RoomType rt WHERE rt.hotel.hotel_id = :hotelId")
+        List<RoomType> findByHotelHotelId(Long hotelId);
+
+        @Query("SELECT rt FROM RoomType rt WHERE rt.hotel.hotel_id = :hotelId")
+        List<RoomType> findAllRoomTypesByHotelId(@Param("hotelId") Long hotelId);
+
+        @Query("SELECT COUNT(rt) FROM RoomType rt WHERE rt.hotel.hotel_id = :hotelId")
+        int countRoomTypesByHotelId(@Param("hotelId") Long hotelId);
 }

@@ -4,6 +4,7 @@ import com.tourism.booking.dto.booking.PaymentRequestDTO;
 import com.tourism.booking.dto.booking.PaymentResponseDTO;
 import com.tourism.booking.model.Bill;
 import com.tourism.booking.model.Booking;
+import com.tourism.booking.model.BookingRoom;
 import com.tourism.booking.model.Payment;
 import com.tourism.booking.repository.IBillRepository;
 import com.tourism.booking.repository.IBookingRepository;
@@ -75,7 +76,7 @@ public class PaymentService implements IPaymentService {
         payment.setTransaction_id(request.getTransactionId());
         payment.setStatus("PROCESSED");
         payment.setBill(bill);
-
+        payment.setBookingId(request.getBookingId());
         payment = paymentRepository.save(payment);
 
         // Update booking status
@@ -93,12 +94,22 @@ public class PaymentService implements IPaymentService {
         bill.setPrint_time(LocalTime.now());
         bill.setVersion(0L);
 
-        // Calculate amount from booking
-        BigDecimal roomPrice = booking.getRoom().getPrice();
-        long days = ChronoUnit.DAYS.between(booking.getCheck_in_date(), booking.getCheck_out_date());
-        if (days <= 0)
-            days = 1;
-        BigDecimal totalAmount = roomPrice.multiply(BigDecimal.valueOf(days));
+        // Calculate total amount from all booked rooms
+        BigDecimal totalAmount = BigDecimal.ZERO;
+        if (booking.getBookingRooms() != null && !booking.getBookingRooms().isEmpty()) {
+            for (BookingRoom bookingRoom : booking.getBookingRooms()) {
+                BigDecimal roomPrice = bookingRoom.getRoom().getPrice();
+                int numberOfRooms = bookingRoom.getNumberOfRooms();
+                long days = ChronoUnit.DAYS.between(booking.getCheck_in_date(), booking.getCheck_out_date());
+                if (days <= 0)
+                    days = 1;
+
+                BigDecimal roomTotal = roomPrice
+                        .multiply(BigDecimal.valueOf(numberOfRooms))
+                        .multiply(BigDecimal.valueOf(days));
+                totalAmount = totalAmount.add(roomTotal);
+            }
+        }
 
         bill.setTotal_amount(totalAmount);
         bill.setDeposit(totalAmount.multiply(BigDecimal.valueOf(0.3)));
@@ -160,6 +171,8 @@ public class PaymentService implements IPaymentService {
         tempDTO.setStatus("PENDING");
         tempDTO.setPaymentDate(LocalDate.now());
         tempDTO.setPaymentTime(LocalTime.now());
+        tempDTO.setCustomerName("Pending Customer");
+        tempDTO.setAccountNumber(request.getTransactionId());
         return tempDTO;
     }
 
@@ -169,7 +182,8 @@ public class PaymentService implements IPaymentService {
      */
     @Override
     @Transactional
-    public PaymentResponseDTO processPaymentWithBookingFinalization(PaymentRequestDTO request, Long bookingId, Principal principal) {
+    public PaymentResponseDTO processPaymentWithBookingFinalization(PaymentRequestDTO request, Long bookingId,
+            Principal principal) {
         // Hoàn tất booking trước (chuyển từ TEMP sang PENDING và tạo bill)
         bookingService.finalizeBooking(bookingId, principal);
 
@@ -257,6 +271,7 @@ public class PaymentService implements IPaymentService {
     private PaymentResponseDTO convertToDTO(Payment payment) {
         PaymentResponseDTO dto = new PaymentResponseDTO();
         dto.setPaymentId(payment.getPayment_id());
+        dto.setBookingId(payment.getBookingId());
         dto.setAmount(payment.getAmount());
         dto.setPaymentDate(payment.getPayment_date());
         dto.setPaymentTime(payment.getPayment_time());

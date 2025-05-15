@@ -18,13 +18,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("${api.prefix}/hotels")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
-@CrossOrigin("http://localhost:5173/")
+@CrossOrigin(origins = "*")
 public class PublicHotelController {
     IHotelService hotelService;
 
     @GetMapping
     public ResponseEntity<?> getHotels(@RequestParam(defaultValue = "0") int page,
-                                       @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
         return ResponseEntity.ok(new PageReponse<>(hotelService.getHotels(pageable)));
     }
@@ -36,4 +36,3 @@ public class PublicHotelController {
                 .orElseThrow(() -> new ApiException(ErrorCode.HOTEL_NOT_EXIST));
     }
 }
-

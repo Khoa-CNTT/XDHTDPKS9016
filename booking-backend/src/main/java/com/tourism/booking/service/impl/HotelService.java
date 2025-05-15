@@ -14,6 +14,7 @@ import com.tourism.booking.model.RoomType;
 import com.tourism.booking.model.Services;
 import com.tourism.booking.repository.IAccountRepository;
 import com.tourism.booking.repository.IHotelRepository;
+import com.tourism.booking.repository.IRoomRepository;
 import com.tourism.booking.service.IHotelService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,7 @@ import java.util.Set;
 public class HotelService implements IHotelService {
     IHotelRepository hotelRepository;
     IAccountRepository accountRepository;
+    IRoomRepository roomRepository;
     IHotelInfoMapper hotelInfoMapper;
     HotelMapper hotelMapper;
 
@@ -60,13 +62,17 @@ public class HotelService implements IHotelService {
     @Transactional(readOnly = true)
     public Page<HotelInfoResponse> getHotels(Pageable pageable) {
         return hotelRepository.findAll(pageable)
-                .map(hotelInfoMapper::toDto);
+                .map(hotel -> {
+                    // For each hotel in the page, fetch its details
+                    Optional<Hotel> hotelWithDetails = hotelRepository.findByIdWithDetails(hotel.getHotel_id());
+                    return hotelWithDetails.map(hotelInfoMapper::toDto).orElse(hotelInfoMapper.toDto(hotel));
+                });
     }
 
     @Override
     @Transactional(readOnly = true)
     public Optional<HotelInfoResponse> getHotelById(Long hotelId) {
-        return hotelRepository.findById(hotelId)
+        return hotelRepository.findByIdWithDetails(hotelId)
                 .map(hotelInfoMapper::toDto);
     }
 

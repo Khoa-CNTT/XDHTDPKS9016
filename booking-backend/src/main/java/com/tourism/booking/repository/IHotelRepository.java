@@ -27,4 +27,12 @@ public interface IHotelRepository extends JpaRepository<Hotel, Long> {
       @Param("accountId") Long accountId,
       @Param("roomTypeId") Long roomTypeId);
 
+  @Query("""
+          SELECT h FROM Hotel h
+          LEFT JOIN FETCH h.services
+          LEFT JOIN FETCH h.roomTypes rt
+          LEFT JOIN FETCH rt.rooms r
+          WHERE h.hotel_id = :hotelId
+      """)
+  Optional<Hotel> findByIdWithDetails(@Param("hotelId") Long hotelId);
 }

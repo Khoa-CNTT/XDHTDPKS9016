@@ -21,6 +21,11 @@ public enum ErrorCode {
 
     USERNAME_EXISTS(40901, "Username already exists !", HttpStatus.CONFLICT),
     EMAIL_EXISTS(40901, "Email already exists !", HttpStatus.CONFLICT),
+
+    USER_NOT_FOUND(40401, "User not found", HttpStatus.NOT_FOUND),
+    BOOKING_NOT_FOUND(40402, "Booking not found", HttpStatus.NOT_FOUND),
+    ROOM_TYPE_NOT_FOUND(40403, "Room type not found", HttpStatus.NOT_FOUND),
+    INSUFFICIENT_ROOMS_AVAILABLE(40001, "Insufficient rooms available for the selected dates", HttpStatus.BAD_REQUEST),
     ;
 
     Integer code;
