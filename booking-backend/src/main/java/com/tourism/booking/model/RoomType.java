@@ -40,5 +40,9 @@ public class RoomType {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hotel_id", nullable = false)
+    @JsonIgnore
     Hotel hotel;
+
+    @OneToMany(mappedBy = "room_type", cascade = CascadeType.ALL)
+    Set<Room> room = new HashSet<>();
 }

@@ -1,26 +1,26 @@
 package com.tourism.booking.controller;
 
 import com.tourism.booking.dto.page.PageReponse;
+import com.tourism.booking.dto.publicHotel.HotelDetailPublicDTO;
 import com.tourism.booking.exception.ApiException;
 import com.tourism.booking.exception.ErrorCode;
-import com.tourism.booking.service.IHotelService;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.experimental.FieldDefaults;
+import com.tourism.booking.service.IPublicHotelService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-@PreAuthorize("permitAll()")
+import java.time.LocalDate;
+
 @RestController
 @RequestMapping("${api.prefix}/hotels")
-@FieldDefaults(level = AccessLevel.PRIVATE)
-@AllArgsConstructor
-@CrossOrigin("http://localhost:5173/")
+@CrossOrigin(origins = "http://localhost:5173")
+@RequiredArgsConstructor
 public class PublicHotelController {
-    IHotelService hotelService;
+    private final IPublicHotelService hotelService;
+
 
     @GetMapping
     public ResponseEntity<?> getHotels(@RequestParam(defaultValue = "0") int page,
@@ -30,10 +30,16 @@ public class PublicHotelController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable("id") Long id) {
-        return hotelService.getHotelById(id)
+    public ResponseEntity<HotelDetailPublicDTO> getHotelDetail(
+            @PathVariable Long id,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkIn,
+            @RequestParam(defaultValue = "1") int los
+    ) {
+        LocalDate effectiveCheckIn = (checkIn != null) ? checkIn : LocalDate.now();
+
+        return hotelService.getHotelDetail(id, effectiveCheckIn, los)
                 .map(ResponseEntity::ok)
                 .orElseThrow(() -> new ApiException(ErrorCode.HOTEL_NOT_EXIST));
     }
 }
-

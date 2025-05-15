@@ -20,8 +20,7 @@ public class SearchHotelService {
         return hotels.stream().map(hotel -> new SearchHotelResponse(
                 hotel.getName(),
                 hotel.getImage(),
-                hotel.getAddress(),
-                hotel.getHotline()
+                hotel.getAddress()
         )).collect(Collectors.toList());
     }
 }

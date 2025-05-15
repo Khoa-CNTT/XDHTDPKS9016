@@ -11,4 +11,5 @@ public interface HotelMapper {
     @Mapping(target = "account.username", source = "account.username")
     @Mapping(target = "account.email", source = "account.email")
     HotelResponse toResponse(Hotel hotel);
+
 }

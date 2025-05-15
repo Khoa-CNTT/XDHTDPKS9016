@@ -14,5 +14,4 @@ public class SearchHotelResponse {
     String name;
     String image;
     String address;
-    String hotline;
 }
