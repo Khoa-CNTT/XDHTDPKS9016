@@ -19,4 +19,7 @@ public interface IPaymentRepository extends JpaRepository<Payment, Long> {
     @Query("SELECT p FROM Payment p WHERE p.transaction_id = :transactionId")
     Payment findByTransactionId(@Param("transactionId") String transactionId);
 
+    @Query("SELECT p FROM Payment p WHERE p.booking.id_booking = :bookingId")
+    List<Payment> findByBookingId(@Param("bookingId") Long bookingId);
+
 }

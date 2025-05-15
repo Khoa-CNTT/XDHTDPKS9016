@@ -41,4 +41,11 @@ public class Payment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bill_id")
     Bill bill;
+
+    @Column(name = "booking_id", insertable = true, updatable = true)
+    Long bookingId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "booking_id", insertable = false, updatable = false)
+    Booking booking;
 }

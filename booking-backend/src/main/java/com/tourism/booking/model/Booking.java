@@ -63,15 +63,13 @@ public class Booking {
     @Column(name = "special_requests")
     private String special_requests;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_room", nullable = false)
-    private Room room;
+    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<BookingRoom> bookingRooms = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private UserProfile user_profile;
 
-    // Quan hệ 1-1 với Bill
     @OneToOne(mappedBy = "booking", fetch = FetchType.LAZY)
     private Bill bill;
 

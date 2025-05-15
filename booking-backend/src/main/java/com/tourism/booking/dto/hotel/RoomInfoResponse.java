@@ -9,10 +9,10 @@ import java.math.BigDecimal;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ServiceInfoResponse {
-    private Long serviceId;
-    private String serviceName;
-    private BigDecimal servicePrice;
-    private String serviceImage;
-    private String description;
+public class RoomInfoResponse {
+    private Long roomId;
+    private int numberBeds;
+    private BigDecimal price;
+    private String status;
+    private boolean isBooked;
 }

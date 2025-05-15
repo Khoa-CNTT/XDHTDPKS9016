@@ -13,12 +13,12 @@ import java.util.List;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class HotelInfoResponse {
+    Long idHotel;
     String name;
     String image;
     String address;
     String hotline;
     String description;
     List<ServiceInfoResponse> services;
-//    List<RoomTypeInfoResponse> roomTypes;
-
+    List<RoomTypeInfoResponse> roomTypes;
 }

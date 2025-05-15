@@ -3,10 +3,12 @@ package com.tourism.booking.service.impl;
 import com.tourism.booking.dto.booking.BookingRequestDTO;
 import com.tourism.booking.dto.booking.BookingResponseDTO;
 import com.tourism.booking.dto.booking.ContactInfoDTO;
+import com.tourism.booking.dto.booking.RoomBookingRequest;
 import com.tourism.booking.dto.booking.RoomTypeDTO;
 import com.tourism.booking.dto.booking.HotelDTO;
 import com.tourism.booking.dto.booking.ServiceDTO;
 import com.tourism.booking.dto.booking.BillDTO;
+import com.tourism.booking.dto.booking.BookedRoomDTO;
 import com.tourism.booking.dto.user.UserProfileResponse;
 import com.tourism.booking.model.Booking;
 import com.tourism.booking.model.Room;
@@ -16,6 +18,7 @@ import com.tourism.booking.model.Hotel;
 import com.tourism.booking.model.Services;
 import com.tourism.booking.model.Account;
 import com.tourism.booking.model.Bill;
+import com.tourism.booking.model.BookingRoom;
 import com.tourism.booking.repository.IBookingRepository;
 import com.tourism.booking.repository.IRoomRepository;
 import com.tourism.booking.repository.IRoomTypeRepository;
@@ -304,41 +307,144 @@ public class BookingService implements IBookingService {
         }
     }
 
-    // private void setUserIdFromPrincipal(BookingRequestDTO request, Principal
-    // principal) {
-    // try {
-    // Optional<UserProfile> userProfile =
-    // userProfileService.findUserProfileByAccoutId(
-    // Long.parseLong(principal.getName()));
-    // userProfile.ifPresent(profile -> request.setUserId(profile.getUser_id()));
-    // } catch (Exception e) {
-    // logger.warn("Could not set user ID from principal: {}", e.getMessage());
-    // }
-    // }
+    @Override
+    @Transactional
+    public BookingResponseDTO createBooking(BookingRequestDTO bookingRequest) {
+        Booking booking = new Booking();
+        booking.setCheck_in_date(bookingRequest.getCheckInDate());
+        booking.setCheck_out_date(bookingRequest.getCheckOutDate());
+        booking.setCheck_in_time(
+                bookingRequest.getCheckInTime() != null ? bookingRequest.getCheckInTime() : LocalTime.of(14, 0));
+        booking.setCheck_out_time(
+                bookingRequest.getCheckOutTime() != null ? bookingRequest.getCheckOutTime() : LocalTime.of(12, 0));
+        booking.setNumber_people(bookingRequest.getNumberOfPeople());
+        booking.setStatus("PENDING");
+        booking.setContact_name(bookingRequest.getContactName());
+        booking.setContact_email(bookingRequest.getContactEmail());
+        booking.setContact_phone(bookingRequest.getContactPhone());
+        booking.setContact_address(bookingRequest.getContactAddress());
+        booking.setSpecial_requests(bookingRequest.getSpecialRequests());
+
+        if (bookingRequest.getUserId() != null) {
+            UserProfile user = userProfileService.findUserProfileEntityById(bookingRequest.getUserId())
+                    .orElseThrow(
+                            () -> new EntityNotFoundException("User not found with id: " + bookingRequest.getUserId()));
+            booking.setUser_profile(user);
+        }
+
+        booking = bookingRepository.save(booking);
+
+        // Process room selections - FIXED to use correct numberOfRooms
+        for (com.tourism.booking.dto.booking.RoomSelectionDTO roomSelection : bookingRequest.getRoomSelections()) {
+            RoomType roomType = roomTypeRepository.findById(roomSelection.getRoomTypeId())
+                    .orElseThrow(
+                            () -> new EntityNotFoundException("Room type not found: " + roomSelection.getRoomTypeId()));
+
+            List<Room> availableRooms = roomRepository.findAvailableRoomsByTypeAndDateRange(
+                    roomType.getRoom_type_id(),
+                    bookingRequest.getCheckInDate(),
+                    bookingRequest.getCheckOutDate(),
+                    1); // Just need one room of this type
+
+            if (availableRooms.isEmpty()) {
+                throw new RuntimeException("Not enough rooms available");
+            }
+
+            // Create a single booking_room entry with the correct numberOfRooms
+            BookingRoom bookingRoom = new BookingRoom();
+            bookingRoom.setBooking(booking);
+            bookingRoom.setRoom(availableRooms.get(0)); // Use the first available room
+            bookingRoom.setNumberOfRooms(roomSelection.getNumberOfRooms()); // Set the actual number of rooms
+            bookingRoom.setRoomTypeId(roomType.getRoom_type_id());
+
+            booking.getBookingRooms().add(bookingRoom);
+        }
+
+        booking = bookingRepository.save(booking);
+        return convertToResponseDTO(booking);
+    }
 
     private void setBasicBookingInfo(BookingResponseDTO booking, BookingRequestDTO request) {
         booking.setCheckInDate(request.getCheckInDate());
         booking.setCheckOutDate(request.getCheckOutDate());
         booking.setCheckInTime(request.getCheckInTime());
         booking.setCheckOutTime(request.getCheckOutTime());
-        booking.setNumberPeople(request.getNumberPeople());
-        booking.setStatus("INITIALIZED");
+        booking.setNumberPeople(request.getNumberOfPeople());
+        booking.setStatus("PENDING");
     }
 
     private void calculatePricesAndSetInfo(BookingResponseDTO booking, BookingRequestDTO request) {
-        BigDecimal roomPrice = BigDecimal.ZERO;
+        BigDecimal totalRoomPrice = BigDecimal.ZERO;
+        int numberOfDays = calculateNumberOfDays(request.getCheckInDate(), request.getCheckOutDate());
+        List<BookedRoomDTO> bookedRooms = new ArrayList<>();
+
+        // Process room selections
+        if (request.getRoomSelections() != null && !request.getRoomSelections().isEmpty()) {
+            for (com.tourism.booking.dto.booking.RoomSelectionDTO roomSelection : request.getRoomSelections()) {
+                try {
+                    // Get room type information
+                    RoomType roomType = roomTypeRepository.findById(roomSelection.getRoomTypeId())
+                            .orElseThrow(() -> new EntityNotFoundException(
+                                    "Room type not found: " + roomSelection.getRoomTypeId()));
+
+                    // Get a sample room for this room type to get price
+                    List<Room> rooms = roomRepository.findByRoomTypeRoomTypeId(roomType.getRoom_type_id());
+                    if (rooms.isEmpty()) {
+                        throw new EntityNotFoundException(
+                                "No rooms found for room type: " + roomType.getRoom_type_id());
+                    }
+
+                    Room sampleRoom = rooms.get(0);
+                    BigDecimal roomPrice = sampleRoom.getPrice();
+                    BigDecimal roomTotalPrice = roomPrice
+                            .multiply(BigDecimal.valueOf(roomSelection.getNumberOfRooms()));
+
+                    // Add to total room price
+                    totalRoomPrice = totalRoomPrice.add(roomTotalPrice);
+
+                    // Create room DTO for response
+                    BookedRoomDTO bookedRoomDTO = new BookedRoomDTO();
+                    bookedRoomDTO.setRoomId(sampleRoom.getId_room());
+                    bookedRoomDTO.setRoomTypeId(roomType.getRoom_type_id());
+                    bookedRoomDTO.setRoomTypeName(roomType.getType_name());
+                    bookedRoomDTO.setNumberOfRooms(roomSelection.getNumberOfRooms());
+                    bookedRoomDTO.setNumberBeds(sampleRoom.getNumber_bed());
+                    bookedRoomDTO.setPricePerRoom(roomPrice);
+                    bookedRoomDTO.setTotalPrice(roomTotalPrice);
+
+                    bookedRooms.add(bookedRoomDTO);
+
+                    // Set room type for the booking (using the first room type if multiple)
+                    if (booking.getRoomType() == null) {
+                        RoomTypeDTO roomTypeDTO = convertToRoomTypeDTO(roomType);
+                        booking.setRoomType(roomTypeDTO);
+
+                        // Set hotel information
+                        if (roomType.getHotel() != null) {
+                            HotelDTO hotelDTO = convertToHotelDTO(roomType.getHotel());
+                            booking.setHotel(hotelDTO);
+                        }
+                    }
+                } catch (Exception e) {
+                    logger.error("Error processing room selection: {}", e.getMessage());
+                }
+            }
+        }
+
+        // Set the booked rooms
+        booking.setRooms(bookedRooms);
+
+        // Process services
         BigDecimal serviceTotal = BigDecimal.ZERO;
-        int numberOfDays = 0;
-
-        if (request.getRoomId() != null) {
-            setRoomAndHotelInfo(booking, request.getRoomId(), roomPrice, numberOfDays);
-        }
-
         if (request.getServiceIds() != null && !request.getServiceIds().isEmpty()) {
-            serviceTotal = calculateServicesTotal(booking, request.getServiceIds());
+            Set<Long> serviceSet = new HashSet<>(request.getServiceIds());
+            serviceTotal = calculateServicesTotal(booking, serviceSet);
         }
 
-        setBillInformation(booking, roomPrice, serviceTotal, numberOfDays);
+        // Set bill information
+        // Multiply room price by the number of days
+        BigDecimal roomTotal = totalRoomPrice.multiply(BigDecimal.valueOf(numberOfDays));
+        setBillInformation(booking, roomTotal, serviceTotal, numberOfDays);
     }
 
     private void setRoomAndHotelInfo(BookingResponseDTO booking, Long roomId, BigDecimal roomPrice, int numberOfDays) {
@@ -388,19 +494,53 @@ public class BookingService implements IBookingService {
         dto.setContactAddress(booking.getContact_address());
         dto.setSpecialRequests(booking.getSpecial_requests());
 
-        // Add room type information
-        if (booking.getRoom() != null && booking.getRoom().getRoom_type() != null) {
-            RoomType roomType = booking.getRoom().getRoom_type();
-            RoomTypeDTO roomTypeDTO = convertToRoomTypeDTO(roomType);
-            dto.setRoomType(roomTypeDTO);
+        // Create list of booked rooms from BookingRoom entities
+        List<BookedRoomDTO> bookedRooms = new ArrayList<>();
+        BigDecimal totalAmount = BigDecimal.ZERO;
 
-            // Add hotel information
-            if (roomType.getHotel() != null) {
-                Hotel hotel = roomType.getHotel();
-                HotelDTO hotelDTO = convertToHotelDTO(hotel);
-                dto.setHotel(hotelDTO);
+        if (booking.getBookingRooms() != null && !booking.getBookingRooms().isEmpty()) {
+            for (BookingRoom bookingRoom : booking.getBookingRooms()) {
+                Room room = bookingRoom.getRoom();
+                if (room != null && room.getRoom_type() != null) {
+                    RoomType roomType = room.getRoom_type();
+
+                    // Create BookedRoomDTO
+                    BookedRoomDTO bookedRoomDTO = new BookedRoomDTO();
+                    bookedRoomDTO.setRoomId(room.getId_room());
+                    bookedRoomDTO.setRoomTypeId(roomType.getRoom_type_id());
+                    bookedRoomDTO.setRoomTypeName(roomType.getType_name());
+                    bookedRoomDTO.setNumberOfRooms(bookingRoom.getNumberOfRooms());
+                    bookedRoomDTO.setNumberBeds(room.getNumber_bed());
+                    bookedRoomDTO.setPricePerRoom(room.getPrice());
+
+                    // Calculate total price for this room
+                    BigDecimal roomTotal = room.getPrice()
+                            .multiply(BigDecimal.valueOf(bookingRoom.getNumberOfRooms()));
+                    bookedRoomDTO.setTotalPrice(roomTotal);
+
+                    // Add to total amount
+                    totalAmount = totalAmount.add(roomTotal);
+
+                    // Add to rooms list
+                    bookedRooms.add(bookedRoomDTO);
+
+                    // Set room type and hotel info from first room
+                    if (dto.getRoomType() == null) {
+                        RoomTypeDTO roomTypeDTO = convertToRoomTypeDTO(roomType);
+                        dto.setRoomType(roomTypeDTO);
+
+                        if (roomType.getHotel() != null) {
+                            HotelDTO hotelDTO = convertToHotelDTO(roomType.getHotel());
+                            dto.setHotel(hotelDTO);
+                        }
+                    }
+                }
             }
         }
+
+        // Set the rooms list in the DTO
+        dto.setRooms(bookedRooms);
+        dto.setTotalAmount(totalAmount);
 
         // Add services information
         Set<Services> bookingServices = getServicesByBookingId(booking.getId_booking());
@@ -635,48 +775,88 @@ public class BookingService implements IBookingService {
 
     private Booking createBookingEntity(BookingResponseDTO tempBooking, BookingRequestDTO request,
             Principal principal) {
-        Account acc = accountService.getAccountByUsername(principal.getName());
-        UserProfile getUser = userProfileService.findUserProfileByAccoutId(acc.getAccount_id())
-                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy người dùng"));
-
         Booking booking = new Booking();
-        booking.setVersion(0L); // Initialize version for booking
-        booking.setId_booking_temp(tempBooking.getBookingId()); // Set temporary booking ID
 
-        // Set basic booking information
-        booking.setCheck_in_date(tempBooking.getCheckInDate());
-        booking.setCheck_out_date(tempBooking.getCheckOutDate());
-        booking.setCheck_in_time(tempBooking.getCheckInTime());
-        booking.setCheck_out_time(tempBooking.getCheckOutTime());
-        booking.setNumber_people(tempBooking.getNumberPeople());
-        booking.setStatus("PAID");
-
-        // Set contact information
+        // Set basic booking info
+        booking.setCheck_in_date(request.getCheckInDate());
+        booking.setCheck_out_date(request.getCheckOutDate());
+        booking.setCheck_in_time(request.getCheckInTime());
+        booking.setCheck_out_time(request.getCheckOutTime());
+        booking.setNumber_people(request.getNumberOfPeople());
+        booking.setStatus("PENDING");
         booking.setContact_name(tempBooking.getContactName());
         booking.setContact_email(tempBooking.getContactEmail());
         booking.setContact_phone(tempBooking.getContactPhone());
         booking.setContact_address(tempBooking.getContactAddress());
         booking.setSpecial_requests(tempBooking.getSpecialRequests());
 
-        // Set Room
-        if (request.getRoomId() != null) {
-            Room room = roomRepository.findById(request.getRoomId())
-                    .orElseThrow(() -> new EntityNotFoundException("Room not found: " + request.getRoomId()));
-            booking.setRoom(room);
+        // Set user
+        if (principal != null) {
+            Account acc = accountService.getAccountByUsername(principal.getName());
+            UserProfile user = userProfileService.findUserProfileByAccoutId(acc.getAccount_id())
+                    .orElseThrow(() -> new EntityNotFoundException("User not found"));
+            booking.setUser_profile(user);
         }
 
-        // Set User
+        booking = bookingRepository.save(booking);
 
-        try {
-            UserProfile user = userProfileService.findUserProfileEntityById(getUser.getUser_id())
-                    .orElseThrow(() -> new EntityNotFoundException("User not found: " + getUser.getUser_id()));
-            booking.setUser_profile(user);
-        } catch (Exception e) {
-            // Fallback to default user if needed
-            UserProfile defaultUser = userProfileService.findUserProfileEntityById(17L)
-                    .orElseThrow(() -> new EntityNotFoundException("Default user not found"));
-            booking.setUser_profile(defaultUser);
-            logger.warn("Using default user (ID: 17) due to error: {}", e.getMessage());
+        // Handle rooms - SỬA LẠI LOGIC ĐỂ KHÔNG CẦN TÌM PHÒNG TRỐNG
+        if (request.getRoomSelections() != null) {
+            for (com.tourism.booking.dto.booking.RoomSelectionDTO roomSelection : request.getRoomSelections()) {
+                try {
+                    // Lấy thông tin RoomType
+                    RoomType roomType = roomTypeRepository.findById(roomSelection.getRoomTypeId())
+                            .orElseThrow(() -> new EntityNotFoundException(
+                                    "Room type not found: " + roomSelection.getRoomTypeId()));
+
+                    // Lấy một phòng bất kỳ thuộc loại này (không cần kiểm tra tính khả dụng)
+                    List<Room> rooms = roomRepository.findByRoomTypeRoomTypeId(roomType.getRoom_type_id());
+                    if (rooms.isEmpty()) {
+                        throw new RuntimeException("No rooms found for type: " + roomType.getType_name());
+                    }
+
+                    // Chọn phòng đầu tiên trong danh sách
+                    Room room = rooms.get(0);
+
+                    // Tạo BookingRoom
+                    BookingRoom bookingRoom = new BookingRoom();
+                    bookingRoom.setBooking(booking);
+                    bookingRoom.setRoom(room);
+                    bookingRoom.setNumberOfRooms(roomSelection.getNumberOfRooms());
+                    bookingRoom.setRoomTypeId(roomType.getRoom_type_id());
+
+                    booking.getBookingRooms().add(bookingRoom);
+
+                    logger.info("Added room to booking: roomId={}, roomType={}, numberOfRooms={}",
+                            room.getId_room(), roomType.getType_name(), roomSelection.getNumberOfRooms());
+                } catch (Exception e) {
+                    logger.error("Error adding room to booking: {}", e.getMessage());
+                    throw new RuntimeException("Error adding room to booking: " + e.getMessage(), e);
+                }
+            }
+        } else if (tempBooking.getRooms() != null && !tempBooking.getRooms().isEmpty()) {
+            // Fallback: Sử dụng thông tin phòng từ tempBooking nếu không có trong request
+            for (BookedRoomDTO bookedRoom : tempBooking.getRooms()) {
+                try {
+                    Room room = roomRepository.findById(bookedRoom.getRoomId())
+                            .orElseThrow(
+                                    () -> new EntityNotFoundException("Room not found: " + bookedRoom.getRoomId()));
+
+                    BookingRoom bookingRoom = new BookingRoom();
+                    bookingRoom.setBooking(booking);
+                    bookingRoom.setRoom(room);
+                    bookingRoom.setNumberOfRooms(bookedRoom.getNumberOfRooms());
+                    bookingRoom.setRoomTypeId(bookedRoom.getRoomTypeId());
+
+                    booking.getBookingRooms().add(bookingRoom);
+
+                    logger.info("Added room from tempBooking: roomId={}, numberOfRooms={}",
+                            room.getId_room(), bookedRoom.getNumberOfRooms());
+                } catch (Exception e) {
+                    logger.error("Error adding room from tempBooking: {}", e.getMessage());
+                    throw new RuntimeException("Error adding room from tempBooking: " + e.getMessage(), e);
+                }
+            }
         }
 
         return booking;
