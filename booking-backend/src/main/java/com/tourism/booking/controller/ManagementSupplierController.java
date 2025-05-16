@@ -1,6 +1,7 @@
 package com.tourism.booking.controller;
 
 import com.tourism.booking.dto.hotel.CreateHotelRequest;
+import com.tourism.booking.dto.hotel.HotelResponse;
 import com.tourism.booking.dto.hotel.UpdateHotelRequest;
 import com.tourism.booking.dto.page.PageReponse;
 import com.tourism.booking.exception.ApiException;
@@ -27,9 +28,7 @@ public class ManagementSupplierController {
     IHotelService hotelService;
 
     @GetMapping
-    public ResponseEntity<?> getAllHotels(@RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        Pageable pageable = PageRequest.of(page, size);
+    public ResponseEntity<?> getAllHotels(Pageable pageable) {
         return ResponseEntity.ok(new PageReponse<>(hotelService.getHotels(pageable)));
     }
 
@@ -41,12 +40,17 @@ public class ManagementSupplierController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createHotel(@Valid @RequestBody CreateHotelRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(hotelService.createHotel(request));
+    public ResponseEntity<?> createHotelWithAccount(@RequestBody CreateHotelRequest request) {
+        try {
+            HotelResponse createdHotel = hotelService.createHotel(request);
+            return new ResponseEntity<>(createdHotel, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateHotel(@PathVariable("id") Long id, @Valid @RequestBody UpdateHotelRequest request) {
+    public ResponseEntity<?> updateHotel(@PathVariable("id") Long id, @RequestBody UpdateHotelRequest request) {
         return ResponseEntity.ok(hotelService.updateBasicHotelInfo(id, request));
     }
 

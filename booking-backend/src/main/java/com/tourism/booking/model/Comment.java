@@ -1,12 +1,14 @@
 package com.tourism.booking.model;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -34,5 +36,7 @@ public class Comment {
     @JoinColumn(name = "user_id", nullable = false)
     UserProfile user_profile;
 
-
+    @JsonIgnore
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<RoomComment> roomComments = new HashSet<>();
 }

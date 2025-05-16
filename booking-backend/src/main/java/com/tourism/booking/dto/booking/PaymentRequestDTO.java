@@ -20,4 +20,9 @@ public class PaymentRequestDTO {
     private String status;
     private LocalDate paymentDate;
     private LocalTime paymentTime;
+
+    // Additional VNPay fields
+    private String bankCode;
+    private String bankTranNo;
+    private String cardType;
 }

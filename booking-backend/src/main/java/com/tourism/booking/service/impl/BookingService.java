@@ -195,7 +195,7 @@ public class BookingService implements IBookingService {
             booking.setContactPhone(contactInfo.getContactPhone());
             booking.setContactAddress(contactInfo.getContactAddress());
             booking.setSpecialRequests(contactInfo.getSpecialRequests());
-            booking.setStatus("CONTACT_INFO_ADDED");
+            booking.setStatus("PAID");
 
             // Update in temporary storage
             temporaryBookings.put(contactInfo.getBookingId(), booking);
@@ -396,10 +396,12 @@ public class BookingService implements IBookingService {
 
                     Room sampleRoom = rooms.get(0);
                     BigDecimal roomPrice = sampleRoom.getPrice();
+
+                    // Tính tổng tiền cho số lượng phòng được đặt
                     BigDecimal roomTotalPrice = roomPrice
                             .multiply(BigDecimal.valueOf(roomSelection.getNumberOfRooms()));
 
-                    // Add to total room price
+                    // Cộng vào tổng tiền phòng
                     totalRoomPrice = totalRoomPrice.add(roomTotalPrice);
 
                     // Create room DTO for response
@@ -407,12 +409,16 @@ public class BookingService implements IBookingService {
                     bookedRoomDTO.setRoomId(sampleRoom.getId_room());
                     bookedRoomDTO.setRoomTypeId(roomType.getRoom_type_id());
                     bookedRoomDTO.setRoomTypeName(roomType.getType_name());
-                    bookedRoomDTO.setNumberOfRooms(roomSelection.getNumberOfRooms());
+                    bookedRoomDTO.setNumberOfRooms(roomSelection.getNumberOfRooms()); // Số phòng
                     bookedRoomDTO.setNumberBeds(sampleRoom.getNumber_bed());
                     bookedRoomDTO.setPricePerRoom(roomPrice);
-                    bookedRoomDTO.setTotalPrice(roomTotalPrice);
+                    bookedRoomDTO.setTotalPrice(roomTotalPrice); // Tổng tiền đã nhân với số lượng phòng
 
                     bookedRooms.add(bookedRoomDTO);
+
+                    // Log chi tiết để debug
+                    logger.info("Room calculation for type {}: pricePerRoom={}, numberOfRooms={}, totalPrice={}",
+                            roomType.getType_name(), roomPrice, roomSelection.getNumberOfRooms(), roomTotalPrice);
 
                     // Set room type for the booking (using the first room type if multiple)
                     if (booking.getRoomType() == null) {
@@ -441,10 +447,14 @@ public class BookingService implements IBookingService {
             serviceTotal = calculateServicesTotal(booking, serviceSet);
         }
 
-        // Set bill information
-        // Multiply room price by the number of days
-        BigDecimal roomTotal = totalRoomPrice.multiply(BigDecimal.valueOf(numberOfDays));
-        setBillInformation(booking, roomTotal, serviceTotal, numberOfDays);
+        // Set bill information with totalRoomPrice (đã bao gồm số lượng phòng)
+        setBillInformation(booking, totalRoomPrice, serviceTotal, numberOfDays);
+
+        // Log tổng kết
+        logger.info("Final calculation summary:");
+        logger.info("- Total room price per day: {}", totalRoomPrice);
+        logger.info("- Number of days: {}", numberOfDays);
+        logger.info("- Service total: {}", serviceTotal);
     }
 
     private void setRoomAndHotelInfo(BookingResponseDTO booking, Long roomId, BigDecimal roomPrice, int numberOfDays) {
@@ -885,16 +895,39 @@ public class BookingService implements IBookingService {
     private void setBillInformation(BookingResponseDTO booking, BigDecimal roomPrice, BigDecimal serviceTotal,
             int numberOfDays) {
         BillDTO bill = new BillDTO();
+
+        // 1. Tính tổng tiền phòng = totalPrice (đã bao gồm số lượng phòng) * số ngày
         BigDecimal roomTotal = roomPrice.multiply(BigDecimal.valueOf(Math.max(1, numberOfDays)));
         bill.setRoomTotal(roomTotal);
+
+        // 2. Set tổng tiền dịch vụ
         bill.setServiceTotal(serviceTotal);
+
+        // 3. Tính tổng tiền = tổng tiền phòng + tổng tiền dịch vụ
         BigDecimal total = roomTotal.add(serviceTotal);
         bill.setTotal(total);
+
+        // 4. Set số ngày
         bill.setNumberOfDays(numberOfDays);
+
+        // 5. Tính tiền đặt cọc (30% tổng tiền)
         BigDecimal deposit = total.multiply(new BigDecimal("0.3"));
         bill.setDeposit(deposit);
+
+        // 6. Set ID cho bill
         bill.setBillId(generateTemporaryBookingId());
+
+        // 7. Set bill vào booking
         booking.setBill(bill);
+
+        // Log chi tiết để debug
+        logger.info("Bill calculation details:");
+        logger.info("- Number of days: {}", numberOfDays);
+        logger.info("- Room price (already includes number of rooms): {}", roomPrice);
+        logger.info("- Room total (price * days): {}", roomTotal);
+        logger.info("- Service total: {}", serviceTotal);
+        logger.info("- Final total: {}", total);
+        logger.info("- Deposit (30%): {}", deposit);
     }
 
     private int calculateNumberOfDays(LocalDate checkIn, LocalDate checkOut) {
