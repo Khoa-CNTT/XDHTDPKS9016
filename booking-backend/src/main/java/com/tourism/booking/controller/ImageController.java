@@ -39,7 +39,6 @@ public class ImageController {
     @PostMapping("/upload")
     public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) {
         try {
-            // Tạo tên file duy nhất
             String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
             Path filePath = Paths.get(uploadDir).resolve(fileName);
 
