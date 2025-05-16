@@ -45,7 +45,7 @@ public class Room {
 
     @JsonIgnore
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
-    Set<Rating> ratings = new HashSet<>();
+    Set<RoomRating> roomRatings = new HashSet<>();
 
     @JsonIgnore
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)

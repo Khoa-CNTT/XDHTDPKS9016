@@ -10,6 +10,4 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RatingRequest {
     int score;
-    int room_type_id;
-    int id_room;
 }

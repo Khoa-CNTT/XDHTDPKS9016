@@ -1,13 +1,9 @@
 package com.tourism.booking.dto.rating;
 
-import lombok.*;
-import lombok.experimental.FieldDefaults;
+public interface RatingResponse {
+    Integer getId();
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
-public class RatingResponse {
-    int rating;
+    Integer getRating();
+
+    String getName();
 }

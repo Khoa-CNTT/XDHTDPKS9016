@@ -17,7 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/comments")
 @AllArgsConstructor
-@CrossOrigin
+@CrossOrigin(origins = "*")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CommentController {
 

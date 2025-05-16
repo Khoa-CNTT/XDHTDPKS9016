@@ -1,12 +1,13 @@
 package com.tourism.booking.model;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -20,8 +21,11 @@ public class Rating {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long rating_id;
 
-    @Column(name = "score")
+    @Column(name = "score", nullable = false)
     int score;
+
+    @Column(name = "comment", columnDefinition = "TEXT")
+    String comment;
 
     @Column(name = "rating_date")
     LocalDate rating_date;
@@ -29,12 +33,10 @@ public class Rating {
     @Column(name = "rating_time")
     LocalTime rating_time;
 
-    // Quan hệ nhiều-1 với UserProfile
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     UserProfile user_profile;
 
-    @ManyToOne
-    @JoinColumn(name = "id_room", nullable = false)
-    Room room;
+    @OneToMany(mappedBy = "rating", cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<RoomRating> roomRatings = new HashSet<>();
 }
