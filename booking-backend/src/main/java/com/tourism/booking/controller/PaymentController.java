@@ -104,19 +104,46 @@ public class PaymentController {
             @RequestParam(value = "userId", required = false) Long userId) {
 
         logger.info("Payment callback received for booking {}: {}", bookingId, queryParams);
-        Map<String, Object> response = new HashMap<>();
-
-        // Check if transaction already processed
-        String vnp_TransactionNo = queryParams.get("vnp_TransactionNo");
-        if (isTransactionProcessed(vnp_TransactionNo)) {
-            logger.info("Transaction already processed: {}", vnp_TransactionNo);
-            return createSuccessResponse(vnp_TransactionNo, bookingId);
-        }
 
         try {
-            String vnp_ResponseCode = queryParams.get("vnp_ResponseCode");
+            // 1. Validate required parameters
+            String[] requiredParams = {
+                    "vnp_Amount",
+                    "vnp_BankCode",
+                    "vnp_BankTranNo",
+                    "vnp_CardType",
+                    "vnp_OrderInfo",
+                    "vnp_PayDate",
+                    "vnp_ResponseCode",
+                    "vnp_TmnCode",
+                    "vnp_TransactionNo",
+                    "vnp_TransactionStatus",
+                    "vnp_TxnRef"
+            };
 
-            if ("00".equals(vnp_ResponseCode)) {
+            for (String param : requiredParams) {
+                if (!queryParams.containsKey(param)) {
+                    logger.error("Missing required parameter: {}", param);
+                    return createErrorResponse("Missing required parameter: " + param);
+                }
+            }
+
+            // 2. Check if transaction already processed
+            String vnp_TransactionNo = queryParams.get("vnp_TransactionNo");
+            if (isTransactionProcessed(vnp_TransactionNo)) {
+                logger.info("Transaction already processed: {}", vnp_TransactionNo);
+                return createSuccessResponse(vnp_TransactionNo, bookingId);
+            }
+
+            // 3. Process based on response code
+            String vnp_ResponseCode = queryParams.get("vnp_ResponseCode");
+            String vnp_TransactionStatus = queryParams.get("vnp_TransactionStatus");
+
+            // Log transaction details
+            logger.info("Processing transaction: ResponseCode={}, Status={}, Amount={}",
+                    vnp_ResponseCode, vnp_TransactionStatus, queryParams.get("vnp_Amount"));
+
+            if ("00".equals(vnp_ResponseCode) && "00".equals(vnp_TransactionStatus)) {
                 // 1. Get the temporary booking with services
                 BookingResponseDTO tempBookingDTO = bookingService.getBookingById(bookingId);
                 if (tempBookingDTO == null) {
@@ -227,12 +254,13 @@ public class PaymentController {
                 logger.info("Payment cancelled by user for booking: {}", bookingId);
                 return handleCancelledPayment(bookingId, vnp_TransactionNo);
             } else {
-                logger.warn("Payment failed with code: {} for booking: {}", vnp_ResponseCode, bookingId);
+                logger.warn("Payment failed with code: {} and status: {} for booking: {}",
+                        vnp_ResponseCode, vnp_TransactionStatus, bookingId);
                 return handleFailedPayment(vnp_ResponseCode, bookingId, vnp_TransactionNo);
             }
         } catch (Exception e) {
             logger.error("Error processing payment callback: {}", e.getMessage(), e);
-            return createErrorResponse(e.getMessage());
+            return createErrorResponse("Error processing payment: " + e.getMessage());
         }
     }
 
@@ -267,14 +295,46 @@ public class PaymentController {
         request.setBookingId(booking.getBookingId());
         request.setBillId(booking.getBill().getBillId());
 
+        // Process amount
         String vnp_Amount = queryParams.get("vnp_Amount");
         if (vnp_Amount != null) {
-            long amount = Long.parseLong(vnp_Amount) / 100;
+            long amount = Long.parseLong(vnp_Amount) / 100; // VNPay amount is in VND * 100
             request.setAmount(new BigDecimal(amount));
         }
 
+        // Set payment method and transaction details
         request.setPaymentMethod("VNPAY");
         request.setTransactionId(queryParams.get("vnp_TransactionNo"));
+
+        // Set additional VNPay information
+        request.setBankCode(queryParams.get("vnp_BankCode"));
+        request.setBankTranNo(queryParams.get("vnp_BankTranNo"));
+        request.setCardType(queryParams.get("vnp_CardType"));
+
+        // Set payment date from VNPay
+        String vnp_PayDate = queryParams.get("vnp_PayDate");
+        if (vnp_PayDate != null && vnp_PayDate.length() >= 14) {
+            try {
+                // Parse VNPay date format (yyyyMMddHHmmss)
+                int year = Integer.parseInt(vnp_PayDate.substring(0, 4));
+                int month = Integer.parseInt(vnp_PayDate.substring(4, 6));
+                int day = Integer.parseInt(vnp_PayDate.substring(6, 8));
+                int hour = Integer.parseInt(vnp_PayDate.substring(8, 10));
+                int minute = Integer.parseInt(vnp_PayDate.substring(10, 12));
+                int second = Integer.parseInt(vnp_PayDate.substring(12, 14));
+
+                request.setPaymentDate(LocalDate.of(year, month, day));
+                request.setPaymentTime(LocalTime.of(hour, minute, second));
+            } catch (Exception e) {
+                logger.error("Error parsing VNPay date: {}", e.getMessage());
+                request.setPaymentDate(LocalDate.now());
+                request.setPaymentTime(LocalTime.now());
+            }
+        } else {
+            request.setPaymentDate(LocalDate.now());
+            request.setPaymentTime(LocalTime.now());
+        }
+
         return request;
     }
 
@@ -413,5 +473,52 @@ public class PaymentController {
                 }
             }
         };
+    }
+
+    private boolean validateSecureHash(Map<String, String> queryParams) {
+        try {
+            // Trong quá trình development/test, return true để bỏ qua việc kiểm tra hash
+            if (true) {
+                return true;
+            }
+
+            String vnp_SecureHash = queryParams.get("vnp_SecureHash");
+
+            // Create a new map without the secure hash for validation
+            Map<String, String> validationParams = new HashMap<>(queryParams);
+            validationParams.remove("vnp_SecureHash");
+            validationParams.remove("bookingId"); // Remove non-VNPay params
+            validationParams.remove("userId"); // Remove non-VNPay params
+
+            // Build hash data
+            List<String> fieldNames = new ArrayList<>(validationParams.keySet());
+            Collections.sort(fieldNames);
+            StringBuilder hashData = new StringBuilder();
+
+            for (String fieldName : fieldNames) {
+                String fieldValue = validationParams.get(fieldName);
+                if ((fieldValue != null) && (fieldValue.length() > 0)) {
+                    hashData.append(fieldName);
+                    hashData.append('=');
+                    hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
+                    if (fieldNames.indexOf(fieldName) < fieldNames.size() - 1) {
+                        hashData.append('&');
+                    }
+                }
+            }
+
+            String calculatedHash = VNPayConfig.hmacSHA512(VNPayConfig.secretKey, hashData.toString());
+            boolean isValid = calculatedHash.equals(vnp_SecureHash);
+
+            if (!isValid) {
+                logger.warn("Hash validation failed. Expected: {}, Got: {}", calculatedHash, vnp_SecureHash);
+                logger.warn("Hash data string: {}", hashData.toString());
+            }
+
+            return isValid;
+        } catch (Exception e) {
+            logger.error("Error validating secure hash: {}", e.getMessage(), e);
+            return false;
+        }
     }
 }

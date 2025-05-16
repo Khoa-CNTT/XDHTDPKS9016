@@ -10,11 +10,15 @@ import com.tourism.booking.mapper.HotelMapper;
 import com.tourism.booking.mapper.IHotelInfoMapper;
 import com.tourism.booking.model.Account;
 import com.tourism.booking.model.Hotel;
+import com.tourism.booking.model.Role;
 import com.tourism.booking.model.RoomType;
 import com.tourism.booking.model.Services;
+import com.tourism.booking.model.UserProfile;
 import com.tourism.booking.repository.IAccountRepository;
 import com.tourism.booking.repository.IHotelRepository;
+import com.tourism.booking.repository.IRoleRepository;
 import com.tourism.booking.repository.IRoomRepository;
+import com.tourism.booking.repository.IUserProfileRepository;
 import com.tourism.booking.service.IHotelService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -37,14 +41,24 @@ public class HotelService implements IHotelService {
     IRoomRepository roomRepository;
     IHotelInfoMapper hotelInfoMapper;
     HotelMapper hotelMapper;
+    IRoleRepository roleRepository;
+    IUserProfileRepository userProfileRepository;
+    EmailService emailService;
 
     @Override
     @Transactional
     public HotelResponse createHotel(CreateHotelRequest request) {
-        // Validate and get account
-        Account account = accountRepository.findById(request.getAccount_id())
-                .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_EXIST));
 
+        Account account = new Account();
+        account.setUsername(request.getUsername());
+        account.setPassword(request.getPassword());
+        account.setEmail(request.getEmail());
+
+        Set<Role> roles = new HashSet<>();
+        // Lấy role có ID là 3 từ database
+        roleRepository.findById(3).ifPresent(roles::add);
+        account.setRoles(roles);
+        Account savedAccount = accountRepository.save(account);
         // Create new hotel
         Hotel hotel = new Hotel();
         hotel.setName(request.getName());
@@ -52,10 +66,30 @@ public class HotelService implements IHotelService {
         hotel.setHotline(request.getHotline());
         hotel.setImage(request.getImage());
         hotel.setDescription(request.getDescription());
-        hotel.setAccount(account);
+        hotel.setAccount(savedAccount);
 
         Hotel savedHotel = hotelRepository.save(hotel);
+
+        UserProfile userProfile = new UserProfile();
+        userProfile.setAccount(savedAccount);
+        userProfile.setFull_name(request.getName());
+        userProfile.setEmail(request.getEmail());
+        userProfile.setPhone(request.getHotline());
+        userProfile.setAddress(request.getAddress());
+        userProfile.setStatus("ACTIVE");
+
+        userProfileRepository.save(userProfile);
+
+        if (request.isSendEmail()) {
+            sendAccountCreationEmail(savedAccount.getEmail(), savedAccount.getUsername(), savedAccount.getPassword());
+        }
+
         return hotelMapper.toResponse(savedHotel);
+    }
+
+    private void sendAccountCreationEmail(String email, String username, String password) {
+        // Gọi EmailService để gửi email
+        emailService.sendAccountCreationEmail(email, username, password);
     }
 
     @Override
