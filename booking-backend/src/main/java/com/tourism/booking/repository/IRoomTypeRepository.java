@@ -29,7 +29,6 @@ public interface IRoomTypeRepository extends JpaRepository<RoomType, Long> {
             nativeQuery = true
     )
     Page<RoomType> findRoomTypesByAccountId(Long id, Pageable pageable);
-//
     @Query(value = """
             SELECT r.room_type_id, r.type_name, r.number_room, r.description, r.room_image, r.hotel_id
             FROM room_type r
