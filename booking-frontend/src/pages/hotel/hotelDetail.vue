@@ -39,20 +39,6 @@
               </li>
             </ul>
           </div>
-          <!-- <div class="bg-white p-6 rounded-lg shadow-lg pb-2" v-if="hotel?.roomTypes?.length">
-            <h2 class="text-xl font-bold text-blue-700">Các loại phòng</h2>
-            <ul class="list-disc pl-5 text-gray-700">
-              <li v-for="(roomTypes, index) in hotel.roomTypes" :key="index">
-                {{ roomTypes.type_name }}
-                <p>Số lượng:{{ roomTypes.number_bed }}</p>
-                <p>Số lượng người tối đa:{{ roomTypes.maximum_people }}</p>
-                <p>Mô tả:{{ roomTypes.description }}</p>
-                <p>Phòng trống:{{ roomTypes.available_room }}</p>
-              </li>
-
-            </ul>
-          </div> -->
-
         </div>
       </div>
 
@@ -61,10 +47,10 @@
         <div class="w-12 h-1 bg-text my-2"></div>
         <div class="space-y-4">
           <!-- Lặp qua danh sách khách sạn từ API -->
-          <div v-for="(hotel, index) in hotelList.slice(1, showAllHotels ? hotelList.length : 4)"
+          <div v-for="(hotel, index) in hotelList.slice(0, showAllHotels ? hotelList.length : 4)"
             class="bg-white rounded-lg shadow-md hover:scale-105 transition cursor-pointer ">
-            <img :src="hotel.image || '/assets/images/img-hotel-6.jpeg'" class="w-full h-32 object-cover rounded-t-lg"
-              :alt="hotel.name">
+            <img v-if="hotel.image" :src="'http://157.66.101.165:8080' + hotel.image" alt="Hotel Image"
+              class="w-full h-full object-cover" />
             <h3
               class="text-center text-text font-semibold p-3 hover:text-blue-600 cursor-pointer transition-colors duration-200">
               {{ hotel.name }}</h3>
@@ -80,34 +66,20 @@
       </div>
 
     </div>
-
-    <div class="container mx-auto px-8">
-      <h2 class="text-xl font-bold text-text">Phòng</h2>
-      <div class="w-12 h-1 bg-blue-700 mb-6"></div>
-      <swiper :modules="[Navigation, Pagination, Autoplay]" :slides-per-view="5" :space-between="16"
-        :autoplay="{ delay: 500, disableOnInteraction: false }" :loop="true" class="pb-4">
-        <swiper-slide v-for="(room, index) in rooms" :key="index">
-          <div class="bg-white rounded-lg shadow-md hover:scale-105 transition">
-            <img :src="room.image" class="w-full h-32 object-cover rounded-t-lg">
-            <h3 class="text-center text-text font-semibold p-3">{{ room.name }}</h3>
-          </div>
-        </swiper-slide>
-      </swiper>
-    </div>
     <div class="container mx-auto px-8 pt-4" v-if="hotel?.roomTypes?.length">
-      <h2 class="text-xl font-bold text-text">Bảng giá phòng</h2>
+      <h2 class="text-xl font-bold text-text">Bảng loại phòng</h2>
       <div class="w-12 h-1 bg-blue-700 mb-6"></div>
       <table class="w-full border-collapse border border-gray-800 mt-2 text-sm md:text-base text-center">
         <thead>
           <tr class="bg-gray-200 text-gray-900">
             <th class="p-3 border border-gray-800">Loại phòng</th>
-            <th class="p-3 border border-gray-800">Giá (VND)</th>
+            <!-- <th class="p-3 border border-gray-800">Giá (VND)</th> -->
           </tr>
         </thead>
         <tbody>
           <tr v-for="(room, index) in hotel.roomTypes" :key="index" class="border-b border-gray-800">
             <td class="p-3 border border-gray-800">{{ room.type_name }}</td>
-            <td class="p-3 text-blue-700 border border-gray-800">{{ room.price }} VND</td>
+            <!-- <td class="p-3 text-blue-700 border border-gray-800">{{ room.price }} VND</td> -->
           </tr>
         </tbody>
       </table>
@@ -116,27 +88,36 @@
       <h2 class="text-2xl font-bold text-blue-700 mb-4">Các loại phòng</h2>
       <div class="w-full border text-sm md:text-base flex flex-wrap gap-6 p-6 bg-gray-100 rounded-lg">
         <div v-for="(room, index) in hotel.roomTypes" :key="index"
-          class="w-full md:w-[32%] bg-white border rounded-lg shadow-md overflow-hidden flex flex-col">
-          <img :src="room.room_image || require('@/assets/images/room-1.jpg')" :alt="room.type_name"
-            class="w-full h-48 object-cover" />
+          class="w-full sm:w-[48%] md:w-[32%] bg-white border rounded-2xl shadow-lg overflow-hidden flex flex-col hover:shadow-xl transition-shadow">
+          <img
+            :src="room.room_image ? 'http://157.66.101.165:8080' + room.room_image : 'http://157.66.101.165:8080/api/v1/images/view/b3a94d55-e4a4-42cf-8e9d-9e785d4488a7_room-9.jpg'"
+            alt="Hotel Image" class="w-full h-[220px] object-cover rounded-t-2xl" />
+
           <div class="p-4 flex flex-col justify-between h-full">
             <div>
               <h2 class="text-xl font-semibold mb-2 text-blue-800">{{ room.type_name }}</h2>
               <p class="text-gray-600 mb-2">{{ room.description }}</p>
-              <ul class="text-sm text-gray-600 list-disc list-inside mb-4">
-                <li>🛏️ Số giường: {{ room.number_bed }}</li>
-                <li>👥 Tối đa: {{ room.maximum_people }} người</li>
-                <li>📦 Phòng trống: {{ room.available_room }}</li>
+
+              <ul class="text-sm text-gray-700 list-disc list-inside mb-2">
+                <li>📦 Phòng trống: {{ room.number_room }}</li>
+              </ul>
+
+              <ul class="text-sm text-gray-700 list-disc list-inside mb-4">
+                <li v-for="r in room.rooms" :key="r.id_room">
+                  🛏️ {{ r.number_bed }} giường
+                </li>
               </ul>
             </div>
-            <button  @click="showBookingModal = true"
-              class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full mt-auto">
-              Đặt Phòng
+
+            <button @click="goToRooms"
+              class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 w-full mt-auto">
+              Xem Phòng
             </button>
           </div>
         </div>
       </div>
     </div>
+
 
     <div class="container mx-auto px-8 pt-4">
       <h2 class="text-xl font-bold text-text">Đánh giá khách hàng</h2>
@@ -167,49 +148,7 @@
       <iframe class="w-full h-72 md:h-96 rounded-lg shadow-lg" src="https://www.google.com/maps/embed?..."
         allowfullscreen></iframe>
     </div>
-
-<div class="bg-gray-100 font-sans p-5">
-    <div class="max-w-screen-lg mx-auto bg-white rounded-lg shadow p-4 flex mb-5">
-      <!-- Cột trái -->
-      <div class="w-1/4 p-2">
-        <img src="https://via.placeholder.com/200x120" alt="Main room image" class="rounded-lg w-full" />
-        <div class="flex space-x-2 mt-2">
-          <img src="https://via.placeholder.com/90x60" alt="Sub image 1" class="rounded" />
-          <img src="https://via.placeholder.com/90x60" alt="Sub image 2" class="rounded" />
-        </div>
-        <a href="#" class="text-blue-600 text-sm mt-2 inline-block">Xem ảnh và chi tiết</a>
-        <h4 class="text-lg font-semibold mb-2 mt-4">Loại phòng</h4>
-
-        <div class="mb-4">
-          <strong>Ưu tiên giường (nếu có)</strong><br />
-          <label class="block"><input type="radio" name="bed" v-model="bedOption" value="1 giường lớn" /> 1 giường lớn 🛏️</label>
-          <label class="block"><input type="radio" name="bed" v-model="bedOption" value="2 giường đơn" /> 2 giường đơn 🛏️🛏️</label>
-        </div>
-
-        <ul class="list-none space-y-1 leading-relaxed">
-          <li>📏 Diện tích phòng: 34 m²</li>
-          <li>🌇 Hướng Thành phố</li>
-          <li>🚭 Không hút thuốc</li>
-          <li>🛁 Phòng tắm vòi sen & bồn tắm</li>
-          <li><a href="#" class="text-blue-600">Các tiện ích khác</a></li>
-        </ul>
-      </div>
-
-      <!-- Cột phải -->
-      <div class="w-3/4 p-2 space-y-4 mt-4">
-        <RoomOption
-          v-for="(room, index) in rooms"
-          :key="index"
-          :room="room"
-        />
-      </div>
-    </div>
-  </div>
-
-
-
-
-    <div class="container mx-auto  p-6  my-6 text-white text-center">
+    <div class="container mx-auto  px-8 my-8 text-white text-center">
       <div class="bg-white text-gray-800 p-5 rounded-lg shadow-md">
         <h2 class="text-2xl font-bold tracking-wide mb-4 flex items-center justify-center gap-2">
           🎁 Ưu đãi & Khuyến mãi 🎉
@@ -232,27 +171,103 @@
         </ul>
       </div>
     </div>
-    <BookingModal v-if="showBookingModal" :show="showBookingModal" @close="showBookingModal = false" />
-    <router-link
-  :to="{ name: 'HotelReview', params: { id: hotelId } }"
-  class="inline-block"
->
-  <button
-    class="px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold rounded-lg shadow hover:scale-105 hover:shadow-lg transition-transform duration-200"
-  >
-    Đánh Giá
-  </button>
-</router-link>
+    <div class="container mx-auto px-8">
+      <h2 class="text-xl font-bold text-text">Phòng</h2>
+      <div class="w-12 h-1 bg-blue-700 mb-6"></div>
+    </div>
+    <div class="bg-gradient-to-r from-gray-100 to-blue-100 py-1">
+      <div class="container mx-auto px-4 md:px-8">
+        <div class="flex flex-col md:flex-row gap-8 border border-gray-300 p-6 rounded-xl shadow-lg">
+          <!-- Cột trái - Hình ảnh và mô tả khách sạn -->
+          <div class="md:w-1/3 bg-white rounded-xl shadow-md p-4">
+            <img :src="`http://157.66.101.165:8080${hotel.image}`" alt="Main room image" class="rounded-lg w-full" />
+            <div class="flex gap-2 mt-3">
+              <img v-for="(roomType, i) in hotel.roomTypes.slice(0, 2)" :key="i"
+                :src="`http://157.66.101.165:8080${roomType.room_image}`" class="rounded-md w-1/2" />
+            </div>
+            <a href="#" class="text-blue-600 text-sm mt-2 inline-block">📷 Xem ảnh và chi tiết</a>
+
+            <h4 class="text-lg font-semibold mt-4 mb-2">🏨 {{ hotel.name }}</h4>
+            <p class="text-sm text-gray-700 mb-2">{{ hotel.address }}</p>
+            <p class="text-sm text-gray-700">📞 {{ hotel.hotline }}</p>
+          </div>
+
+          <!-- Cột phải - Danh sách các phòng còn chỗ -->
+          <div class="md:w-2/3 space-y-6">
+            <template v-for="(roomType, index) in hotel.roomTypes" :key="index">
+              <template v-for="(room, idx) in roomType.rooms" :key="room.id_room">
+                <div
+                  class="flex flex-col sm:flex-row border border-gray-300 rounded-lg overflow-hidden bg-white shadow-sm transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-[0_10px_20px_rgba(168,85,247,0.4)] hover:ring-2 hover:ring-purple-300 cursor-pointer">
+
+                  <!-- Thông tin loại phòng -->
+                  <div class="sm:w-1/3 p-4 border-b sm:border-b-0 sm:border-r border-gray-300">
+                    <strong class="block mb-2">{{ roomType.type_name }}</strong>
+                    <ul class="list-none space-y-1 text-sm">
+                      <li>🛏️ Số giường: {{ room.number_bed }}</li>
+                      <li>{{ roomType.description }}</li>
+                      <li>{{ roomType.room_type_id }}</li>
+                      <li>✔ Có bữa sáng tuyệt hảo (519.481 ₫ /người)</li>
+                      <li>✘ Không hoàn tiền (Giá thấp!)</li>
+                      <li>✔ Đặt và trả tiền ngay</li>
+                    </ul>
+                  </div>
+
+                  <!-- Biểu tượng -->
+                  <div
+                    class="sm:w-1/12 flex items-center justify-center text-xl border-b sm:border-b-0 sm:border-r border-gray-300">
+                    👥 ℹ️
+                  </div>
+
+                  <!-- Giá -->
+                  <div class="sm:w-1/4 p-4 text-red-700 border-b sm:border-b-0 sm:border-r border-gray-300">
+                    <div class="bg-red-100 text-red-600 text-sm font-bold p-1 mb-1">
+                      📍 Giá tốt nhất hiện tại
+                    </div>
+                    <div class="line-through text-gray-600 text-sm">
+                      {{ room.price + 100 }} ₫ <span class="text-red-500 ml-1">-20%</span>
+                    </div>
+                    <div class="text-xl font-bold">{{ room.price.toLocaleString() }} ₫</div>
+                    <div class="text-xs text-gray-500">Giá mỗi đêm chưa gồm thuế và phí</div>
+                  </div>
+
+                  <!-- Số lượng còn lại -->
+                  <div
+                    class="sm:w-1/12 flex items-center justify-center border-b sm:border-b-0 sm:border-r border-gray-300">
+                    {{ roomType.number_room }}
+                  </div>
+
+                  <!-- Nút đặt -->
+                  <div class="sm:w-1/4 flex flex-col items-center justify-center px-4 py-2">
+                    <button @click="openBooking(room, roomType)"
+                      class="bg-blue-600 text-white px-4 py-2 rounded mb-1 w-full">Đặt ngay</button>
+                    <div class="text-green-600 text-sm font-semibold">Còn phòng</div>
+                  </div>
+                </div>
+              </template>
+            </template>
+          </div>
+        </div>
+      </div>
+    </div>
+    <BookingModal :show="showBooking" :room="selectedRoom" :hotel="hotel" @close="showBooking = false" :roomType="selectedRoomType"/>
+    <!-- <ListRoom /> -->
+    <!-- <BookingModal v-if="showBookingModal" :show="showBookingModal" @close="showBookingModal = false" /> -->
+    <router-link :to="{ name: 'HotelReview', params: { id: hotelId } }" class="inline-block">
+      <button
+        class="px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold rounded-lg shadow hover:scale-105 hover:shadow-lg transition-transform duration-200">
+        Đánh Giá
+      </button>
+    </router-link>
     <router-view />
   </div>
 </template>
 <script setup>
-import BookingModal from '@/pages/hotel/BookingModal.vue';
+import ListRoom from './ListRoom.vue';
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { getHotelByIdApi } from '@/services/home';
 import { getHotelListApi } from '@/services/home';
-
+import BookingModal from '@/pages/hotel/BookingModal.vue';
 const route = useRoute();
 const hotel = ref(null);
 const hotelList = ref([]);
@@ -264,6 +279,8 @@ const showAllHotels = ref(false);
 const hotelId = route.params.id
 onMounted(async () => {
   const hotelId = route.params.id;
+  console.log('=======', hotelId);
+
   try {
     const response = await getHotelByIdApi(hotelId);
     hotel.value = response;
@@ -287,100 +304,27 @@ const fetchHotelList = async () => {
 const toggleShowAllHotels = () => {
   showAllHotels.value = !showAllHotels.value;
 };
+const selectedRoomType = ref(null)
+const showBooking = ref(false)
+const selectedRoom = ref(null)
+const openBooking = (room, roomType) => {
+  selectedRoom.value = room
+  selectedRoomType.value = roomType // nếu bạn muốn lưu thêm loại phòng
+
+  console.log('Room:', selectedRoom.value)
+  console.log('RoomType ID:', roomType.room_type_id)
+
+  showBooking.value = true
+}
 onMounted(() => {
   fetchHotelList();
 });
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-import { Swiper, SwiperSlide } from 'swiper/vue';
-import { Navigation, Pagination, Autoplay } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
-import 'swiper/css/autoplay';
-
-const showModal = ref(false)
-const selectedRoom = ref(null)
-
-const openModal = (room) => {
-  selectedRoom.value = room
-  showModal.value = true
+const goToRooms = () => {
+  const hotelId = route.params.hotelId
+  showBookingModal.value = true
+  router.push({ name: 'HotelRooms' })
 }
 
-const closeModal = () => {
-  showModal.value = false
-  selectedRoom.value = null
-}
-
-const roomsType = [
-  {
-    id: 1,
-    name: 'Phòng Deluxe',
-    description: 'Phòng hiện đại dành cho 2 người, có ban công và ánh sáng tự nhiên.',
-    features: [
-      'Giường đôi cao cấp',
-      'Máy lạnh, tủ lạnh mini',
-      'TV màn hình phẳng',
-      'Wi-Fi miễn phí'
-    ],
-    image: '/assets/images/room-4.jpg'
-  },
-  {
-    id: 2,
-    name: 'Phòng Suite',
-    description: 'Không gian rộng rãi, có phòng khách riêng và tầm nhìn đẹp.',
-    features: [
-      'Bồn tắm & phòng tắm đứng',
-      'Ghế sofa & bàn làm việc',
-      'Mini Bar cao cấp',
-      'Bữa sáng miễn phí'
-    ],
-    image: '/assets/images/room-5.jpg'
-  },
-  {
-    id: 3,
-    name: 'Phòng VIP',
-    description: 'Dành cho khách hàng cao cấp với không gian sang trọng đẳng cấp.',
-    features: [
-      'Phòng rộng >60m²',
-      'Dịch vụ đưa đón sân bay',
-      'Phòng tắm đá cẩm thạch',
-      'Hồ bơi riêng (nếu có)'
-    ],
-    image: '/assets/images/room-6.jpg'
-  }
-]
-const rooms = [
-  { name: "Phòng A", image: "/assets/images/room-1.jpg" },
-  { name: "Phòng B", image: "/assets/images/room-2.jpg" },
-  { name: "Phòng C", image: "/assets/images/room-3.jpg" },
-  { name: "Phòng D", image: "/assets/images/room-4.jpg" },
-  { name: "Phòng E", image: "/assets/images/room-5.jpg" },
-  { name: "Phòng F", image: "/assets/images/room-6.jpg" },
-  { name: "Phòng G", image: "/assets/images/room-7.jpg" },
-  { name: "Phòng F", image: "/assets/images/room-8.jpg" },
-  { name: "Phòng G", image: "/assets/images/room-10.jpg" },
-];
-const roomPrices = ref([
-  { type: "Phòng Deluxe", price: "1,500,000" },
-  { type: "Phòng Suite", price: "2,500,000" },
-  { type: "Phòng VIP", price: "5,000,000" }
-]);
-const reviews = ref([
-  { id: 1, name: "Nguyễn Văn A", comment: "Khách sạn rất đẹp và tiện nghi. Dịch vụ tuyệt vời!" },
-  { id: 2, name: "Trần Thị B", comment: "Phòng sạch sẽ, view đẹp, nhân viên nhiệt tình. Sẽ quay lại!" },
-  { id: 3, name: "Lê Văn C", comment: "Giá cả hợp lý, ăn sáng ngon, vị trí thuận tiện." }
-]);
 </script>

@@ -45,4 +45,13 @@ export interface Booking {
     content: Hotel[];
     page: PageInfo;
   }
-  
+  export interface HotelSearchResult {
+  hotel_id: number;
+  name: string;
+  image: string;
+  address: string;
+  hotline: string;
+  description: string;
+}
+
+export type HotelSearchResponse = HotelSearchResult[];

@@ -27,7 +27,7 @@
               class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-400" />
             <!-- Hiển thị ảnh đã chọn -->
             <div v-if="form.service_image" class="mt-2">
-              <img :src="form.service_image" alt="Ảnh đã chọn" class="w-32 h-auto border rounded"/>
+              <img :src="form.service_image" alt="Ảnh đã chọn"  class="w-32 h-32 border rounded object-contain"/>
             </div>
           </div>
   
@@ -71,19 +71,20 @@
     description: '',
   });
 
-  const handleFileUpload = async (event: Event) => {
-    const target = event.target as HTMLInputElement;
-    const file = target.files?.[0];
-    if (file) {
-      try {
-        const uploadedUrl = await uploadImageApi(file);
-        form.value.service_image = uploadedUrl;
-        console.log('Uploaded image URL:', uploadedUrl);
-      } catch (error) {
-        console.error('Lỗi khi tải ảnh:', error);
-      }
+const handleFileUpload = async (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  const file = target.files?.[0];
+  if (file) {
+    try {
+      const uploadedUrl = await uploadImageApi(file);
+      const fullImageUrl = `http://157.66.101.165:8080${uploadedUrl}`;
+      form.value.service_image = fullImageUrl;
+      console.log('Uploaded full image URL:', fullImageUrl);
+    } catch (error) {
+      console.error('Lỗi khi tải ảnh:', error);
     }
-  };
+  }
+};
   
   const submitForm = async () => {
     try {

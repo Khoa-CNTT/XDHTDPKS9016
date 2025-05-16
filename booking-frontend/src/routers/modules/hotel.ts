@@ -15,6 +15,11 @@ export const hotelRoute: RouteRecordRaw[] = [
         name: 'HotelReview',
         component: () => import('@/pages/hotel/hotelReview.vue'),
       },
+      {
+        path: 'rooms',
+        name: 'HotelRooms',
+        component: () => import('@/pages/hotel/ListRoom.vue'),
+      },
     ],
   }
 

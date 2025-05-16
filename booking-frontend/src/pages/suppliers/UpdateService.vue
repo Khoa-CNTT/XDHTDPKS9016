@@ -2,7 +2,8 @@
   <div class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50" @click="$emit('close')">
     <div class="bg-white rounded-lg shadow-xl w-96 p-6 relative" @click.stop>
       <!-- Nút đóng modal -->
-      <button @click="$emit('close')" class="absolute top-2 right-2 text-xl text-gray-600 hover:text-gray-800 focus:outline-none">
+      <button @click="$emit('close')"
+        class="absolute top-2 right-2 text-xl text-gray-600 hover:text-gray-800 focus:outline-none">
         &times;
       </button>
 
@@ -11,31 +12,39 @@
       <!-- Tên dịch vụ -->
       <div class="mb-6">
         <label class="block text-sm font-medium text-gray-700 mb-2">Tên dịch vụ</label>
-        <input v-model="form.service_name" type="text" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Nhập tên dịch vụ" />
+        <input v-model="form.service_name" type="text"
+          class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Nhập tên dịch vụ" />
       </div>
 
       <!-- Giá dịch vụ -->
       <div class="mb-6">
         <label class="block text-sm font-medium text-gray-700 mb-2">Giá dịch vụ</label>
-        <input v-model.number="form.service_price" type="number" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Nhập giá" />
+        <input v-model.number="form.service_price" type="number"
+          class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Nhập giá" />
       </div>
 
       <!-- Mô tả dịch vụ -->
       <div class="mb-6">
         <label class="block text-sm font-medium text-gray-700 mb-2">Mô tả</label>
-        <textarea v-model="form.description" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" rows="4" placeholder="Nhập mô tả"></textarea>
+        <textarea v-model="form.description"
+          class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          rows="4" placeholder="Nhập mô tả"></textarea>
       </div>
 
-      <!-- Chọn ảnh -->
-      <!-- <div class="mb-6">
+
+      <div class="mb-6">
         <label class="block text-sm font-medium text-gray-700 mb-2">Chọn ảnh</label>
-        <input type="file" @change="handleFileChange" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-        <div v-if="selectedImage" class="mt-2 text-sm text-gray-600">Đã chọn ảnh: {{ selectedImage.name }}</div>
-      </div> -->
+        <input type="file" 
+          class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        <div  class="mt-2 text-sm text-gray-600">Đã chọn ảnh:</div>
+      </div>
 
       <!-- Nút cập nhật -->
       <div class="flex justify-center">
-        <button @click="handleUpdate" class="w-1/2 py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <button @click="handleUpdate"
+          class="w-1/2 py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
           Cập nhật dịch vụ
         </button>
       </div>
@@ -45,9 +54,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { updateServiceApi } from '@/services/supplier';
 import type { AddService, Service } from '@/types/supplier';
-
+import { updateServiceApi } from '@/services/supplier';
 const props = defineProps<{
   service: Service | null;
 }>();
@@ -83,6 +91,7 @@ const handleUpdate = async () => {
     errorMessage.value = 'Cập nhật thất bại!';
   }
 };
+
 </script>
 
 
