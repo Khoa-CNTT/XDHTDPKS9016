@@ -45,6 +45,7 @@ import SupplierDetailPopup from '@/pages/admin/SupplierDetailPopup.vue'
 import AddSupplierPopup from '@/pages/admin/AddSupplierPopup.vue'
 import EditSupplierPopup from '@/pages/admin/EditSupplierPopup.vue'
 import DeleteConfirmModal from '@/pages/admin/DeleteConfirmModal.vue'
+import { log } from 'console'
 const showAddPopup = ref(false)
 const tableHeaders = ['STT', 'Tên nhà cung cấp', 'Hình ảnh', 'Địa chỉ', 'Số điện thoại', 'Mô tả', 'Hành động']
 
@@ -56,6 +57,8 @@ const showEditPopup = ref(false)
 const fetchInfoHotel = async () => {
   try {
     const res = await getManagementSupplier()
+   console.log('====>',res);
+   
     suppliers.value = res.content
   } catch (error) {
     console.error('Lỗi khi gọi API nhà cung cấp:', error)

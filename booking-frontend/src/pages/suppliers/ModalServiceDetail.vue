@@ -11,15 +11,21 @@
           <p><strong>Giá:</strong> {{ service.service_price }}</p>
           <p><strong>Mô tả:</strong> {{ service.description }}</p>
           <div class="flex justify-center items-center">
-            <p v-if="!service.service_image" class="text-gray-500 italic">Không có hình ảnh</p>
-            <img v-else :src="service.service_image" alt="Hình ảnh dịch vụ" class="max-w-xs rounded-lg shadow-md" />
-          </div>
+          <p v-if="!service.service_image" class="text-gray-500 italic">Không có hình ảnh</p>
+          <img
+            v-else
+            :src="fullImageUrl"
+            alt="Hình ảnh dịch vụ"
+            class="max-w-xs rounded-lg shadow-md"
+          />
+        </div>
         </div>
       </div>
     </div>
   </template>
   
   <script setup lang="ts">
+  import {computed} from 'vue';
   import { defineProps, defineEmits } from 'vue';
   import { Service } from '@/types/supplier';
   
@@ -35,5 +41,10 @@
   const close = () => {
     emit('close');
   };
+  const fullImageUrl = computed(() => {
+  if (!props.service?.service_image) return '';
+  const imageUrl = props.service.service_image;
+  return imageUrl.startsWith('http') ? imageUrl : `http://157.66.101.165:8080${imageUrl}`;
+});
   </script>
   
