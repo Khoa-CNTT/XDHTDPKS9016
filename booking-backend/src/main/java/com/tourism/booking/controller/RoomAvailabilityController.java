@@ -32,7 +32,7 @@ public class RoomAvailabilityController {
 
                 return ResponseEntity.ok(availability);
         }
-
+//
         @GetMapping("/room-type/{roomTypeId}/count")
         public ResponseEntity<Integer> getAvailableRoomsCount(
                         @PathVariable Long roomTypeId,
