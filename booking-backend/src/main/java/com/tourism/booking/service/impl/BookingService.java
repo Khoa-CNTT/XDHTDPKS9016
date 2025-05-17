@@ -165,7 +165,6 @@ public class BookingService implements IBookingService {
             // Calculate prices and set room/service information
             calculatePricesAndSetInfo(bookingResponse, request);
 
-            // Save to temporary storage
             temporaryBookings.put(bookingResponse.getBookingId(), bookingResponse);
             temporaryRequests.put(bookingResponse.getBookingId(), request);
 
