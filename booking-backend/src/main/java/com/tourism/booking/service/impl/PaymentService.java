@@ -74,7 +74,7 @@ public class PaymentService implements IPaymentService {
         payment.setPayment_time(LocalTime.now());
         payment.setPayment_method(request.getPaymentMethod());
         payment.setTransaction_id(request.getTransactionId());
-        payment.setStatus("PROCESSED");
+        payment.setStatus("PAID");
         payment.setBill(bill);
         payment.setBookingId(request.getBookingId());
         payment = paymentRepository.save(payment);
@@ -168,7 +168,7 @@ public class PaymentService implements IPaymentService {
         PaymentResponseDTO tempDTO = new PaymentResponseDTO();
         tempDTO.setTransactionId(request.getTransactionId());
         tempDTO.setAmount(request.getAmount());
-        tempDTO.setStatus("PENDING");
+        tempDTO.setStatus("PAID");
         tempDTO.setPaymentDate(LocalDate.now());
         tempDTO.setPaymentTime(LocalTime.now());
         tempDTO.setCustomerName("Pending Customer");
@@ -184,7 +184,6 @@ public class PaymentService implements IPaymentService {
     @Transactional
     public PaymentResponseDTO processPaymentWithBookingFinalization(PaymentRequestDTO request, Long bookingId,
             Principal principal) {
-        // Hoàn tất booking trước (chuyển từ TEMP sang PENDING và tạo bill)
         bookingService.finalizeBooking(bookingId, principal);
 
         // Sau đó xử lý thanh toán như bình thường

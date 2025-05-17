@@ -54,9 +54,9 @@ public class PaymentBookingController {
                         .badRequest()
                         .body(Map.of(
                                 "error",
-                                "Trạng thái không hợp lệ. Các trạng thái hợp lệ: PENDING, COMPLETED, CANCELLED",
+                                "Trạng thái không hợp lệ. Các trạng thái hợp lệ: PAID, COMPLETED, CANCELLED",
                                 "requested_status", status,
-                                "valid_statuses", Arrays.asList("PENDING", "COMPLETED", "CANCELLED")));
+                                "valid_statuses", Arrays.asList("PAID", "COMPLETED", "CANCELLED")));
             }
 
             logger.info("Gọi service để cập nhật trạng thái");
@@ -80,20 +80,21 @@ public class PaymentBookingController {
 
     // Helper method để kiểm tra status hợp lệ
     private boolean isValidPaymentStatus(String status) {
-        return Arrays.asList("PENDING", "COMPLETED", "CANCELLED").contains(status);
+        return Arrays.asList("PAID", "COMPLETED", "CANCELLED").contains(status);
     }
 
     /**
      * API xử lý thanh toán cho luồng 3 bước
      * Nghiệp vụ: Hoàn tất booking và tạo thanh toán
      */
-//    @PostMapping("/booking/{bookingId}/finalize")
-//    public ResponseEntity<PaymentResponseDTO> processPaymentWithFinalization(
-//            @PathVariable Long bookingId,
-//            @RequestBody PaymentRequestDTO request) {
-//        PaymentResponseDTO payment = paymentService.processPaymentWithBookingFinalization(request, bookingId);
-//        return new ResponseEntity<>(payment, HttpStatus.CREATED);
-//    }
+    // @PostMapping("/booking/{bookingId}/finalize")
+    // public ResponseEntity<PaymentResponseDTO> processPaymentWithFinalization(
+    // @PathVariable Long bookingId,
+    // @RequestBody PaymentRequestDTO request) {
+    // PaymentResponseDTO payment =
+    // paymentService.processPaymentWithBookingFinalization(request, bookingId);
+    // return new ResponseEntity<>(payment, HttpStatus.CREATED);
+    // }
 
     /**
      * API xử lý thanh toán
