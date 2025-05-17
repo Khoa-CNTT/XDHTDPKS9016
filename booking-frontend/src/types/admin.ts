@@ -1,9 +1,9 @@
-export interface PageInfo {
-  totalElements: number
-  totalPages: number
-  number: number
-  size: number
-}
+// export interface PageInfo {
+//   totalElements: number
+//   totalPages: number
+//   number: number
+//   size: number
+// }
 export interface User {
   user_id: number
   full_name: string | null
@@ -18,34 +18,92 @@ export interface User {
   ratings: any[]
 }
 
-export interface Service {
-  service_id: number
-  service_name: string
-  service_price: number
-  service_image: string | null
-  description: string
-  bookings: any[]
+// export interface Service {
+//   service_id: number
+//   service_name: string
+//   service_price: number
+//   service_image: string | null
+//   description: string
+//   bookings: any[]
+// }
+
+// export interface Hotel {
+//   hotel_id: number
+//   name: string
+//   image: string | null
+//   address: string
+//   hotline: string
+//   description: string | null
+//   services: Service[]
+//   rooms: any[]
+// }
+
+// export interface ManagementSupplierResponse {
+//   content: Hotel[]
+//   page: PageInfo
+// }
+// export interface CreateHotelPayload {
+//   name: string
+//   image: string | null
+//   address: string
+//   hotline: string
+//   description: string | null
+// }
+
+
+/////////////////////////
+export interface ApiResponse {
+  content: Hotel[];
+  page: Page;
 }
 
 export interface Hotel {
-  hotel_id: number
-  name: string
-  image: string | null
-  address: string
-  hotline: string
-  description: string | null
-  services: Service[]
-  rooms: any[]
+  idHotel: number;
+  name: string;
+  image: string;
+  address: string;
+  hotline: string;
+  description: string;
+  services: Service[];
+  roomTypes: RoomType[];
 }
 
-export interface ManagementSupplierResponse {
-  content: Hotel[]
-  page: PageInfo
+export interface Service {
+  serviceId: number;
+  serviceName: string;
+  servicePrice: number;
+  serviceImage: string | null;
+  description: string;
 }
-export interface CreateHotelPayload {
-  name: string
-  image: string | null
-  address: string
-  hotline: string
-  description: string | null
+
+export interface RoomType {
+  roomTypeId: number;
+  typeName: string;
+  description: string;
+  roomImage: string;
+  numberRoom: number;
+  averagePrice: number;
+  rooms: Room[];
+}
+
+export interface Room {
+  roomId: number;
+  numberBeds: number;
+  price: number;
+  status: "AVAILABLE" | "BOOKED" | string;
+  booked: boolean;
+}
+
+export interface Page {
+  totalElements: number;
+  totalPages: number;
+  number: number;
+  size: number;
+}
+export interface Residence {
+  name: string;
+  image: string;
+  address: string;
+  hotline: string;
+  description: string;
 }

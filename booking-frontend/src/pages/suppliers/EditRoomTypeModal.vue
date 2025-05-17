@@ -1,124 +1,59 @@
 <template>
-    <div v-if="isOpen" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-white w-full max-w-xl rounded-lg p-6 relative">
-            <h2 class="text-xl font-semibold mb-4">Chỉnh sửa loại phòng</h2>
-
-            <form @submit.prevent="handleUpdate">
-                <div class="mb-4">
-                    <label class="block font-medium">Tên loại phòng</label>
-                    <input v-model="form.type_name" type="text" class="border w-full px-3 py-2 rounded" required />
-                </div>
-
-                <div class="mb-4">
-                    <label class="block font-medium">Số giường</label>
-                    <input v-model.number="form.number_bed" type="number" class="border w-full px-3 py-2 rounded"
-                        required />
-                </div>
-
-                <div class="mb-4">
-                    <label class="block font-medium">Số người tối đa</label>
-                    <input v-model.number="form.maximum_people" type="number" class="border w-full px-3 py-2 rounded"
-                        required />
-                </div>
-
-                <div class="mb-4">
-                    <label class="block font-medium">Giá</label>
-                    <input v-model.number="form.price" type="number" class="border w-full px-3 py-2 rounded" required />
-                </div>
-
-                <div class="mb-4">
-                    <label class="block font-medium">Mô tả</label>
-                    <textarea v-model="form.description" class="border w-full px-3 py-2 rounded" />
-                </div>
-
-                <div class="mb-4">
-                    <label class="block font-medium">Hình ảnh (URL)</label>
-                    <input v-model="form.room_image" type="text" class="border w-full px-3 py-2 rounded" />
-                </div>
-
-                <div class="mb-4">
-                    <label class="block font-medium">Số phòng có sẵn</label>
-                    <input v-model.number="form.available_room" type="number" class="border w-full px-3 py-2 rounded"
-                        required />
-                </div>
-
-                <div class="mb-4">
-                    <label class="block font-medium">Trạng thái</label>
-                    <select v-model="form.status" class="border w-full px-3 py-2 rounded">
-                        <option value="ACTIVE">ACTIVE</option>
-                        <option value="INACTIVE">INACTIVE</option>
-                    </select>
-                </div>
-
-                <div class="flex justify-end gap-3">
-                    <button type="button" @click="emit('onClose')" class="px-4 py-2 border rounded">Hủy</button>
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Cập
-                        nhật</button>
-                </div>
-            </form>
+  <div class="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
+    <div class="bg-white p-6 rounded-lg w-full max-w-lg shadow-lg">
+      <h2 class="text-xl font-semibold mb-4 text-blue-700">Chỉnh sửa loại phòng</h2>
+      
+      <form >
+        <!-- Tên loại phòng -->
+        <div class="mb-4">
+          <label class="block font-medium mb-1">Tên loại phòng</label>
+          <input  type="text" class="w-full border rounded px-3 py-2" required />
         </div>
+
+        <!-- Số lượng -->
+        <div class="mb-4">
+          <label class="block font-medium mb-1">Số lượng</label>
+          <input  type="number" class="w-full border rounded px-3 py-2" required />
+        </div>
+      <!-- Ảnh -->
+        <div class="mb-4">
+          <label class="block font-medium mb-1">Hình ảnh</label>
+          <input type="file" accept="image/*"  class="w-full" />
+          <div  class="mt-2">
+            <img alt="Preview" class="h-32 rounded object-cover" />
+          </div>
+        </div>
+        <!-- Mô tả -->
+        <div class="mb-4">
+          <label class="block font-medium mb-1">Mô tả</label>
+          <textarea  class="w-full border rounded px-3 py-2"></textarea>
+        </div>
+
+  
+
+        <!-- Nút hành động -->
+        <div class="flex justify-end gap-3 mt-4">
+          <button type="button" @click="$emit('close')" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Hủy</button>
+          <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Lưu thay đổi</button>
+        </div>
+      </form>
     </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { watch, reactive } from 'vue'
+import { ref, watch, reactive } from 'vue'
+import type { RoomTypeSummary } from '@/types/supplier'
 import { updateRoomTypeApi } from '@/services/supplier'
 import { toast } from 'vue3-toastify'
-import type { RoomType, AddRoomType } from '@/types/supplier'
 
 const props = defineProps<{
-    isOpen: boolean
-    roomType: RoomType | null
-    onClose?: () => void
-    onUpdated?: () => void
+  roomType: RoomTypeSummary | null
 }>()
 
-const form = reactive<AddRoomType>({
-    type_name: '',
-    number_bed: 1,
-    maximum_people: 1,
-    price: 0,
-    description: '',
-    room_image: '',
-    available_room: 1,
-    status: 'ACTIVE',
-})
-watch(
-    () => props.roomType,
-    (newValue) => {
-        if (newValue) {
-            Object.assign(form, {
-                ...newValue,
-                status: newValue.status?.toUpperCase() === 'ACTIVE' ? 'ACTIVE' : 'INACTIVE'
-            })
-        }
-    },
-    { immediate: true }
-)
+const emit = defineEmits(['close', 'updated'])
 
-const emit = defineEmits(['onClose', 'onUpdated']);
 
-const handleUpdate = async () => {
-    if (!props.roomType?.room_type_id) return
 
-    try {
-        await updateRoomTypeApi(props.roomType.room_type_id, form)
-        toast.success('Cập nhật loại phòng thành công!', {
-            autoClose: 10000,
-            position: 'top-right',
-        });
-        emit('onUpdated');
-        emit('onClose');
-    } catch (error) {
-        console.error(error)
-        toast.error('Cập nhật loại phòng thất bại!', {
-            autoClose: 10000,
-            position: 'top-right',
-        });
-    }
-}
+
 </script>
-
-<style scoped>
-/* Tuỳ chọn thêm animation hoặc style */
-</style>

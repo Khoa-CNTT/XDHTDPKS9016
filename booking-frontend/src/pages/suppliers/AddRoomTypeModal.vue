@@ -34,13 +34,7 @@
             <label class="block text-sm font-medium mb-1">Phòng trống</label>
             <input v-model.number="form.available_room" type="number" placeholder="Phòng trống" class="input" />
           </div>
-          <div>
-            <label class="block text-sm font-medium mb-1">Trạng thái</label>
-            <select v-model="form.status" class="input">
-              <option value="ACTIVE">ACTIVE</option>
-              <option value="INACTIVE">INACTIVE</option>
-            </select>
-          </div>
+         
         </div>
   
         <div class="flex justify-end mt-4 gap-2">
@@ -54,19 +48,18 @@
   <script setup lang="ts">
   import { ref, defineEmits, defineProps } from 'vue'
   import { createRoomTypeApi, uploadImageApi } from '@/services/supplier'
-  
+  import {RoomTypeDetail} from '@/types/supplier'
   const emit = defineEmits(['close', 'created','added'])
   const props = defineProps<{ isOpen: boolean, fetchRoomTypes: Function }>()
-  const form = ref({
-    type_name: '',
-    number_bed: 1,
-    maximum_people: 1,
-    price: 0,
-    description: '',
-    room_image: '',
-    available_room: 1,
-    status: 'ACTIVE'
-  })
+const form = ref<RoomTypeDetail>({
+  type_name: '',
+  number_bed: 1,
+  maximum_people: 1,
+  price: 0,
+  description: '',
+  room_image: '',
+  available_room: 1
+})
   
   // ✅ Hàm upload ảnh và lưu URL
   const handleFileUpload = async (event: Event) => {
@@ -89,7 +82,10 @@
   
   const submit = async () => {
     try {
+      console.log('Dữ liệu gửi lên:', form.value)
       const res = await createRoomTypeApi(form.value)
+      console.log('hihi',res);
+      
       emit('created', res)
       props.fetchRoomTypes()
       close()

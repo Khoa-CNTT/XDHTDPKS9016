@@ -1,10 +1,12 @@
 import { $api } from '@/api/ofetch'
 import {
-  PageInfo,
-  ManagementSupplierResponse,
+  // PageInfo,
+  // ManagementSupplierResponse,
   User,
   Hotel,
-  CreateHotelPayload,
+  // CreateHotelPayload,
+  ApiResponse,
+  Residence
 } from '@/types/admin'
 
 export interface BaseResponse<T> {
@@ -51,16 +53,15 @@ export const getUserDetailsApi = async (userId: number): Promise<User> => {
   )
 }
 // Supplier
-export const getManagementSupplier = async (): Promise<ManagementSupplierResponse> => {
+export const getManagementSupplier = async (page = 0): Promise<ApiResponse> => {
   return $api(
-    '/management-supplier',
+    `/management-supplier?page=${page}`,
     {
       method: 'GET',
     },
     true,
   )
 }
-
 export const getSupplierByIdApi = async (supplierId: number): Promise<Hotel> => {
   return $api(
     `/management-supplier/${supplierId}`,
@@ -71,30 +72,6 @@ export const getSupplierByIdApi = async (supplierId: number): Promise<Hotel> => 
   )
 }
 
-export const createSupplierApi = async (supplierData: CreateHotelPayload): Promise<Hotel> => {
-  return $api(
-    '/management-supplier',
-    {
-      method: 'POST',
-      body: supplierData,
-    },
-    true,
-  )
-}
-
-export const updateSupplierApi = async (
-  supplierId: number,
-  supplierData: CreateHotelPayload
-): Promise<Hotel> => {
-  return $api(
-    `/management-supplier/${supplierId}`,
-    {
-      method: 'PUT',
-      body: supplierData,
-    },
-    true,
-  )
-}
 
 export const deleteSupplierApi = async (supplierId: number): Promise<void> => {
   return $api(
@@ -105,3 +82,40 @@ export const deleteSupplierApi = async (supplierId: number): Promise<void> => {
     true,
   )
 }
+
+
+
+// export const createSupplierApi = async (supplierData: CreateHotelPayload): Promise<Hotel> => {
+//   return $api(
+//     '/management-supplier',
+//     {
+//       method: 'POST',
+//       body: supplierData,
+//     },
+//     true,
+//   )
+// }
+
+// export const updateSupplierApi = async (
+//   supplierId: number,
+//   supplierData: CreateHotelPayload
+// ): Promise<Hotel> => {
+//   return $api(
+//     `/management-supplier/${supplierId}`,
+//     {
+//       method: 'PUT',
+//       body: supplierData,
+//     },
+//     true,
+//   )
+// }
+
+// export const deleteSupplierApi = async (supplierId: number): Promise<void> => {
+//   return $api(
+//     `/management-supplier/${supplierId}`,
+//     {
+//       method: 'DELETE',
+//     },
+//     true,
+//   )
+// }
