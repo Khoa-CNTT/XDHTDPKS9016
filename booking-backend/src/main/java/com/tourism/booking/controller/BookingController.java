@@ -214,7 +214,7 @@ public class BookingController {
                 return ResponseEntity
                         .badRequest()
                         .body(Map.of("error",
-                                "Trạng thái không hợp lệ. Các trạng thái hợp lệ: PENDING, CONFIRMED, COMPLETED, CANCELLED, PAID"));
+                                "Trạng thái không hợp lệ. Các trạng thái hợp lệ: CONFIRMED, COMPLETED, CANCELLED, PAID"));
             }
 
             BookingResponseDTO booking = bookingService.updateBookingStatus(id, status);
@@ -232,7 +232,7 @@ public class BookingController {
     }
 
     private boolean isValidBookingStatus(String status) {
-        return Arrays.asList("PENDING", "CONFIRMED", "COMPLETED", "CANCELLED", "PAID").contains(status);
+        return Arrays.asList("CONFIRMED", "COMPLETED", "CANCELLED", "PAID").contains(status);
     }
 
     @PostMapping

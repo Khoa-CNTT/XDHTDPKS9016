@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class ContactInfoDTO {
-    private Long bookingId; // To associate with a pending booking
+    private Long bookingId;
     private String contactName;
     private String contactEmail;
     private String contactPhone;

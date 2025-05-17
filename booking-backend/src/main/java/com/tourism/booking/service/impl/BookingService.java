@@ -316,7 +316,7 @@ public class BookingService implements IBookingService {
         booking.setCheck_out_time(
                 bookingRequest.getCheckOutTime() != null ? bookingRequest.getCheckOutTime() : LocalTime.of(12, 0));
         booking.setNumber_people(bookingRequest.getNumberOfPeople());
-        booking.setStatus("PENDING");
+        booking.setStatus("PAID");
         booking.setContact_name(bookingRequest.getContactName());
         booking.setContact_email(bookingRequest.getContactEmail());
         booking.setContact_phone(bookingRequest.getContactPhone());
@@ -368,7 +368,7 @@ public class BookingService implements IBookingService {
         booking.setCheckInTime(request.getCheckInTime());
         booking.setCheckOutTime(request.getCheckOutTime());
         booking.setNumberPeople(request.getNumberOfPeople());
-        booking.setStatus("PENDING");
+        booking.setStatus("PAID");
     }
 
     private void calculatePricesAndSetInfo(BookingResponseDTO booking, BookingRequestDTO request) {
@@ -623,9 +623,6 @@ public class BookingService implements IBookingService {
 
         // Set statusDisplay for UI
         switch (booking.getStatus()) {
-            case "PENDING":
-                dto.setStatusDisplay("Chờ xác nhận");
-                break;
             case "CONFIRMED":
                 dto.setStatusDisplay("Đã xác nhận");
                 break;
@@ -636,7 +633,7 @@ public class BookingService implements IBookingService {
                 dto.setStatusDisplay("Đã hủy");
                 break;
             case "PAID":
-                dto.setStatusDisplay("Đã thanh toán");
+                dto.setStatusDisplay("Chờ xác nhận");
                 break;
             default:
                 dto.setStatusDisplay(booking.getStatus());
@@ -791,7 +788,7 @@ public class BookingService implements IBookingService {
         booking.setCheck_in_time(request.getCheckInTime());
         booking.setCheck_out_time(request.getCheckOutTime());
         booking.setNumber_people(request.getNumberOfPeople());
-        booking.setStatus("PENDING");
+        booking.setStatus("PAID");
         booking.setContact_name(tempBooking.getContactName());
         booking.setContact_email(tempBooking.getContactEmail());
         booking.setContact_phone(tempBooking.getContactPhone());

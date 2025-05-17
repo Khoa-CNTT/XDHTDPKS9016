@@ -26,6 +26,7 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
@@ -96,14 +97,15 @@ public class PaymentController {
         }
     }
 
-    @GetMapping("/payment-callback")
+    @GetMapping(value = "/payment-callback", produces = "text/html")
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
-    public ResponseEntity<Map<String, Object>> paymentCallback(
+    public ModelAndView paymentCallback(
             @RequestParam Map<String, String> queryParams,
             @RequestParam(value = "bookingId", required = false) Long bookingId,
             @RequestParam(value = "userId", required = false) Long userId) {
 
         logger.info("Payment callback received for booking {}: {}", bookingId, queryParams);
+        ModelAndView modelAndView = new ModelAndView();
 
         try {
             // 1. Validate required parameters
@@ -124,7 +126,9 @@ public class PaymentController {
             for (String param : requiredParams) {
                 if (!queryParams.containsKey(param)) {
                     logger.error("Missing required parameter: {}", param);
-                    return createErrorResponse("Missing required parameter: " + param);
+                    modelAndView.setViewName("error");
+                    modelAndView.addObject("error", "Missing required parameter: " + param);
+                    return modelAndView;
                 }
             }
 
@@ -132,7 +136,11 @@ public class PaymentController {
             String vnp_TransactionNo = queryParams.get("vnp_TransactionNo");
             if (isTransactionProcessed(vnp_TransactionNo)) {
                 logger.info("Transaction already processed: {}", vnp_TransactionNo);
-                return createSuccessResponse(vnp_TransactionNo, bookingId);
+                modelAndView.setViewName("bookingsuccess");
+                modelAndView.addObject("bookingId", bookingId);
+                modelAndView.addObject("amount", Long.parseLong(queryParams.get("vnp_Amount")) / 100);
+                modelAndView.addObject("paymentTime", new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
+                return modelAndView;
             }
 
             // 3. Process based on response code
@@ -148,7 +156,9 @@ public class PaymentController {
                 BookingResponseDTO tempBookingDTO = bookingService.getBookingById(bookingId);
                 if (tempBookingDTO == null) {
                     logger.error("Temporary booking not found: {}", bookingId);
-                    return createErrorResponse("Booking not found");
+                    modelAndView.setViewName("error");
+                    modelAndView.addObject("error", "Booking not found");
+                    return modelAndView;
                 }
 
                 // Get services before finalizing
@@ -223,7 +233,9 @@ public class PaymentController {
                     logger.info("Booking saved with status PAID and services attached");
                 } catch (Exception e) {
                     logger.error("Error saving booking: {}", e.getMessage(), e);
-                    return createErrorResponse("Error saving booking: " + e.getMessage());
+                    modelAndView.setViewName("error");
+                    modelAndView.addObject("error", "Error saving booking: " + e.getMessage());
+                    return modelAndView;
                 }
 
                 // 8. Create payment record - this should save to the payment table
@@ -249,18 +261,41 @@ public class PaymentController {
                 // 9. Get updated booking with all relations for response
                 BookingResponseDTO updatedBooking = bookingService.getBookingById(finalizedBooking.getBookingId());
 
-                return createSuccessResponse(payment, updatedBooking);
+                modelAndView.setViewName("bookingsuccess");
+                modelAndView.addObject("contactName", updatedBooking.getContactName());
+                modelAndView.addObject("amount", Long.parseLong(queryParams.get("vnp_Amount")) / 100);
+                modelAndView.addObject("paymentTime", new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
+
+                // Add hotel information from the booking
+                if (updatedBooking != null && updatedBooking.getRooms() != null
+                        && !updatedBooking.getRooms().isEmpty()) {
+                    modelAndView.addObject("hotelName", updatedBooking.getHotel().getName());
+                    modelAndView.addObject("hotelAddress", updatedBooking.getHotel().getAddress());
+
+                } else {
+                    logger.warn("No hotel information available for booking: {}", bookingId);
+                    modelAndView.addObject("hotelName", "Không có thông tin");
+                    modelAndView.addObject("hotelAddress", "Không có thông tin");
+                }
+
+                return modelAndView;
             } else if ("24".equals(vnp_ResponseCode)) {
                 logger.info("Payment cancelled by user for booking: {}", bookingId);
-                return handleCancelledPayment(bookingId, vnp_TransactionNo);
+                modelAndView.setViewName("error");
+                modelAndView.addObject("error", "Payment was cancelled by user");
+                return modelAndView;
             } else {
                 logger.warn("Payment failed with code: {} and status: {} for booking: {}",
                         vnp_ResponseCode, vnp_TransactionStatus, bookingId);
-                return handleFailedPayment(vnp_ResponseCode, bookingId, vnp_TransactionNo);
+                modelAndView.setViewName("error");
+                modelAndView.addObject("error", "Payment failed with code: " + vnp_ResponseCode);
+                return modelAndView;
             }
         } catch (Exception e) {
             logger.error("Error processing payment callback: {}", e.getMessage(), e);
-            return createErrorResponse("Error processing payment: " + e.getMessage());
+            modelAndView.setViewName("error");
+            modelAndView.addObject("error", "Error processing payment: " + e.getMessage());
+            return modelAndView;
         }
     }
 

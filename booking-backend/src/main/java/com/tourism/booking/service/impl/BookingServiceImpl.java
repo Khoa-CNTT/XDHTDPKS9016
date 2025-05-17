@@ -62,7 +62,7 @@ public class BookingServiceImpl implements IBookingService {
         booking.setCheck_out_time(
                 bookingRequest.getCheckOutTime() != null ? bookingRequest.getCheckOutTime() : LocalTime.of(12, 0));
         booking.setNumber_people(bookingRequest.getNumberOfPeople());
-        booking.setStatus("PENDING");
+        booking.setStatus("PAID");
         booking.setContact_name(bookingRequest.getContactName());
         booking.setContact_email(bookingRequest.getContactEmail());
         booking.setContact_phone(bookingRequest.getContactPhone());
