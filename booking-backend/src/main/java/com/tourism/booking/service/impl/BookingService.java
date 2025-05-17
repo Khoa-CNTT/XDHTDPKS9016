@@ -159,7 +159,6 @@ public class BookingService implements IBookingService {
             bookingResponse.setBookingId(generateTemporaryBookingId());
             setBasicBookingInfo(bookingResponse, request);
 
-            // Set user information
             setUserInformation(bookingResponse, user.getUser_id());
 
             // Calculate prices and set room/service information
