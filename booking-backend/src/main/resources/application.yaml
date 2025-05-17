@@ -24,7 +24,10 @@ spring:
           auth: true
           starttls:
             enable: true
-
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
 jwt:
   signerKey: "NGqcTenEeF3c21PqKhCWjAcpUNz1gJYFIZ1mbj8uFs3RmO9QlNEjLijajUO/mQse"
   valid-duration: 6000 # in second
@@ -33,7 +36,3 @@ jwt:
 gemini:
   api:
     key: "AIzaSyAX8spVWG7wkzb0ENFmHKhZ8IKR4seT_S0"
-logging:
-  level:
-    org.springframework.web: INFO
-    com.tourism.booking: DEBUG
