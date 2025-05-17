@@ -66,30 +66,29 @@
                 {{ row.status }}
               </span>
             </td>
-         <td class="px-4 py-2 text-center">
-  <div class="flex justify-center gap-2 flex-wrap">
-    <!-- Nút Xác nhận (với Icon) -->
-    <button v-if="row.status === 'Chờ xác nhận'" @click="confirmBooking(index)"
-    class="p-2 bg-green-500 hover:bg-green-600 text-white rounded transition">
-      <Icon icon="mdi:check-circle" width="20" height="20" class="mr-1" />
-    
-    </button>
+            <td class="px-4 py-2 text-center">
+              <div class="flex justify-center gap-2 flex-wrap">
+                <!-- Nút Xác nhận (với Icon) -->
+                <button v-if="row.status === 'Chờ xác nhận'" @click="confirmBooking(index)"
+                  class="p-2 bg-green-500 hover:bg-green-600 text-white rounded transition">
+                  <Icon icon="mdi:check-circle" width="20" height="20" class="mr-1" />
 
-    <!-- Nút Hủy (với Icon) -->
-    <button v-if="row.status === 'Chờ xác nhận' || row.status === 'Đã xác nhận'" @click="cancel(index)"
-     class="p-2 bg-red-500 hover:bg-green-600 text-white rounded transition">
-      <Icon icon="mdi:cancel" width="20" height="20" class="mr-1" />
-   
-    </button>
+                </button>
 
-    <!-- Nút Xem (với Icon) -->
-    <button @click="view(row)"
-       class="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded transition">
-      <Icon icon="mdi:eye" width="20" height="20" class="mr-1" />
-   
-    </button>
-  </div>
-</td>
+                <!-- Nút Hủy (với Icon) -->
+                <button v-if="row.status === 'Chờ xác nhận' || row.status === 'Đã xác nhận'" @click="cancel(index)"
+                  class="p-2 bg-red-500 hover:bg-green-600 text-white rounded transition">
+                  <Icon icon="mdi:cancel" width="20" height="20" class="mr-1" />
+
+                </button>
+
+                <!-- Nút Xem (với Icon) -->
+                <button @click="view(row)" class="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded transition">
+                  <Icon icon="mdi:eye" width="20" height="20" class="mr-1" />
+
+                </button>
+              </div>
+            </td>
 
 
 

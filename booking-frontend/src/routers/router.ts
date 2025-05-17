@@ -28,6 +28,10 @@ const routes: RouteRecordRaw[] = [
     children: profileRoute,
   },
   {
+    path: '/payment-history',
+    component: () => import('@/pages/historyPayment/index.vue'),
+  },
+  {
     path: '/test',
     component: () => import('@/pages/test.vue'),
   },
@@ -36,7 +40,6 @@ const routes: RouteRecordRaw[] = [
     meta: {
       layout: 'GuestLayout',
       public: true,
-    
     },
     beforeEnter: [authGuard],
     children: authRoute,
@@ -94,7 +97,7 @@ router.afterEach((to) => {
 
   // Cập nhật document.title khi chuyển route
   const baseTitle = 'EliteBooking'
-  const pageTitle = to.meta.title as string 
+  const pageTitle = to.meta.title as string
   document.title = pageTitle || baseTitle
 })
 
