@@ -22,15 +22,20 @@
                             <div>
                                 <label class="block font-medium mb-1">Ngày nhận phòng</label>
                                 <input type="date" v-model="body.checkInDate" class="w-full border rounded px-3 py-2" />
+                                <p v-if="errorCheckInDate" class="text-red-600 text-sm mt-1">{{ errorCheckInDate }}</p>
                             </div>
                             <div>
                                 <label class="block font-medium mb-1">Giờ nhận phòng</label>
-                                <input type="time" v-model="body.checkInTime" class="w-full border rounded px-3 py-2" />
+                                <input :min="today" type="time" v-model="body.checkInTime"
+                                    class="w-full border rounded px-3 py-2" />
+
                             </div>
                             <div>
                                 <label class="block font-medium mb-1">Ngày trả phòng</label>
-                                <input type="date" v-model="body.checkOutDate"
+                                <input :min="body.checkInDate || today" type="date" v-model="body.checkOutDate"
                                     class="w-full border rounded px-3 py-2" />
+                                <p v-if="errorCheckOutDate" class="text-red-600 text-sm mt-1">{{ errorCheckOutDate }}
+                                </p>
                             </div>
                             <div>
                                 <label class="block font-medium mb-1">Giờ trả phòng</label>
@@ -127,7 +132,7 @@
     </div>
 </template>
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { initializeBookingApi, contactInfoPaymentApi } from '@/services/booking'
 const props = defineProps({
     show: Boolean,
@@ -161,7 +166,7 @@ const body = ref({
     numberOfPeople: 1,
     roomSelections: [
         {
-            roomTypeId: props.roomType.room_type_id,
+            // roomTypeId: props.roomType.room_type_id,
             numberOfRooms: 1
         }
     ],
@@ -169,19 +174,47 @@ const body = ref({
 })
 const loading = ref(false)
 function formatTimeToHHMMSS(time) {
-  // time có thể là "14:00" hoặc "14:00:00"
-  if (!time) return '' 
-  if (time.length === 5) {
-    // dạng "HH:mm" => thêm ":00"
-    return time + ':00'
-  }
-  return time
+    // time có thể là "14:00" hoặc "14:00:00"
+    if (!time) return ''
+    if (time.length === 5) {
+        // dạng "HH:mm" => thêm ":00"
+        return time + ':00'
+    }
+    return time
 }
+
+const today = new Date().toISOString().split('T')[0]
+const errorCheckInDate = ref('')
+const errorCheckOutDate = ref('')
+// Watch ngày nhận phòng
+watch(() => body.value.checkInDate, (newVal) => {
+    if (newVal && newVal < today) {
+        errorCheckInDate.value = 'Ngày nhận phòng không được chọn trước ngày hôm nay'
+    } else {
+        errorCheckInDate.value = ''
+    }
+
+    // Nếu ngày trả phòng nhỏ hơn ngày nhận phòng thì cảnh báo ngay
+    if (body.value.checkOutDate && body.value.checkOutDate < newVal) {
+        errorCheckOutDate.value = 'Ngày trả phòng không được nhỏ hơn ngày nhận phòng'
+    } else {
+        errorCheckOutDate.value = ''
+    }
+})
+
+// Watch ngày trả phòng
+watch(() => body.value.checkOutDate, (newVal) => {
+    if (newVal && body.value.checkInDate && newVal < body.value.checkInDate) {
+        errorCheckOutDate.value = 'Ngày trả phòng không được nhỏ hơn ngày nhận phòng'
+    } else {
+        errorCheckOutDate.value = ''
+    }
+})
 async function handleNextStep() {
     console.log('handleNextStep được gọi')
 
     if (step.value === 1) {
-         body.value.checkInTime = formatTimeToHHMMSS(body.value.checkInTime)
+        body.value.checkInTime = formatTimeToHHMMSS(body.value.checkInTime)
         body.value.checkOutTime = formatTimeToHHMMSS(body.value.checkOutTime)
         // 1. Gán serviceIds từ checkbox người dùng đã chọn
         body.value.serviceIds = [...selectedServices.value]
@@ -215,4 +248,31 @@ async function handleNextStep() {
         }
     }
 }
+const submitBooking = async () => {
+    try {
+        const payload = {
+            bookingId: contact.value.bookingId,
+            contactName: contact.value.name,
+            contactEmail: contact.value.email,
+            contactPhone: contact.value.phone,
+            contactAddress: contact.value.address,
+            specialRequests: contact.value.specialRequests,
+        };
+
+        const res = await contactInfoPaymentApi(payload); // Lưu lại kết quả
+        console.log('API trả về:', res);
+        if (res.paymentUrl) {
+            // Chuyển hướng sang trang thanh toán
+            window.open(res.paymentUrl, '_blank');
+            emit('close');
+        } else {
+            console.error("Không tìm thấy paymentUrl trong response");
+        }
+        // toast.success("Đặt lịch khám thành công!");
+        // router.push(`/dat-lich/xac-nhan/${contact.value.bookingId}`);
+    } catch (error) {
+        // toast.error("Đặt lịch không thành công. Vui lòng thử lại!");
+        console.error("Lỗi khi gửi dữ liệu đặt lịch:", error);
+    }
+};
 </script>

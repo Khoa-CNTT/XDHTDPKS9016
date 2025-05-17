@@ -24,8 +24,8 @@ public class Rating {
     @Column(name = "score", nullable = false)
     int score;
 
-    @Column(name = "comment", columnDefinition = "TEXT")
-    String comment;
+//    @Column(name = "comment", columnDefinition = "TEXT")
+//    String comment;
 
     @Column(name = "rating_date")
     LocalDate rating_date;

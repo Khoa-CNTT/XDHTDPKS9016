@@ -1,10 +1,11 @@
 
 
 import { $api } from '@/api/ofetch'
-import { ServiceResponse, AddService, Service } from "@/types/supplier"
-import { RoomTypeResponse,AddRoomType,RoomType} from "@/types/supplier"
-import { HotelInfo,HotelProfile} from "@/types/supplier"
-export const getServiceListApi = async (): Promise<ServiceResponse> => {
+import { GetService , AddService, Service,NewService,AddServiceResponse } from "@/types/supplier"
+import { RoomTypeResponse,RoomTypeSummary,RoomType,RoomTypeDetail,UpdateRoomTypeBody} from "@/types/supplier"
+import { HotelInfo,InfoHotel} from "@/types/supplier"
+//service
+export const getServiceListApi = async (): Promise<GetService[]> => {
   return $api('/management-service', { method: 'GET' }, true);
 };
 
@@ -18,7 +19,7 @@ export const deleteServiceApi = async (serviceId: number): Promise<void> => {
 };
 
 
-export const updateServiceApi = async (serviceId: number, serviceData: AddService): Promise<Service> => {
+export const updateServiceApi = async (serviceId: number, serviceData: NewService): Promise<AddServiceResponse> => {
   return $api(`/management-service/${serviceId}`, {
     method: 'PUT',
     headers: {
@@ -28,24 +29,18 @@ export const updateServiceApi = async (serviceId: number, serviceData: AddServic
   }, true);
 };
 
-// Thêm dịch vụ mới
-export const createServiceApi = async (serviceData: AddService): Promise<Service> => {
+export const createServiceApi = async (serviceData: NewService): Promise<AddServiceResponse> => {
   return $api('/management-service', {
     method: 'POST',
     body: serviceData,
   }, true);
 };
 
-export const getRoomTypesApi = async (): Promise<RoomTypeResponse> => {
-  return $api('/room-types', { method: 'GET' }, true);
-};
+// export const getRoomTypesApi = async (): Promise<RoomTypeResponse> => {
+//   return $api('/room-types', { method: 'GET' }, true);
+// };
 
-export const createRoomTypeApi = async (roomTypeData: AddRoomType): Promise<RoomType> => {
-  return $api('/room-types', {
-    method: 'POST',
-    body: roomTypeData,
-  }, true);
-};
+
 
 
 export const uploadImageApi = async (file: File): Promise<string> => {
@@ -60,34 +55,47 @@ export const uploadImageApi = async (file: File): Promise<string> => {
   return response; 
 };
 
-export const deleteRoomTypeApi = async (roomTypeId: number): Promise<void> => {
-  await $api(`/room-types/${roomTypeId}`, { method: 'DELETE' }, true);
-};
 
-export const updateRoomTypeApi = async (
-  roomTypeId: number,
-  roomTypeData: AddRoomType
-): Promise<RoomType> => {
-  return $api(`/room-types/${roomTypeId}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(roomTypeData),
-  }, true);
-};
+
+
 
 export const getInfoHotelApi = async (): Promise<HotelInfo> => {
   return $api('/hotel-info', { method: 'GET' }, true);
 };
 
 
-export const updateHotelInfoApi = async (hotelData: HotelProfile): Promise<HotelInfo> => {
+export const updateHotelInfoApi = async (hotelData: InfoHotel): Promise<HotelInfo> => {
   return $api('/hotel-info', {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(hotelData),
+  }, true);
+};
+
+///type room
+export const getRoomTypesApi = async (): Promise<RoomTypeResponse> => {
+  return $api('/room-types', { method: 'GET' }, true);
+};
+export const createRoomTypeApi = async (roomTypeData: RoomTypeDetail): Promise<RoomType> => {
+  return $api('/room-types', {
+    method: 'POST',
+    body: roomTypeData,
+  }, true);
+};
+export const deleteRoomTypeApi = async (roomTypeId: number): Promise<void> => {
+  await $api(`/room-types/${roomTypeId}`, { method: 'DELETE' }, true);
+};
+export const updateRoomTypeApi = async (
+  roomTypeId: number,
+  roomTypeData: UpdateRoomTypeBody
+): Promise<RoomTypeSummary> => {
+  return $api(`/room-types/${roomTypeId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(roomTypeData),
   }, true);
 };

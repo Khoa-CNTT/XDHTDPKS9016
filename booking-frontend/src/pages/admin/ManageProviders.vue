@@ -1,131 +1,152 @@
 <template>
-  <div class="card relative">
-    <div class="card-header flex justify-between items-center flex-wrap gap-4">
-      <div class="flex items-center">
-        <label for="search" class="mr-2">Tìm tên nhà cung cấp</label>
-        <input id="search" v-model="searchTerm" placeholder="Nhập tên nhà cung cấp..."
-          class="px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
-      </div>
-      <button class="bg-green-500 text-white px-4 py-2 rounded" @click="showAddPopup = true">
-        Thêm nhà cung cấp +
+  <div class="space-y-6 px-4 py-6">
+    <div class="border rounded-lg p-6 bg-white shadow flex justify-between items-center">
+      <h3 class="text-lg font-semibold text-blue-700 flex">
+        <Icon icon="mdi:tools" class="mr-2 text-xl" width="24" height="24" /> Quản lý khách sạn
+      </h3>
+      <button class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition flex items-center">
+        <Icon icon="mdi:plus-box" class="text-xl pr-2" width="24" height="24" /> Thêm dịch vụ mới
       </button>
     </div>
+    <!-- Bảng danh sách khách sạn -->
+    <div class="border rounded-lg p-6 bg-white shadow">
+      <h3 class="text-lg font-semibold mb-4 text-blue-700 flex">
+        <Icon icon="mdi:clipboard-list" width="24" height="24" class="mr-2" /> Danh sách khách sạn
+      </h3>
+      <table class="min-w-full divide-y divide-gray-200 border">
+        <thead class="bg-gray-100">
+          <tr>
+            <th class="px-4 py-2 text-left">STT</th>
+            <th class="px-4 py-2 text-left">Tên</th>
+            <th class="px-4 py-2 text-left">Ảnh</th>
+            <th class="px-4 py-2 text-left">Địa chỉ</th>
+            <th class="px-4 py-2 text-left">Số điện thoại</th>
+            <th class="px-4 py-2 text-left">Dịch vụ</th>
+            <th class="px-4 py-2 text-left">Loại phòng</th>
+            <th class="px-4 py-2 text-left">Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(hotel, index) in hotels" :key="hotel.idHotel" class="border-t align-top">
+            <!-- STT -->
+            <td class="px-4 py-2">{{ index + 1 }}</td>
+            <!-- Tên khách sạn -->
+            <td class="px-4 py-2">{{ hotel.name }}</td>
+            <!-- Ảnh -->
+            <td class="px-4 py-2">
+              <img :src="`http://157.66.101.165:8080${hotel.image}`" alt="Ảnh khách sạn"
+                class="w-20 h-14 object-cover rounded" />
+            </td>
+            <!-- Địa chỉ -->
+            <td class="px-4 py-2 whitespace-pre-line">{{ hotel.address }}</td>
+            <!-- Hotline -->
+            <td class="px-4 py-2">{{ hotel.hotline }}</td>
+            <!-- Mô tả (truncate với ...) -->
+            <td class="px-4 py-2">
+              <div v-if="hotel.services.length">
+                <div v-for="svc in hotel.services" :key="svc.serviceId" class="truncate">
+                  {{ svc.serviceName }}
+                </div>
+              </div>
+              <div v-else class="italic text-gray-500">Không có</div>
+            </td>
+            <!-- Loại phòng (xuống dòng) -->
+            <td class="px-4 py-2">
+              <div v-if="hotel.roomTypes.length">
+                <div v-for="rt in hotel.roomTypes" :key="rt.roomTypeId" class="truncate">
+                  {{ rt.typeName }}
+                </div>
+              </div>
+              <div v-else class="italic text-gray-500">Không có</div>
+            </td>
+            <td class="px-4 py-2 text-center">
+              <div class="flex justify-center gap-2 flex">
+                <!-- Nút Xác nhận (với Icon) -->
+                <button class="p-2 bg-green-500 hover:bg-green-600 text-white rounded transition">
+                  <Icon icon="mdi:check-circle" width="20" height="20" class="mr-1" />
 
-    <div class="card-body">
-      <CustomTable :headers="tableHeaders" :rows="formattedTableData">
-        <template #actions="{ row, index }">
-          <div class="flex gap-2 justify-end">
-            <button class="px-2 py-1 bg-green-500 text-white rounded"
-              @click="() => openEditPopup(Number(row.hotel_id))">
-              Sửa
-            </button>
-            <button class="px-2 py-1 bg-red-500 text-white rounded" @click="() => confirmDelete(Number(row.hotel_id))">
-              Xóa
-            </button>
-            <button class="px-2 py-1 bg-blue-500 text-white rounded" @click="() => openDetail(Number(row.hotel_id))">
-              Xem chi tiết
-            </button>
-          </div>
-        </template>
-      </CustomTable>
+                </button>
+
+                <!-- Nút Hủy (với Icon) -->
+                <button class="p-2 bg-red-500 hover:bg-red-600 text-white rounded transition"
+                  @click="confirmDelete(hotel.idHotel)">
+                  <Icon icon="mdi:cancel" width="20" height="20" class="mr-1" />
+
+                </button>
+
+                <!-- Nút Xem (với Icon) -->
+                <button class="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded transition"
+                  @click="handleView(hotel.idHotel)">
+                  <Icon icon="mdi:eye" width="20" height="20" class="mr-1" />
+
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="pt-6 flex justify-center">
+        <Pagination :total="totalElements" :items-per-page="pageSize" :default-page="currentPage"
+          @page-change="fetchInfoHotel" />
+      </div>
     </div>
-    <AddSupplierPopup v-if="showAddPopup" @close="showAddPopup = false" @created="fetchInfoHotel" />
-    <SupplierDetailPopup v-if="showDetailPopup" :supplier="selectedSupplier" @close="showDetailPopup = false" />
-    <EditSupplierPopup v-if="showEditPopup" :supplier="selectedSupplier" @close="showEditPopup = false"
-      @updated="fetchInfoHotel" />
     <DeleteConfirmModal v-if="showDeleteModal" @cancel="showDeleteModal = false" @confirm="handleDelete" />
+    <SupplierDetailPopup v-if="showDetailPopup" :supplier="selectedSupplier" @close="showDetailPopup = false" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import CustomTable from '@/components/base/CustomTable.vue'
+import { ref, onMounted } from 'vue'
+import Pagination from '@/components/base/Pagination.vue'
+import SupplierDetailPopup from './SupplierDetailPopup.vue'
 import { getManagementSupplier, getSupplierByIdApi, deleteSupplierApi } from '@/services/admin'
-import SupplierDetailPopup from '@/pages/admin/SupplierDetailPopup.vue'
-import AddSupplierPopup from '@/pages/admin/AddSupplierPopup.vue'
-import EditSupplierPopup from '@/pages/admin/EditSupplierPopup.vue'
-import DeleteConfirmModal from '@/pages/admin/DeleteConfirmModal.vue'
-import { log } from 'console'
-const showAddPopup = ref(false)
-const tableHeaders = ['STT', 'Tên nhà cung cấp', 'Hình ảnh', 'Địa chỉ', 'Số điện thoại', 'Mô tả', 'Hành động']
-
-const suppliers = ref<any[]>([])
-const searchTerm = ref('')
-const selectedSupplier = ref<any | null>(null)
+import DeleteConfirmModal from './DeleteConfirmModal.vue'
+const hotels = ref<any[]>([])
 const showDetailPopup = ref(false)
-const showEditPopup = ref(false)
-const fetchInfoHotel = async () => {
+const selectedSupplier = ref<any>(null)
+const currentPage = ref(1)
+const pageSize = ref(10)
+const totalElements = ref(0)
+const fetchInfoHotel = async (page = 1) => {
   try {
-    const res = await getManagementSupplier()
-   console.log('====>',res);
-   
-    suppliers.value = res.content
+    const res = await getManagementSupplier(page - 1)
+    hotels.value = res.content
+    totalElements.value = res.page.totalElements
+    pageSize.value = res.page.size
+    currentPage.value = res.page.number + 1
   } catch (error) {
     console.error('Lỗi khi gọi API nhà cung cấp:', error)
   }
 }
 
-onMounted(() => {
-  fetchInfoHotel()
-})
-const openDetail = async (supplierId: number) => {
+const handleView = async (id: number) => {
   try {
-    const supplier = await getSupplierByIdApi(supplierId)
-    console.log(supplier);
-
-    selectedSupplier.value = supplier
+    const res = await getSupplierByIdApi(id)
+    selectedSupplier.value = res
     showDetailPopup.value = true
   } catch (error) {
-    console.error('Lỗi khi lấy thông tin nhà cung cấp:', error)
+    console.error('Lỗi khi lấy chi tiết nhà cung cấp:', error)
   }
 }
-const openEditPopup = async (supplierId: number) => {
-  try {
-    const supplier = await getSupplierByIdApi(supplierId)
-    selectedSupplier.value = supplier
-    showEditPopup.value = true
-  } catch (error) {
-    console.error('Lỗi khi lấy thông tin nhà cung cấp:', error)
-  }
-}
-const formattedTableData = computed(() => {
-  return suppliers.value.map((item, index) => ({
-    stt: index + 1,
-    ten: item.name,
-    hinhAnh: item.image || 'null',
-    diaChi: item.address,
-    sdt: item.hotline,
-    moTa: item.description || 'Chưa có mô tả',
-    hotel_id: item.hotel_id,
-    raw: item
-  }))
-})
-
 const showDeleteModal = ref(false)
 const deleteId = ref<number | null>(null)
-
 const confirmDelete = (id: number) => {
   deleteId.value = id
   showDeleteModal.value = true
 }
-
 const handleDelete = async () => {
-  if (!deleteId.value) return
+  if (deleteId.value === null) return
+
   try {
     await deleteSupplierApi(deleteId.value)
     await fetchInfoHotel()
-  } catch (error) {
-    console.error('Lỗi khi xóa nhà cung cấp:', error)
-  } finally {
     showDeleteModal.value = false
     deleteId.value = null
+  } catch (error) {
+    console.error('Lỗi khi xóa nhà cung cấp:', error)
   }
 }
-
-const filteredData = computed(() => {
-  if (!searchTerm.value) return suppliers.value
-  return suppliers.value.filter(item =>
-    item.ten.toLowerCase().includes(searchTerm.value.toLowerCase())
-  )
+onMounted(() => {
+  fetchInfoHotel()
 })
 </script>

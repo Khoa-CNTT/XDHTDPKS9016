@@ -7,7 +7,7 @@
         Admin
       </RouterLink> -->
 
-      <nav class="flex-1 px-2 space-y-1">
+      <nav class="flex-1 px-2 space-y-1 mt-6">
         <router-link to="/admin/manage-providers"
           class="flex items-center gap-2 px-4 py-3 rounded-lg transition-colors duration-300 hover:bg-blue-600"
           :class="$route.path === '/admin/manage-providers' ? 'bg-blue-500' : ''">
