@@ -1,6 +1,8 @@
 package com.tourism.booking.exception;
 
 import com.tourism.booking.dto.ApiResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -16,6 +18,8 @@ import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionHandle {
+
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandle.class);
 
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<ApiResponse> handleApiException(ApiException e) {
@@ -42,6 +46,7 @@ public class GlobalExceptionHandle {
                 .code(4000)
                 .build());
     }
+
     // 2) Bắt riêng MissingServletRequestPartException (thiếu part 'file')
     @ExceptionHandler(MissingServletRequestPartException.class)
     public ResponseEntity<ApiResponse> handleMissingPart(MissingServletRequestPartException e) {
@@ -52,12 +57,37 @@ public class GlobalExceptionHandle {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
-    // 3) (Tùy chọn) Bắt chung mọi Exception khác
+    // 3) Handle payment-related exceptions specifically
+    @ExceptionHandler(PaymentProcessingException.class)
+    public ResponseEntity<ApiResponse> handlePaymentException(PaymentProcessingException e) {
+        logger.error("Payment processing error: {}", e.getMessage(), e);
+        ApiResponse body = ApiResponse.builder()
+                .code(5001)
+                .message(e.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
+    }
+
+    // 4) Handle booking-related exceptions
+    @ExceptionHandler(BookingProcessingException.class)
+    public ResponseEntity<ApiResponse> handleBookingException(BookingProcessingException e) {
+        logger.error("Booking processing error: {}", e.getMessage(), e);
+        ApiResponse body = ApiResponse.builder()
+                .code(5002)
+                .message(e.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
+    }
+
+    // 5) Handle all other exceptions with detailed logging
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse> handleAllOtherExceptions(Exception e) {
+        logger.error("Unexpected error: {}", e.getMessage(), e);
+        String errorMessage = String.format("Có lỗi xảy ra trên server: %s - %s",
+                e.getClass().getSimpleName(), e.getMessage());
         ApiResponse body = ApiResponse.builder()
                 .code(5000)
-                .message("Có lỗi xảy ra trên server.")
+                .message(errorMessage)
                 .build();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
