@@ -3,7 +3,8 @@
 import { $api } from '@/api/ofetch'
 import { GetService , AddService, Service,NewService,AddServiceResponse } from "@/types/supplier"
 import { RoomTypeResponse,RoomTypeSummary,RoomType,RoomTypeDetail,UpdateRoomTypeBody} from "@/types/supplier"
-import { HotelInfo,InfoHotel} from "@/types/supplier"
+import { HotelInfo,InfoHotel,HotelProfile, HotelDetail} from "@/types/supplier"
+import { IBookingList} from "@/types/supplier"
 //service
 export const getServiceListApi = async (): Promise<GetService[]> => {
   return $api('/management-service', { method: 'GET' }, true);
@@ -97,5 +98,21 @@ export const updateRoomTypeApi = async (
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(roomTypeData),
+  }, true);
+};
+
+export const getAllBookings = async (): Promise<IBookingList[]> => {
+  return $api('/hotel-info', { method: 'GET' }, true);
+};
+export const getComment = async (): Promise<Comment[]> => {
+  const response = await $api('/hotel-info', { method: 'GET' }, true);
+  return response as Comment[];
+};
+
+//create info hotel
+export const createHotel = async (roomTypeData: HotelProfile): Promise<HotelDetail> => {
+  return $api('/management-supplier', {
+    method: 'POST',
+    body: roomTypeData,
   }, true);
 };

@@ -1,6 +1,13 @@
 <template>
   <div class="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
-    <div class="bg-white p-6 rounded-lg w-full max-w-5xl max-h-[90vh] overflow-y-auto shadow-lg">
+   <div class="relative bg-white p-6 rounded-lg w-full max-w-5xl max-h-[90vh] overflow-y-auto shadow-lg">
+      <button
+        class="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-2xl font-bold focus:outline-none"
+        @click="$emit('close')"
+        aria-label="Đóng"
+      >
+        &times;
+      </button>
       <!-- Tiêu đề -->
       <h2 class="text-2xl font-semibold mb-4 text-blue-600">Chi tiết khách sạn</h2>
 

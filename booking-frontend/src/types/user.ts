@@ -1,8 +1,8 @@
-import { number } from "yup"
+import { number } from 'yup'
 export interface User {
-  id: number;
-  username: string;
-  role: string;
+  id: number
+  username: string
+  role: string
 }
 export interface IUser {
   id: string
@@ -27,47 +27,47 @@ export interface Member {
   permission: 'OWNER' | 'MEMBER'
 }
 export interface UserProfile {
-  user_id: number;
-  full_name: string;
-  gender: string;
-  address: string;
-  email: string;
-  phone: string;
-  birth_date: string;
-  status: string | number;
-  username: string;
-  role: string;
+  user_id: number
+  full_name: string
+  gender: string
+  address: string
+  email: string
+  phone: string
+  birth_date: string
+  status: string | number
+  username: string
+  role: string
 }
 export interface UserInfo {
-  user_id: number;
-  full_name: string | null;
-  gender: string | null;
-  address: string | null;
-  email: string;
-  phone: string | null;
-  birth_date: string | null;
-  status: string |  number;
-  username: string;
-  role:string;
+  user_id: number
+  full_name: string | null
+  gender: string | null
+  address: string | null
+  email: string
+  phone: string | null
+  birth_date: string | null
+  status: string | number
+  username: string
+  // role?: string
 }
 export interface CreateUserRequest {
-  full_name: string;
-  gender: string;
-  address: string;
-  email: string;
-  phone: string;
-  birth_date: string; 
-  status: string;
+  full_name: string
+  gender: string
+  address: string
+  email: string
+  phone: string
+  birth_date: string
+  status: string
 }
 
 export interface CreateUserResponse {
-  user_id: number;
-  full_name: string;
-  gender: string;
-  address: string;
-  email: string;
-  phone: string;
-  birth_date: string;
-  status: string;
-  username: string;
+  user_id: number
+  full_name: string
+  gender: string
+  address: string
+  email: string
+  phone: string
+  birth_date: string
+  status: string
+  username: string
 }

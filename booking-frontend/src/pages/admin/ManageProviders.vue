@@ -4,8 +4,9 @@
       <h3 class="text-lg font-semibold text-blue-700 flex">
         <Icon icon="mdi:tools" class="mr-2 text-xl" width="24" height="24" /> Quản lý khách sạn
       </h3>
-      <button class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition flex items-center">
-        <Icon icon="mdi:plus-box" class="text-xl pr-2" width="24" height="24" /> Thêm dịch vụ mới
+      <button @click="showCreateHotel = true"
+        class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition flex items-center">
+        <Icon icon="mdi:plus-box" class="text-xl pr-2" width="24" height="24" /> Thêm mới khách sạn
       </button>
     </div>
     <!-- Bảng danh sách khách sạn -->
@@ -62,8 +63,8 @@
             <td class="px-4 py-2 text-center">
               <div class="flex justify-center gap-2 flex">
                 <!-- Nút Xác nhận (với Icon) -->
-                <button class="p-2 bg-green-500 hover:bg-green-600 text-white rounded transition">
-                  <Icon icon="mdi:check-circle" width="20" height="20" class="mr-1" />
+                <button @click="openEditModal" class="p-2 bg-green-500 hover:bg-green-600 text-white rounded transition">
+                  <Icon icon="mdi:pencil" width="20" height="20" class="mr-1" />
 
                 </button>
 
@@ -90,8 +91,10 @@
           @page-change="fetchInfoHotel" />
       </div>
     </div>
+    <CreateHotel v-if="showCreateHotel" @close="showCreateHotel = false" @refresh="fetchInfoHotel" />
     <DeleteConfirmModal v-if="showDeleteModal" @cancel="showDeleteModal = false" @confirm="handleDelete" />
     <SupplierDetailPopup v-if="showDetailPopup" :supplier="selectedSupplier" @close="showDetailPopup = false" />
+    <EditSupplierPopup v-if="showEditModal" :supplier="selectedHotelToEdit" @close="showEditModal = false" />
   </div>
 </template>
 
@@ -101,12 +104,17 @@ import Pagination from '@/components/base/Pagination.vue'
 import SupplierDetailPopup from './SupplierDetailPopup.vue'
 import { getManagementSupplier, getSupplierByIdApi, deleteSupplierApi } from '@/services/admin'
 import DeleteConfirmModal from './DeleteConfirmModal.vue'
+import EditSupplierPopup from './EditSupplierPopup.vue'
+import CreateHotel from './CreateHotel.vue'
 const hotels = ref<any[]>([])
 const showDetailPopup = ref(false)
 const selectedSupplier = ref<any>(null)
 const currentPage = ref(1)
 const pageSize = ref(10)
 const totalElements = ref(0)
+const showCreateHotel = ref(false)
+const showEditModal = ref(false)
+const selectedHotelToEdit = ref<any>(null)
 const fetchInfoHotel = async (page = 1) => {
   try {
     const res = await getManagementSupplier(page - 1)
@@ -146,6 +154,11 @@ const handleDelete = async () => {
     console.error('Lỗi khi xóa nhà cung cấp:', error)
   }
 }
+const openEditModal = (hotel: any) => {
+  selectedHotelToEdit.value = hotel
+  showEditModal.value = true
+}
+
 onMounted(() => {
   fetchInfoHotel()
 })

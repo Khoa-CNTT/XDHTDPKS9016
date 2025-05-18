@@ -18,49 +18,53 @@
         <div class="flex-1 flex flex-col justify-center items-center bg-white p-10">
           <h2 class="text-3xl font-semibold mb-6 uppercase">Đăng ký</h2>
 
-          <form class="w-full max-w-md space-y-5" @submit.prevent="handleRegister">
+          <form class="w-full max-w-md space-y-5" @submit.prevent="handleRegister" novalidate>
+            <div>
+              <label class="block text-lg font-bold mb-1" for="username">Tên người dùng</label>
+              <input
+                id="username"
+                v-model="formData.username"
+                @blur="validateField('username')"
+                type="text"
+                placeholder="Enter your username"
+                class="w-full p-4 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400" />
+              <p v-if="errors.username" class="text-red-600 text-sm mt-1">{{ errors.username }}</p>
+            </div>
 
             <div>
-              <label class="block text-lg font-bold mb-1">Tên người dùng</label>
-              <input v-model="formData.username" type="text" placeholder="Enter your username" required
+              <label class="block text-lg font-bold mb-1" for="email">Email</label>
+              <input
+                id="email"
+                v-model="formData.email"
+                @blur="validateField('email')"
+                type="email"
+                placeholder="Enter your email"
                 class="w-full p-4 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400" />
+              <p v-if="errors.email" class="text-red-600 text-sm mt-1">{{ errors.email }}</p>
             </div>
 
             <div>
-              <label class="block text-lg font-bold mb-1">Email</label>
-              <input v-model="formData.email" type="email" placeholder="Enter your email" required
+              <label class="block text-lg font-bold mb-1" for="password">Mật khẩu</label>
+              <input
+                id="password"
+                v-model="formData.password"
+                @blur="validateField('password')"
+                type="password"
+                placeholder="6+ characters"
                 class="w-full p-4 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400" />
+              <p v-if="errors.password" class="text-red-600 text-sm mt-1">{{ errors.password }}</p>
             </div>
 
-            <div>
-              <label class="block text-lg font-bold mb-1">Mật khẩu</label>
-              <input v-model="formData.password" type="password" placeholder="6+ characters" required
-                class="w-full p-4 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400" />
-
-             
-            </div>
-
-            <div class="flex items-center my-5">
-              <div class="flex-1 border-b border-gray-300"></div>
-              <span class="px-4 text-gray-600 font-bold">OR</span>
-              <div class="flex-1 border-b border-gray-300"></div>
-            </div>
-
-            <div class="flex justify-around gap-5">
-              <button type="button"
-                class="flex-1 p-4 bg-blue-600 text-white rounded hover:bg-blue-700 transition">Facebook</button>
-              <button type="button"
-                class="flex-1 p-4 bg-red-500 text-white rounded hover:bg-red-600 transition">Google</button>
-            </div>
-
-            <button type="submit"
-              class="w-full p-5 bg-blue-500 text-white rounded text-lg hover:bg-blue-600 transition">
+            <button
+              type="submit"
+              :disabled="hasErrors"
+              class="w-full p-5 bg-blue-500 text-white rounded text-lg hover:bg-blue-600 transition disabled:opacity-50 disabled:cursor-not-allowed">
               Đăng ký
             </button>
 
             <p class="text-center mt-5">
               Bạn đã có tài khoản chưa?
-              <RouterLink href="#" to="/login" class="text-blue-500 hover:underline">Đăng nhập</RouterLink>
+              <RouterLink to="/login" class="text-blue-500 hover:underline">Đăng nhập</RouterLink>
               ngay.
             </p>
           </form>
@@ -70,50 +74,63 @@
   </div>
 </template>
 
-<script setup>
-import { registerApi } from '@/services/auth';
-import { useRouter } from 'vue-router';
+<script setup lang="ts">
+import { reactive, computed } from 'vue'
+import { registerApi } from '@/services/auth'
+import { useRouter } from 'vue-router'
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
-import eyeIcon from '@/assets/icons/svg/i-eye.svg';
-const emit = defineEmits(['close', 'switchToLogin']);
-const router = useRouter();
-// const togglePasswordVisibility = () => {
-//   passwordVisible.value = !passwordVisible.value;
-// };
-function goToLoginPage() {
-  router.push({ name: 'login' });
+import { validEmail, validUsername, validPass } from '@/utils/validate'
+
+const emit = defineEmits(['close', 'switchToLogin'])
+const router = useRouter()
+
+const formData = reactive({
+  email: '',
+  username: '',
+  password: ''
+})
+
+const errors = reactive({
+  email: '',
+  username: '',
+  password: ''
+})
+
+const hasErrors = computed(() => Object.values(errors).some(msg => msg !== ''))
+
+function validateField(field: keyof typeof formData) {
+  let result
+  if (field === 'email') {
+    result = validEmail(formData.email)
+    errors.email = result.check ? '' : result.mess
+  } else if (field === 'username') {
+    result = validUsername(formData.username)
+    errors.username = result.check ? '' : result.mess
+  } else if (field === 'password') {
+    result = validPass(formData.password)
+    errors.password = result.check ? '' : result.mess
+  }
 }
 
-const formData = ref({
-  email: '',
-  password: '',
-  username: '',
-});
+async function handleRegister() {
+  // Validate all
+  validateField('username')
+  validateField('email')
+  validateField('password')
 
-const errorMessage = ref('');
+  if (hasErrors.value) return
 
-const handleRegister = async () => {
   try {
-    const response = await registerApi(formData.value)
-    console.log('Đăng ký thành công:', response)
-
-    toast.success('Đăng ký thành công!', {
-      autoClose: 10000,
-      position: 'top-right',
-    })
-
+    await registerApi(formData)
+    toast.success('Đăng ký thành công!', { autoClose: 10000, position: 'top-right' })
     setTimeout(() => {
       emit('close')
       router.push({ name: 'login' })
     }, 3000)
   } catch (error) {
     console.error('Lỗi đăng ký:', error)
-    errorMessage.value = 'Đã có lỗi xảy ra, vui lòng thử lại!'
-    toast.error('Đăng ký thất bại! Vui lòng kiểm tra lại thông tin.', {
-      autoClose: 10000,
-      position: 'top-right',
-    })
+    toast.error('Đăng ký thất bại! Vui lòng kiểm tra lại thông tin.', { autoClose: 10000, position: 'top-right' })
   }
 }
 </script>

@@ -5,6 +5,8 @@ import com.tourism.booking.dto.booking.BookedRoomDTO;
 import com.tourism.booking.dto.booking.BookingResponseDTO;
 import com.tourism.booking.dto.booking.PaymentRequestDTO;
 import com.tourism.booking.dto.booking.PaymentResponseDTO;
+import com.tourism.booking.exception.BookingProcessingException;
+import com.tourism.booking.exception.PaymentProcessingException;
 import com.tourism.booking.model.*;
 import com.tourism.booking.repository.IPaymentRepository;
 import com.tourism.booking.repository.IRoomRepository;
@@ -18,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.annotation.Isolation;
@@ -27,6 +30,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.ui.Model;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
@@ -39,7 +43,7 @@ import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@RestController
+@Controller
 @RequestMapping("${api.prefix}/payment")
 @CrossOrigin(origins = "*")
 public class PaymentController {
@@ -65,6 +69,7 @@ public class PaymentController {
     private IRoomRepository roomRepository;
 
     @GetMapping("/booking-payment")
+    @ResponseBody
     public ResponseEntity<String> createBookingPayment(@RequestParam("bookingId") Long bookingId) {
         logger.info("Creating payment URL for booking: {}", bookingId);
 
@@ -97,17 +102,49 @@ public class PaymentController {
         }
     }
 
-    @GetMapping(value = "/payment-callback", produces = "text/html")
+    @GetMapping(value = "/payment-callback")
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
-    public ModelAndView paymentCallback(
+    public String paymentCallback(
             @RequestParam Map<String, String> queryParams,
             @RequestParam(value = "bookingId", required = false) Long bookingId,
-            @RequestParam(value = "userId", required = false) Long userId) {
+            @RequestParam(value = "userId", required = false) Long userId,
+            Model model) {
 
         logger.info("Payment callback received for booking {}: {}", bookingId, queryParams);
-        ModelAndView modelAndView = new ModelAndView();
 
         try {
+            // 2. Check if transaction already processed
+            String vnp_TransactionNo = queryParams.get("vnp_TransactionNo");
+            if (isTransactionProcessed(vnp_TransactionNo)) {
+                logger.info("Transaction already processed: {}", vnp_TransactionNo);
+                try {
+                    // Get booking information for the success page
+                    BookingResponseDTO booking = bookingService.getBookingById(bookingId);
+                    if (booking != null) {
+                        model.addAttribute("contactName", booking.getContactName());
+                        model.addAttribute("amount", Long.parseLong(queryParams.get("vnp_Amount")) / 100);
+                        model.addAttribute("paymentTime",
+                                new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
+
+                        // Add hotel information if available
+                        if (booking.getHotel() != null) {
+                            model.addAttribute("hotelName", booking.getHotel().getName());
+                            model.addAttribute("hotelAddress", booking.getHotel().getAddress());
+                        } else {
+                            model.addAttribute("hotelName", "Không có thông tin");
+                            model.addAttribute("hotelAddress", "Không có thông tin");
+                        }
+                        return "bookingsuccess";
+                    } else {
+                        throw new BookingProcessingException(
+                                "Không thể tìm thấy thông tin đặt phòng cho giao dịch đã xử lý. BookingId: "
+                                        + bookingId);
+                    }
+                } catch (Exception e) {
+                    throw new BookingProcessingException("Lỗi khi lấy thông tin đặt phòng cho giao dịch đã xử lý", e);
+                }
+            }
+
             // 1. Validate required parameters
             String[] requiredParams = {
                     "vnp_Amount",
@@ -125,22 +162,8 @@ public class PaymentController {
 
             for (String param : requiredParams) {
                 if (!queryParams.containsKey(param)) {
-                    logger.error("Missing required parameter: {}", param);
-                    modelAndView.setViewName("error");
-                    modelAndView.addObject("error", "Missing required parameter: " + param);
-                    return modelAndView;
+                    throw new PaymentProcessingException("Thiếu thông tin thanh toán bắt buộc: " + param);
                 }
-            }
-
-            // 2. Check if transaction already processed
-            String vnp_TransactionNo = queryParams.get("vnp_TransactionNo");
-            if (isTransactionProcessed(vnp_TransactionNo)) {
-                logger.info("Transaction already processed: {}", vnp_TransactionNo);
-                modelAndView.setViewName("bookingsuccess");
-                modelAndView.addObject("bookingId", bookingId);
-                modelAndView.addObject("amount", Long.parseLong(queryParams.get("vnp_Amount")) / 100);
-                modelAndView.addObject("paymentTime", new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
-                return modelAndView;
             }
 
             // 3. Process based on response code
@@ -148,157 +171,95 @@ public class PaymentController {
             String vnp_TransactionStatus = queryParams.get("vnp_TransactionStatus");
 
             // Log transaction details
-            logger.info("Processing transaction: ResponseCode={}, Status={}, Amount={}",
-                    vnp_ResponseCode, vnp_TransactionStatus, queryParams.get("vnp_Amount"));
+            logger.info("Processing transaction: ResponseCode={}, Status={}, Amount={}, BookingId={}",
+                    vnp_ResponseCode, vnp_TransactionStatus, queryParams.get("vnp_Amount"), bookingId);
 
             if ("00".equals(vnp_ResponseCode) && "00".equals(vnp_TransactionStatus)) {
-                // 1. Get the temporary booking with services
-                BookingResponseDTO tempBookingDTO = bookingService.getBookingById(bookingId);
-                if (tempBookingDTO == null) {
-                    logger.error("Temporary booking not found: {}", bookingId);
-                    modelAndView.setViewName("error");
-                    modelAndView.addObject("error", "Booking not found");
-                    return modelAndView;
-                }
-
-                // Get services before finalizing
-                Set<Services> services = bookingService.getServicesByBookingId(bookingId);
-                logger.info("Retrieved {} services for booking {}", services.size(), bookingId);
-
-                // Lưu thông tin phòng từ temporary booking để dùng sau
-                List<BookedRoomDTO> roomsFromTemp = tempBookingDTO.getRooms();
-                logger.info("Saved {} room selections from temporary booking",
-                        roomsFromTemp != null ? roomsFromTemp.size() : 0);
-
-                // 2. Create a mock Principal with userId
-                Principal mockPrincipal = createMockPrincipal(userId);
-
-                // 3. Finalize booking with mock Principal
-                // This step will save the booking and create a bill record
-                BookingResponseDTO finalizedBooking = bookingService.finalizeBooking(bookingId, mockPrincipal);
-                logger.info("Booking finalized successfully: {}", finalizedBooking.getBookingId());
-
-                // 4. Get the finalized booking entity and update its status
-                Booking booking = bookingService.getBookingEntityById(finalizedBooking.getBookingId());
-                booking.setStatus("PAID");
-
-                // 5. Explicitly save services to booking_service junction table
-                if (services != null && !services.isEmpty()) {
-                    booking.setServices(services);
-                    logger.info("Added {} services to finalized booking", services.size());
-                }
-
-                // 6. Ensure booking rooms are properly saved
-                if (booking.getBookingRooms() == null || booking.getBookingRooms().isEmpty()) {
-                    logger.warn("No booking rooms found for booking {}, creating simple booking room records",
-                            bookingId);
-
-                    // Khởi tạo collection nếu chưa có
-                    if (booking.getBookingRooms() == null) {
-                        booking.setBookingRooms(new HashSet<>());
-                    }
-
-                    // Đơn giản hoá: Tạo một booking_room giả lập nếu không thể khôi phục
-                    // Đây là giải pháp tạm thời, trong thực tế cần triển khai đầy đủ
-                    try {
-                        // Tìm một room bất kỳ cho demo - trong thực tế cần tìm room phù hợp
-                        List<Room> availableRooms = roomRepository.findAll();
-
-                        if (!availableRooms.isEmpty()) {
-                            Room room = availableRooms.get(0);
-                            BookingRoom bookingRoom = new BookingRoom();
-                            bookingRoom.setBooking(booking);
-                            bookingRoom.setRoom(room);
-                            System.out.println(bookingRoom.getRoom().getId_room());
-                            bookingRoom.setRoomTypeId(room.getRoom_type().getRoom_type_id());
-                            bookingRoom.setNumberOfRooms(1); // Default value
-                            System.out.println(bookingRoom.getNumberOfRooms());
-                            // Thêm vào collection hiện có
-                            booking.getBookingRooms().add(bookingRoom);
-                            logger.info("Created simple booking room record: roomId={}, roomTypeId={}",
-                                    room.getId_room(), room.getRoom_type().getRoom_type_id());
-                        } else {
-                            logger.error("Cannot create booking room - no rooms available");
-                        }
-                    } catch (Exception e) {
-                        logger.error("Error creating booking room: {}", e.getMessage());
-                        // Tiếp tục thực hiện mà không có booking room
-                    }
-                } else {
-                    System.out.println("ddax den day");
-                    System.out.println("Booking already processed: " + bookingId);
-                    logger.info("Booking has {} rooms properly assigned", booking.getBookingRooms().size());
-                }
-
-                // 7. Save the updated booking
                 try {
-                    booking = bookingService.saveBooking(booking);
-                    logger.info("Booking saved with status PAID and services attached");
+                    // 1. Get the temporary booking with services
+                    BookingResponseDTO tempBookingDTO = bookingService.getBookingById(bookingId);
+                    if (tempBookingDTO == null) {
+                        throw new BookingProcessingException("Không tìm thấy thông tin đặt phòng: " + bookingId);
+                    }
+
+                    // Get services before finalizing
+                    Set<Services> services = bookingService.getServicesByBookingId(bookingId);
+                    logger.info("Retrieved {} services for booking {}", services.size(), bookingId);
+
+                    // 2. Create a mock Principal with userId
+                    Principal mockPrincipal = createMockPrincipal(userId);
+
+                    // 3. Finalize booking with mock Principal
+                    BookingResponseDTO finalizedBooking = bookingService.finalizeBooking(bookingId, mockPrincipal);
+                    logger.info("Booking finalized successfully: {}", finalizedBooking.getBookingId());
+
+                    // 4. Get the finalized booking entity and update its status
+                    Booking booking = bookingService.getBookingEntityById(finalizedBooking.getBookingId());
+                    booking.setStatus("PAID");
+
+                    // 5. Save services if any
+                    if (services != null && !services.isEmpty()) {
+                        booking.setServices(services);
+                        logger.info("Added {} services to finalized booking", services.size());
+                    }
+
+                    // 6. Save the updated booking
+                    try {
+                        booking = bookingService.saveBooking(booking);
+                        logger.info("Booking saved with status PAID and services attached");
+                    } catch (Exception e) {
+                        throw new BookingProcessingException("Lỗi khi lưu thông tin đặt phòng", e);
+                    }
+
+                    // 7. Create payment record
+                    try {
+                        PaymentRequestDTO paymentRequest = createPaymentRequest(finalizedBooking, queryParams);
+                        paymentRequest.setStatus("SUCCESS");
+                        paymentRequest.setPaymentDate(LocalDate.now());
+                        paymentRequest.setPaymentTime(LocalTime.now());
+                        paymentRequest.setBookingId(booking.getId_booking());
+
+                        PaymentResponseDTO payment = paymentService.processPayment(paymentRequest);
+                        logger.info("Payment processed successfully: {}", payment.getPaymentId());
+                    } catch (Exception e) {
+                        logger.error("Error processing payment record: {}", e.getMessage(), e);
+                        // Continue to show success page even if payment record creation fails
+                    }
+
+                    // 8. Prepare success view
+                    model.addAttribute("contactName", finalizedBooking.getContactName());
+                    model.addAttribute("amount", Long.parseLong(queryParams.get("vnp_Amount")) / 100);
+                    model.addAttribute("paymentTime", new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
+
+                    if (finalizedBooking.getHotel() != null) {
+                        model.addAttribute("hotelName", finalizedBooking.getHotel().getName());
+                        model.addAttribute("hotelAddress", finalizedBooking.getHotel().getAddress());
+                    } else {
+                        model.addAttribute("hotelName", "Không có thông tin");
+                        model.addAttribute("hotelAddress", "Không có thông tin");
+                    }
+                    return "bookingsuccess";
+
                 } catch (Exception e) {
-                    logger.error("Error saving booking: {}", e.getMessage(), e);
-                    modelAndView.setViewName("error");
-                    modelAndView.addObject("error", "Error saving booking: " + e.getMessage());
-                    return modelAndView;
+                    throw new PaymentProcessingException("Lỗi trong quá trình xử lý thanh toán: " + e.getMessage(), e);
                 }
-
-                // 8. Create payment record - this should save to the payment table
-                PaymentRequestDTO paymentRequest = createPaymentRequest(finalizedBooking, queryParams);
-                paymentRequest.setStatus("SUCCESS");
-                paymentRequest.setPaymentDate(LocalDate.now());
-                paymentRequest.setPaymentTime(LocalTime.now());
-
-                // Đảm bảo bookingId được thiết lập đúng
-                logger.info("Setting bookingId in PaymentController: {}", booking.getId_booking());
-                System.out.println("Setting bookingId in PaymentController: " + booking.getId_booking());
-                paymentRequest.setBookingId(booking.getId_booking());
-
-                PaymentResponseDTO payment = paymentService.processPayment(paymentRequest);
-                logger.info("Payment processed successfully: {}", payment.getPaymentId());
-
-                // Đảm bảo payment có bookingId trong response
-                if (payment.getBookingId() == null) {
-                    payment.setBookingId(finalizedBooking.getBookingId());
-                    logger.info("Fixed missing bookingId in payment response: {}", payment.getBookingId());
-                }
-
-                // 9. Get updated booking with all relations for response
-                BookingResponseDTO updatedBooking = bookingService.getBookingById(finalizedBooking.getBookingId());
-
-                modelAndView.setViewName("bookingsuccess");
-                modelAndView.addObject("contactName", updatedBooking.getContactName());
-                modelAndView.addObject("amount", Long.parseLong(queryParams.get("vnp_Amount")) / 100);
-                modelAndView.addObject("paymentTime", new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
-
-                // Add hotel information from the booking
-                if (updatedBooking != null && updatedBooking.getRooms() != null
-                        && !updatedBooking.getRooms().isEmpty()) {
-                    modelAndView.addObject("hotelName", updatedBooking.getHotel().getName());
-                    modelAndView.addObject("hotelAddress", updatedBooking.getHotel().getAddress());
-
-                } else {
-                    logger.warn("No hotel information available for booking: {}", bookingId);
-                    modelAndView.addObject("hotelName", "Không có thông tin");
-                    modelAndView.addObject("hotelAddress", "Không có thông tin");
-                }
-
-                return modelAndView;
             } else if ("24".equals(vnp_ResponseCode)) {
-                logger.info("Payment cancelled by user for booking: {}", bookingId);
-                modelAndView.setViewName("error");
-                modelAndView.addObject("error", "Payment was cancelled by user");
-                return modelAndView;
+                model.addAttribute("error", "Giao dịch đã bị hủy bởi người dùng");
+                return "error";
             } else {
-                logger.warn("Payment failed with code: {} and status: {} for booking: {}",
-                        vnp_ResponseCode, vnp_TransactionStatus, bookingId);
-                modelAndView.setViewName("error");
-                modelAndView.addObject("error", "Payment failed with code: " + vnp_ResponseCode);
-                return modelAndView;
+                model.addAttribute("error", "Giao dịch thất bại với mã lỗi: " + vnp_ResponseCode);
+                return "error";
             }
+
+        } catch (PaymentProcessingException | BookingProcessingException e) {
+            logger.error("Payment/Booking processing error: {}", e.getMessage(), e);
+            model.addAttribute("error", e.getMessage());
+            return "error";
         } catch (Exception e) {
-            logger.error("Error processing payment callback: {}", e.getMessage(), e);
-            modelAndView.setViewName("error");
-            modelAndView.addObject("error", "Error processing payment: " + e.getMessage());
-            return modelAndView;
+            logger.error("Unexpected error in payment callback: {}", e.getMessage(), e);
+            model.addAttribute("error",
+                    "Đã xảy ra lỗi không mong muốn trong quá trình xử lý thanh toán: " + e.getMessage());
+            return "error";
         }
     }
 

@@ -27,6 +27,9 @@ public enum ErrorCode {
     BOOKING_NOT_FOUND(40402, "Booking not found", HttpStatus.NOT_FOUND),
     ROOM_TYPE_NOT_FOUND(40403, "Room type not found", HttpStatus.NOT_FOUND),
     INSUFFICIENT_ROOMS_AVAILABLE(40001, "Insufficient rooms available for the selected dates", HttpStatus.BAD_REQUEST),
+    ROOM_NOT_FOUND(40404, "Room not found", HttpStatus.NOT_FOUND),
+    ROOM_TYPE_MISMATCH(40405, "Room does not belong to the specified room type", HttpStatus.NOT_FOUND),
+    ROOM_NOT_AVAILABLE(40001, "Room is not available for the selected dates", HttpStatus.BAD_REQUEST),
     ;
 
     Integer code;

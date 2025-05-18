@@ -26,6 +26,9 @@ public class Room {
     @Column(name = "id_room")
     Long id_room;
 
+    @Column(name = "number_rooms", nullable = false)
+    Integer number_rooms;
+
     @Column(name = "number_bed", nullable = false)
     int number_bed;
 
