@@ -215,7 +215,7 @@ public class PaymentServiceImpl implements IPaymentService {
         // Set status display
         if ("SUCCESS".equals(payment.getStatus()) || "PROCESSED".equals(payment.getStatus())) {
             dto.setStatusDisplay("Thành công");
-        } else if ("PENDING".equals(payment.getStatus())) {
+        } else if ("PAID".equals(payment.getStatus())) {
             dto.setStatusDisplay("Đang xử lý");
         } else if ("FAILED".equals(payment.getStatus())) {
             dto.setStatusDisplay("Thất bại");

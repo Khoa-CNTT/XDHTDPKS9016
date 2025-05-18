@@ -12,7 +12,7 @@
           class="flex items-center gap-2 px-4 py-3 rounded-lg transition-colors duration-300 hover:bg-blue-600"
           :class="$route.path === '/admin/manage-providers' ? 'bg-blue-500' : ''">
           <Icon icon="carbon:service-desk" width="24" height="24" />
-          <span>Quản lý nhà cung cấp</span>
+          <span>Quản lý khách sạn</span>
         </router-link>
 
         <router-link to="/admin/manage-user"
