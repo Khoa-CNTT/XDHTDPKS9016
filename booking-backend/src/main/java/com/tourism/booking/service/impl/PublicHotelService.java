@@ -58,6 +58,8 @@ public class PublicHotelService implements IPublicHotelService {
                                                 .build())
                                         .collect(Collectors.toList());
 
+                                String status = availableRooms.isEmpty() ? "Hết phòng" : "Còn phòng";
+
                                 return RoomTypePublicDTO.builder()
                                         .room_type_id(rt.getRoom_type_id())
                                         .type_name(rt.getType_name())
@@ -65,6 +67,7 @@ public class PublicHotelService implements IPublicHotelService {
                                         .description(rt.getDescription())
                                         .room_image(rt.getRoom_image())
                                         .rooms(roomsDto)
+                                        .status(status)
                                         .build();
                             })
                             .collect(Collectors.toList());
@@ -82,6 +85,7 @@ public class PublicHotelService implements IPublicHotelService {
                             .build();
                 });
     }
+
 
     @Override
     public Page<HotelPublicDTO> getHotels(Pageable pageable) {

@@ -4,6 +4,7 @@ import com.tourism.booking.model.RoomType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -48,4 +49,9 @@ public interface IRoomTypeRepository extends JpaRepository<RoomType, Long> {
 
     @Query("SELECT rt FROM RoomType rt WHERE rt.hotel.hotel_id = :hotelId")
     List<RoomType> findAllRoomTypesByHotelId(@Param("hotelId") Long hotelId);
+
+    @Modifying
+    @Query("UPDATE RoomType rt SET rt.number_room = :count WHERE rt.room_type_id = :roomTypeId")
+    void updateNumberRoom(@Param("roomTypeId") Long roomTypeId, @Param("count") int count);
+
 }

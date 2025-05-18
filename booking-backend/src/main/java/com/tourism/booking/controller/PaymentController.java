@@ -209,9 +209,10 @@ public class PaymentController {
                             BookingRoom bookingRoom = new BookingRoom();
                             bookingRoom.setBooking(booking);
                             bookingRoom.setRoom(room);
+                            System.out.println(bookingRoom.getRoom().getId_room());
                             bookingRoom.setRoomTypeId(room.getRoom_type().getRoom_type_id());
                             bookingRoom.setNumberOfRooms(1); // Default value
-
+                            System.out.println(bookingRoom.getNumberOfRooms());
                             // Thêm vào collection hiện có
                             booking.getBookingRooms().add(bookingRoom);
                             logger.info("Created simple booking room record: roomId={}, roomTypeId={}",
@@ -224,6 +225,8 @@ public class PaymentController {
                         // Tiếp tục thực hiện mà không có booking room
                     }
                 } else {
+                    System.out.println("ddax den day");
+                    System.out.println("Booking already processed: " + bookingId);
                     logger.info("Booking has {} rooms properly assigned", booking.getBookingRooms().size());
                 }
 
