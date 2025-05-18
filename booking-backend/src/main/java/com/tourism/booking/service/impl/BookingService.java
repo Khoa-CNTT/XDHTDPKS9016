@@ -385,36 +385,42 @@ public class BookingService implements IBookingService {
                             .orElseThrow(() -> new EntityNotFoundException(
                                     "Room type not found: " + roomSelection.getRoomTypeId()));
 
-                    // Get a sample room for this room type to get price
+                    // Check if the requested number of rooms is available based on
+                    // room_type.number_room
+                    if (roomType.getNumber_room() < roomSelection.getNumberOfRooms()) {
+                        throw new RuntimeException("Not enough rooms available for type: " + roomType.getType_name() +
+                                ". Requested: " + roomSelection.getNumberOfRooms() + ", Available: "
+                                + roomType.getNumber_room());
+                    }
+
+                    // Get a representative room for price calculation
                     List<Room> rooms = roomRepository.findByRoomTypeRoomTypeId(roomType.getRoom_type_id());
                     if (rooms.isEmpty()) {
                         throw new EntityNotFoundException(
                                 "No rooms found for room type: " + roomType.getRoom_type_id());
                     }
 
-                    Room sampleRoom = rooms.get(0);
-                    BigDecimal roomPrice = sampleRoom.getPrice();
+                    Room representativeRoom = rooms.get(0);
+                    BigDecimal roomPrice = representativeRoom.getPrice();
 
-                    // Tính tổng tiền cho số lượng phòng được đặt
+                    // Calculate total price for the requested number of rooms
                     BigDecimal roomTotalPrice = roomPrice
                             .multiply(BigDecimal.valueOf(roomSelection.getNumberOfRooms()));
-
-                    // Cộng vào tổng tiền phòng
                     totalRoomPrice = totalRoomPrice.add(roomTotalPrice);
 
                     // Create room DTO for response
                     BookedRoomDTO bookedRoomDTO = new BookedRoomDTO();
-                    bookedRoomDTO.setRoomId(sampleRoom.getId_room());
+                    bookedRoomDTO.setRoomId((long) roomSelection.getNumberOfRooms());
                     bookedRoomDTO.setRoomTypeId(roomType.getRoom_type_id());
                     bookedRoomDTO.setRoomTypeName(roomType.getType_name());
-                    bookedRoomDTO.setNumberOfRooms(roomSelection.getNumberOfRooms()); // Số phòng
-                    bookedRoomDTO.setNumberBeds(sampleRoom.getNumber_bed());
+                    bookedRoomDTO.setNumberOfRooms(roomSelection.getNumberOfRooms());
+                    bookedRoomDTO.setNumberBeds(representativeRoom.getNumber_bed());
                     bookedRoomDTO.setPricePerRoom(roomPrice);
-                    bookedRoomDTO.setTotalPrice(roomTotalPrice); // Tổng tiền đã nhân với số lượng phòng
+                    bookedRoomDTO.setTotalPrice(roomTotalPrice);
 
                     bookedRooms.add(bookedRoomDTO);
 
-                    // Log chi tiết để debug
+                    // Log details for debugging
                     logger.info("Room calculation for type {}: pricePerRoom={}, numberOfRooms={}, totalPrice={}",
                             roomType.getType_name(), roomPrice, roomSelection.getNumberOfRooms(), roomTotalPrice);
 
@@ -431,6 +437,7 @@ public class BookingService implements IBookingService {
                     }
                 } catch (Exception e) {
                     logger.error("Error processing room selection: {}", e.getMessage());
+                    throw new RuntimeException("Failed to process room selection: " + e.getMessage(), e);
                 }
             }
         }
@@ -445,10 +452,10 @@ public class BookingService implements IBookingService {
             serviceTotal = calculateServicesTotal(booking, serviceSet);
         }
 
-        // Set bill information with totalRoomPrice (đã bao gồm số lượng phòng)
+        // Set bill information with totalRoomPrice
         setBillInformation(booking, totalRoomPrice, serviceTotal, numberOfDays);
 
-        // Log tổng kết
+        // Log summary
         logger.info("Final calculation summary:");
         logger.info("- Total room price per day: {}", totalRoomPrice);
         logger.info("- Number of days: {}", numberOfDays);
