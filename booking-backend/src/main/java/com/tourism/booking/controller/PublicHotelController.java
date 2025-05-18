@@ -20,8 +20,8 @@ import java.time.LocalDate;
 @PreAuthorize("permitAll()")
 @RestController
 @RequestMapping("${api.prefix}/hotels")
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@AllArgsConstructor
+    @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+    @AllArgsConstructor
 @CrossOrigin(origins = "*")
 public class PublicHotelController {
     IPublicHotelService hotelService;

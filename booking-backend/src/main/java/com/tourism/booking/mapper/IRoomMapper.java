@@ -15,6 +15,7 @@ public interface IRoomMapper {
     Room toEntity(RoomRequest req);
 
     @Mapping(source="id_room",       target="id_room")
+    @Mapping(source = "number_rooms", target = "number_rooms")
     @Mapping(source="number_bed",    target="number_bed")
     @Mapping(source="price",         target="price")
     @Mapping(source="room_type.type_name", target="type_name")

@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RoomResponse {
     Long id_room;
+    Integer number_rooms;
     Integer number_bed;
     BigDecimal price;
     String full_name;
