@@ -41,18 +41,6 @@ public class BookingServiceImpl implements IBookingService {
     @Override
     @Transactional
     public BookingResponseDTO createBooking(BookingRequestDTO bookingRequest) {
-        // Validate availability for each room type
-        for (RoomSelectionDTO roomSelection : bookingRequest.getRoomSelections()) {
-            int availableCount = roomAvailabilityService.getAvailableRoomsCount(
-                    roomSelection.getRoomTypeId(),
-                    bookingRequest.getCheckInDate(),
-                    bookingRequest.getCheckOutDate());
-
-            if (availableCount < roomSelection.getNumberOfRooms()) {
-                throw new ApiException(ErrorCode.INSUFFICIENT_ROOMS_AVAILABLE);
-            }
-        }
-
         // Create new booking
         Booking booking = new Booking();
         booking.setCheck_in_date(bookingRequest.getCheckInDate());
@@ -84,44 +72,42 @@ public class BookingServiceImpl implements IBookingService {
         BigDecimal totalAmount = BigDecimal.ZERO;
 
         for (RoomSelectionDTO roomSelection : bookingRequest.getRoomSelections()) {
-            RoomType roomType = roomTypeRepository.findById(roomSelection.getRoomTypeId())
-                    .orElseThrow(() -> new ApiException(ErrorCode.ROOM_TYPE_NOT_FOUND));
+            // Verify room exists and belongs to the specified room type
+            Room room = roomRepository.findById(roomSelection.getRoomId())
+                    .orElseThrow(() -> new ApiException(ErrorCode.ROOM_NOT_FOUND));
 
-            // Find available rooms of this type
-            List<Room> availableRooms = roomRepository.findAvailableRoomsByTypeAndDateRange(
-                    roomType.getRoom_type_id(),
-                    bookingRequest.getCheckInDate(),
-                    bookingRequest.getCheckOutDate(),
-                    roomSelection.getNumberOfRooms());
-
-            if (availableRooms.size() < roomSelection.getNumberOfRooms()) {
-                throw new ApiException(ErrorCode.INSUFFICIENT_ROOMS_AVAILABLE);
+            if (!room.getRoom_type().getRoom_type_id().equals(roomSelection.getRoomTypeId())) {
+                throw new ApiException(ErrorCode.ROOM_TYPE_MISMATCH);
             }
 
-            // Create booking rooms - FIXED: Instead of creating multiple entries with
-            // numberOfRooms=1,
-            // create a single entry with the correct numberOfRooms value
-            Room room = availableRooms.get(0);
+            // Check if room is available for the requested dates
+            List<Room> availableRooms = roomRepository.findAvailableRoomsByDateRange(
+                    roomSelection.getRoomTypeId(),
+                    bookingRequest.getCheckInDate(),
+                    bookingRequest.getCheckOutDate());
+
+            if (!availableRooms.stream().anyMatch(r -> r.getId_room().equals(roomSelection.getRoomId()))) {
+                throw new ApiException(ErrorCode.ROOM_NOT_AVAILABLE);
+            }
+
+            // Create booking room
             BookingRoom bookingRoom = new BookingRoom();
             bookingRoom.setBooking(booking);
             bookingRoom.setRoom(room);
-            bookingRoom.setNumberOfRooms(roomSelection.getNumberOfRooms()); // FIXED: Use user-selected room count
-            bookingRoom.setRoomTypeId(roomType.getRoom_type_id());
+            bookingRoom.setRoomTypeId(room.getRoom_type().getRoom_type_id());
             booking.getBookingRooms().add(bookingRoom);
 
-            // Add to total amount - multiply by the number of rooms
-            totalAmount = totalAmount
-                    .add(room.getPrice().multiply(BigDecimal.valueOf(roomSelection.getNumberOfRooms())));
+            // Add to total amount
+            totalAmount = totalAmount.add(room.getPrice());
 
             // Create DTO for response
             BookedRoomDTO bookedRoomDTO = new BookedRoomDTO();
-            bookedRoomDTO.setRoomTypeId(roomType.getRoom_type_id());
-            bookedRoomDTO.setRoomTypeName(roomType.getType_name());
-            bookedRoomDTO.setNumberOfRooms(roomSelection.getNumberOfRooms());
-            bookedRoomDTO.setNumberBeds(availableRooms.get(0).getNumber_bed());
-            bookedRoomDTO.setPricePerRoom(availableRooms.get(0).getPrice());
-            bookedRoomDTO.setTotalPrice(
-                    availableRooms.get(0).getPrice().multiply(BigDecimal.valueOf(roomSelection.getNumberOfRooms())));
+            bookedRoomDTO.setRoomId(room.getId_room());
+            bookedRoomDTO.setRoomTypeId(room.getRoom_type().getRoom_type_id());
+            bookedRoomDTO.setRoomTypeName(room.getRoom_type().getType_name());
+            bookedRoomDTO.setNumberBeds(room.getNumber_bed());
+            bookedRoomDTO.setPricePerRoom(room.getPrice());
+            bookedRoomDTO.setTotalPrice(room.getPrice());
 
             bookedRooms.add(bookedRoomDTO);
         }

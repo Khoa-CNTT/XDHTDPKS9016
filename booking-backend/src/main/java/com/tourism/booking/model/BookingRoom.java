@@ -14,6 +14,7 @@ import lombok.experimental.FieldDefaults;
 public class BookingRoom {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     Long id;
 
     @ManyToOne
@@ -24,9 +25,9 @@ public class BookingRoom {
     @JoinColumn(name = "room_id")
     Room room;
 
-    @Column(name = "number_of_rooms")
-    Integer numberOfRooms;
-
     @Column(name = "room_type_id")
     Long roomTypeId;
+
+    @Column(name = "number_of_rooms", nullable = false)
+    Integer numberOfRooms = 1; // Set default value to 1
 }
