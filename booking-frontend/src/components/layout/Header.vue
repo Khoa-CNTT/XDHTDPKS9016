@@ -6,6 +6,7 @@ import { useRouter } from 'vue-router'
 import { logoutApi } from '@/services/auth'
 import { toast } from 'vue3-toastify'
 import { nextTick } from 'vue'
+
 const authStore = useAuthStore()
 const showDropdown = ref(false)
 
@@ -41,7 +42,7 @@ const handleLogout = async () => {
     })
     console.log('Đang chuyển hướng tới /login')
     router.push('/login')
-    // window.location.reload()
+    window.location.reload()
   } catch (error) {
     console.error('Lỗi khi logout:', error)
   }
@@ -59,118 +60,78 @@ onMounted(() => {
           Elite<span class="text-gray-400">Booking</span>
         </div>
         <nav class="flex-1 flex justify-center space-x-8 mb-100">
-          <RouterLink
-            to="/"
-            custom
-            v-slot="{ isExactActive, navigate }"
-          >
-            <span
-              @click="navigate"
-              :class="[
-                'cursor-pointer hover:text-blue-600 text-xl',
-                isExactActive ? 'text-blue-700 font-semibold' : 'text-gray-600',
-              ]"
-            >
+          <RouterLink to="/" custom v-slot="{ isExactActive, navigate }">
+            <span @click="navigate" :class="[
+              'cursor-pointer hover:text-blue-600 text-xl',
+              isExactActive ? 'text-blue-700 font-semibold' : 'text-gray-600',
+            ]">
               Trang chủ
             </span>
           </RouterLink>
 
-          <RouterLink
-            to="/hotels"
-            custom
-            v-slot="{ isExactActive, navigate }"
-          >
-            <span
-              @click="navigate"
-              :class="[
-                'cursor-pointer hover:text-blue-600 text-xl',
-                isExactActive ? 'text-blue-700 font-semibold' : 'text-gray-600',
-              ]"
-            >
+          <RouterLink to="/hotels" custom v-slot="{ isExactActive, navigate }">
+            <span @click="navigate" :class="[
+              'cursor-pointer hover:text-blue-600 text-xl',
+              isExactActive ? 'text-blue-700 font-semibold' : 'text-gray-600',
+            ]">
               Khách sạn
             </span>
           </RouterLink>
 
-          <RouterLink
-            to="/about"
-            custom
-            v-slot="{ isExactActive, navigate }"
-          >
-            <span
-              @click="navigate"
-              :class="[
-                'cursor-pointer hover:text-blue-600 text-xl',
-                isExactActive ? 'text-blue-700 font-semibold' : 'text-gray-600',
-              ]"
-            >
+          <RouterLink to="/about" custom v-slot="{ isExactActive, navigate }">
+            <span @click="navigate" :class="[
+              'cursor-pointer hover:text-blue-600 text-xl',
+              isExactActive ? 'text-blue-700 font-semibold' : 'text-gray-600',
+            ]">
               Giới thiệu
             </span>
           </RouterLink>
 
-          <RouterLink
-            to="/contact"
-            custom
-            v-slot="{ isExactActive, navigate }"
-          >
-            <span
-              @click="navigate"
-              :class="[
-                'cursor-pointer hover:text-blue-600 text-xl',
-                isExactActive ? 'text-blue-700 font-semibold' : 'text-gray-600',
-              ]"
-            >
+          <RouterLink to="/contact" custom v-slot="{ isExactActive, navigate }">
+            <span @click="navigate" :class="[
+              'cursor-pointer hover:text-blue-600 text-xl',
+              isExactActive ? 'text-blue-700 font-semibold' : 'text-gray-600',
+            ]">
               Liên hệ
             </span>
           </RouterLink>
         </nav>
 
         <!-- Avatar và các chức năng khi click vào avatar -->
-        <div
-          v-if="authStore.getIsLoggedIn"
-          class="relative"
-          @click="toggleDropdown"
-        >
-          <div class="flex items-center space-x-3 cursor-pointer">
+        <div v-if="authStore.getIsLoggedIn" class="relative" @click="toggleDropdown">
+          <!-- <div class="flex items-center space-x-3 cursor-pointer">
             <img
               :src="authStore.getUser?.avatar || 'https://i.pravatar.cc/300'"
               alt="Avatar"
               class="w-10 h-10 rounded-full border"
             />
             <span class="text-gray-700 text-lg">{{ authStore.getUser?.username }}</span>
+          </div> -->
+          <div class="flex items-center space-x-3 cursor-pointer">
+            <img :src="authStore.getUser?.avatar || '/assets/images/avatar.jpg'" alt="Avatar"
+              class="w-10 h-10 rounded-full border" />
+
+            <span class="text-gray-700 text-lg">{{ authStore.getUser?.username }}</span>
           </div>
 
           <!-- Dropdown -->
-          <div
-            v-if="showDropdown"
-            class="absolute right-0 mt-2 w-60 bg-white border border-gray-200 rounded-lg shadow-lg z-50"
-          >
+          <div v-if="showDropdown"
+            class="absolute right-0 mt-2 w-60 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
             <ul class="text-base text-gray-700">
               <li>
-                <RouterLink
-                  to="/profiles"
-                  class="block px-4 py-2 hover:bg-gray-100 rounded-t-lg"
-                  >👤 Quản lý tài khoản</RouterLink
-                >
+                <RouterLink to="/profiles" class="block px-4 py-2 hover:bg-gray-100 rounded-t-lg">👤 Quản lý tài khoản
+                </RouterLink>
               </li>
               <li>
-                <RouterLink
-                  to="/payment-history"
-                  class="block px-4 py-2 hover:bg-gray-100"
-                  >💳 Lịch sử thanh toán</RouterLink
-                >
+                <RouterLink to="/payment-history" class="block px-4 py-2 hover:bg-gray-100">💳 Lịch sử thanh toán
+                </RouterLink>
               </li>
               <li>
-                <RouterLink
-                  to="/change-password"
-                  class="block px-4 py-2 hover:bg-gray-100 rounded-b-lg"
-                  >🔒 Đổi mật khẩu</RouterLink
-                >
+                <RouterLink to="/change-password" class="block px-4 py-2 hover:bg-gray-100 rounded-b-lg">🔒 Đổi mật khẩu
+                </RouterLink>
               </li>
               <li>
-                <button
-                  @click="handleLogout"
-                  class="block w-full text-left px-4 py-2 hover:bg-gray-100 rounded-b-lg"
-                >
+                <button @click="handleLogout" class="block w-full text-left px-4 py-2 hover:bg-gray-100 rounded-b-lg">
                   🔒 Đăng xuất
                 </button>
               </li>
@@ -217,14 +178,17 @@ header,
 
 /* Tăng kích thước chữ */
 .text-xl {
-  font-size: 1.25rem; /* Tăng cỡ chữ cho các phần tử */
+  font-size: 1.25rem;
+  /* Tăng cỡ chữ cho các phần tử */
 }
 
 .text-3xl {
-  font-size: 1.875rem; /* Tăng cỡ chữ cho tiêu đề */
+  font-size: 1.875rem;
+  /* Tăng cỡ chữ cho tiêu đề */
 }
 
 .text-lg {
-  font-size: 1.125rem; /* Tăng cỡ chữ cho các phần tử text lớn */
+  font-size: 1.125rem;
+  /* Tăng cỡ chữ cho các phần tử text lớn */
 }
 </style>

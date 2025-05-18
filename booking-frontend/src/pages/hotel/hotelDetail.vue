@@ -190,6 +190,35 @@
             <h4 class="text-lg font-semibold mt-4 mb-2">🏨 {{ hotel.name }}</h4>
             <p class="text-sm text-gray-700 mb-2">{{ hotel.address }}</p>
             <p class="text-sm text-gray-700">📞 {{ hotel.hotline }}</p>
+            <!-- Hiển thị danh sách đánh giá -->
+            <div class="mt-4">
+              <h5 class="text-md font-semibold mb-2 text-blue-600 text-[20px]">💬 Đánh giá</h5>
+              <ul class="space-y-3 max-h-48 overflow-y-auto">
+                <li v-for="comment in comments" :key="comment.comment_id" class="border rounded p-3 bg-gray-50">
+                  <p class="text-gray-800 mb-1">{{ comment.content }}</p>
+                  <div class="text-xs text-gray-500">
+                    <span>{{ comment.comment_author || 'Khách ẩn danh' }}</span> ·
+                    <span>{{ comment.comment_date }} {{ comment.comment_time }}</span>
+                  </div>
+                </li>
+              </ul>
+            </div>
+             <!-- Form thêm bình luận -->
+    <form @submit.prevent="addComment" class="mt-4">
+      <textarea
+        v-model="newComment"
+        placeholder="Viết bình luận..."
+        class="w-full border rounded p-2 resize-none"
+        rows="3"
+        required
+      ></textarea>
+      <button
+        type="submit"
+        class="mt-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+      >
+        Gửi bình luận
+      </button>
+    </form>
           </div>
 
           <!-- Cột phải - Danh sách các phòng còn chỗ -->
@@ -249,7 +278,8 @@
         </div>
       </div>
     </div>
-    <BookingModal :show="showBooking" :room="selectedRoom" :hotel="hotel" @close="showBooking = false" :roomType="selectedRoomType"/>
+    <BookingModal :show="showBooking" :room="selectedRoom" :hotel="hotel" @close="showBooking = false"
+      :roomType="selectedRoomType" />
     <!-- <ListRoom /> -->
     <!-- <BookingModal v-if="showBookingModal" :show="showBookingModal" @close="showBookingModal = false" /> -->
     <router-link :to="{ name: 'HotelReview', params: { id: hotelId } }" class="inline-block">
@@ -277,6 +307,30 @@ const router = useRouter();
 const showBookingModal = ref(false)
 const showAllHotels = ref(false);
 const hotelId = route.params.id
+const comments = [
+  {
+    comment_id: 1,
+    content: "Phòng rất đẹp và sạch sẽ lamas xzxzc",
+    comment_author: null,
+    comment_date: "2025-05-17",
+    comment_time: "12:42:51",
+  },
+  {
+    comment_id: 2,
+    content: "Dịch vụ thân thiện, tiện nghi đầy đủ.",
+    comment_author: "Nguyễn Văn A",
+    comment_date: "2025-05-15",
+    comment_time: "10:20:00",
+  },
+  {
+    comment_id: 3,
+    content: "Vị trí khách sạn thuận tiện, dễ đi lại.",
+    comment_author: "Trần Thị B",
+    comment_date: "2025-05-16",
+    comment_time: "14:05:30",
+  }
+];
+
 onMounted(async () => {
   const hotelId = route.params.id;
   console.log('=======', hotelId);

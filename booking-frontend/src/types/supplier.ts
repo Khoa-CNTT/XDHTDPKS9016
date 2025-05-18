@@ -169,3 +169,108 @@ export interface UpdateRoomTypeBody {
   description: string
   room_image: string
 }
+
+
+export interface IHotelInfo {
+  hotelId: number;
+  name: string;
+  address: string;
+  email: string;
+  phone: string;
+  description: string;
+}
+
+export interface IRoomInfo {
+  roomId: number;
+  roomTypeId: number;
+  roomTypeName: string;
+  numberOfRooms: number;
+  numberBeds: number;
+  pricePerRoom: number;
+  totalPrice: number;
+}
+
+export interface IServiceInfo {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+}
+
+export interface IBillInfo {
+  billId: number;
+  roomTotal: number;
+  serviceTotal: number;
+  total: number;
+  deposit: number;
+  numberOfDays: number;
+}
+
+export interface IUserInfo {
+  user_id: number;
+  full_name: string;
+  gender: string;
+  address: string;
+  email: string;
+  phone: string;
+  birth_date: string;
+  status: string;
+  username: string;
+}
+
+export interface IBookingItem {
+  bookingId: number;
+  checkInDate: string;
+  checkOutDate: string;
+  checkInTime: string;
+  checkOutTime: string;
+  numberPeople: number;
+  status: string;
+  statusDisplay: string;
+  hotel: IHotelInfo;
+  rooms: IRoomInfo[];
+  services: IServiceInfo[];
+  bill: IBillInfo;
+  user: IUserInfo;
+  contactName: string;
+  contactEmail: string;
+  contactPhone: string;
+  contactAddress: string;
+  specialRequests: string;
+}
+
+export type IBookingList = IBookingItem[];
+export interface Comment {
+  content: string;
+  comment_id: number;
+  comment_author: string | null;
+  comment_date: string; 
+  comment_time: string; 
+}
+//info hotel
+export interface HotelProfile {
+  name: string;
+  email: string;
+  image: string | null;
+  address: string;
+  hotline: string;
+  description: string;
+  username: string;
+  password: string;
+  sendEmail: boolean;
+}
+export interface HotelAccount {
+  account_id: number;
+  username: string | null;
+  email: string | null;
+}
+
+export interface HotelDetail {
+  hotel_id: number;
+  name: string;
+  image: string | null;
+  address: string;
+  hotline: string;
+  description: string | null;
+  account: HotelAccount;
+}
