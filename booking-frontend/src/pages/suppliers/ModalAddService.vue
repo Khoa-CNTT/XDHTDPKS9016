@@ -3,7 +3,10 @@
     class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center"
     @click="$emit('close')"
   >
-    <div class="bg-white p-6 rounded-lg w-96 shadow-lg relative" @click.stop>
+    <div
+      class="bg-white p-6 rounded-lg w-96 shadow-lg relative"
+      @click.stop
+    >
       <button
         class="absolute top-2 right-2 text-xl"
         @click="$emit('close')"
@@ -17,8 +20,9 @@
           <label
             for="service_name"
             class="block text-sm font-semibold text-gray-700"
-            >Tên dịch vụ</label
           >
+            Tên dịch vụ
+          </label>
           <input
             v-model="form.service_name"
             type="text"
@@ -33,10 +37,11 @@
           <label
             for="service_price"
             class="block text-sm font-semibold text-gray-700"
-            >Giá</label
           >
+            Giá
+          </label>
           <input
-            v-model="form.service_price"
+            v-model.number="form.service_price"
             type="number"
             id="service_price"
             class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-400"
@@ -47,31 +52,11 @@
 
         <div class="mb-4">
           <label
-            for="service_image"
-            class="block text-sm font-semibold text-gray-700"
-            >Ảnh dịch vụ</label
-          >
-          <input
-            @change="handleFileUpload"
-            type="file"
-            accept="image/*"
-            class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-400"
-          />
-          <div v-if="form.service_image" class="mt-2">
-            <img
-              :src="form.service_image"
-              alt="Ảnh đã chọn"
-              class="w-32 h-32 border rounded object-contain"
-            />
-          </div>
-        </div>
-
-        <div class="mb-4">
-          <label
             for="description"
             class="block text-sm font-semibold text-gray-700"
-            >Mô tả chi tiết</label
           >
+            Mô tả chi tiết
+          </label>
           <textarea
             v-model="form.description"
             id="description"
@@ -102,42 +87,33 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { createServiceApi, uploadImageApi } from '@/services/supplier';
-import { NewService, Service } from '@/types/supplier';
+import { ref } from 'vue'
+import { createServiceApi } from '@/services/supplier'
+import { NewService } from '@/types/supplier'
+import { toast } from 'vue3-toastify'
 
 const emit = defineEmits<{
-  (e: 'close'): void;
-  (e: 'serviceAdded'): void;
-}>();
+  (e: 'close'): void
+  (e: 'serviceAdded'): void
+}>()
 
 const form = ref<NewService>({
   service_name: '',
   service_price: 0,
-  service_image: '',
   description: '',
-});
+})
 
-const handleFileUpload = async (event: Event) => {
-  const target = event.target as HTMLInputElement;
-  const file = target.files?.[0];
-  if (file) {
-    try {
-      const uploadedUrl = await uploadImageApi(file);
-      const fullImageUrl = `http://157.66.101.165:8080${uploadedUrl}`;
-      form.value.service_image = fullImageUrl;
-    } catch (error) {
-      console.error('Lỗi khi tải ảnh:', error);
-    }
-  }
-};
-
+// Gửi form tạo dịch vụ
 const submitForm = async () => {
   try {
-    await createServiceApi(form.value);
-    emit('serviceAdded'); // Phát sự kiện báo đã thêm thành công
+    console.log('Dữ liệu form gửi đi:', form.value)
+    await createServiceApi(form.value)
+    toast.success('Thêm dịch vụ thành công!')
+    emit('serviceAdded')
+    emit('close')
   } catch (error) {
-    console.error('Lỗi khi tạo dịch vụ mới:', error);
+    console.error('Lỗi khi tạo dịch vụ mới:', error)
+    toast.error('Tạo dịch vụ thất bại!')
   }
-};
+}
 </script>
