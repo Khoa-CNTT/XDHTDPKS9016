@@ -413,7 +413,7 @@ public class BookingService implements IBookingService {
                     bookedRoomDTO.setRoomId(room.getId_room());
                     bookedRoomDTO.setRoomTypeId(room.getRoom_type().getRoom_type_id());
                     bookedRoomDTO.setRoomTypeName(room.getRoom_type().getType_name());
-                    bookedRoomDTO.setNumberOfRooms(1); // Set default to 1 since we're booking specific rooms
+                    bookedRoomDTO.setNumberOfRooms(room.getNumber_rooms()); // Set default to 1 since we're booking specific rooms
                     bookedRoomDTO.setNumberBeds(room.getNumber_bed());
                     bookedRoomDTO.setPricePerRoom(roomPrice);
                     bookedRoomDTO.setTotalPrice(roomPrice);
@@ -833,7 +833,7 @@ public class BookingService implements IBookingService {
                     bookingRoom.setBooking(booking);
                     bookingRoom.setRoom(room);
                     bookingRoom.setRoomTypeId(room.getRoom_type().getRoom_type_id());
-                    bookingRoom.setNumberOfRooms(1); // Set default to 1 since we're booking specific rooms
+                    bookingRoom.setNumberOfRooms(room.getNumber_rooms()); // Set default to 1 since we're booking specific rooms
 
                     booking.getBookingRooms().add(bookingRoom);
 
@@ -856,7 +856,7 @@ public class BookingService implements IBookingService {
                     bookingRoom.setBooking(booking);
                     bookingRoom.setRoom(room);
                     bookingRoom.setRoomTypeId(bookedRoom.getRoomTypeId());
-                    bookingRoom.setNumberOfRooms(1); // Set default to 1 since we're booking specific rooms
+                    bookingRoom.setNumberOfRooms(room.getNumber_rooms()); // Set default to 1 since we're booking specific rooms
 
                     booking.getBookingRooms().add(bookingRoom);
 
