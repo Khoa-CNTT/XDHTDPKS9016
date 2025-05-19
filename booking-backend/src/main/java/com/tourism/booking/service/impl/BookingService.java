@@ -393,7 +393,7 @@ public class BookingService implements IBookingService {
                                         + roomSelection.getRoomTypeId());
                     }
 
-                    // Check room availability
+
                     List<Room> availableRooms = roomRepository.findAvailableRoomsByDateRange(
                             roomSelection.getRoomTypeId(),
                             request.getCheckInDate(),
