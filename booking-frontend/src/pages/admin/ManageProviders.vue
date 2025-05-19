@@ -62,7 +62,7 @@
                 </button>
                 <button @click="confirmDelete(hotel.idHotel)"
                   class="p-2 bg-red-500 hover:bg-red-600 text-white rounded transition">
-                  <Icon icon="mdi:cancel" width="20" height="20" />
+                   <Icon icon="mdi:trash-can" width="20" height="20"/>
                 </button>
                 <button @click="handleView(hotel.idHotel)"
                   class="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded transition">
@@ -102,12 +102,12 @@
       @close="showDetailPopup = false"
     />
 
-    <EditSupplierPopup
+    <!-- <EditSupplierPopup
       v-if="showEditModal"
       :supplier="selectedHotelToEdit"
       @close="showEditModal = false"
       @save="handleHotelSave"
-    />
+    /> -->
   </div>
 </template>
 

@@ -20,8 +20,8 @@
         <div class="mb-4">
           <label class="block font-medium mb-1">Hình ảnh</label>
           <input type="file" accept="image/*" class="w-full" @change="onFileChange" />
-          <div class="mt-2" v-if="previewImage">
-            <img :src="previewImage" alt="Preview" class="h-32 rounded object-cover" />
+          <div class="mt-2" v-if="room_image">
+            <img :src="fullImageUrl" alt="Preview" class="h-32 rounded object-cover" />
           </div>
         </div>
 
@@ -44,7 +44,7 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
 import type { RoomTypeSummary } from '@/types/supplier'
-import { updateRoomTypeApi } from '@/services/supplier'
+import { updateRoomTypeApi, uploadImageApi } from '@/services/supplier'
 import { toast } from 'vue3-toastify'
 
 const props = defineProps<{
@@ -56,8 +56,15 @@ const emit = defineEmits(['close', 'updated'])
 const type_name = ref('')
 const number_room = ref(0)
 const description = ref('')
-const room_image = ref('')
-const fileUpload = ref<File | null>(null)
+const room_image = ref('') // Chỉ lưu đường dẫn tương đối (ví dụ: /images/image1.jpg)
+
+// URL gốc của server chứa ảnh
+const baseUrl = 'http://157.66.101.165:8080'
+
+// Tạo đường dẫn đầy đủ để hiển thị ảnh
+const fullImageUrl = computed(() => {
+  return room_image.value ? `${baseUrl}${room_image.value}` : ''
+})
 
 watch(
   () => props.roomType,
@@ -66,41 +73,42 @@ watch(
       type_name.value = newVal.type_name
       number_room.value = newVal.number_room
       description.value = newVal.description
-      room_image.value = newVal.room_image
+      room_image.value = newVal.room_image // chỉ lưu đường dẫn tương đối
     }
   },
   { immediate: true }
 )
 
-const previewImage = computed(() => {
-  if (fileUpload.value) {
-    return URL.createObjectURL(fileUpload.value)
-  }
-  if (!room_image.value) return ''
-  return room_image.value.startsWith('/')
-    ? `http://157.66.101.165:8080${room_image.value}`
-    : room_image.value
-})
+const onFileChange = async (e: Event) => {
+  const target = e.target as HTMLInputElement
+  const file = target.files?.[0]
+  if (!file) return
 
-const onFileChange = (e: Event) => {
-  const file = (e.target as HTMLInputElement).files?.[0]
-  if (file) {
-    fileUpload.value = file
+  try {
+    const res = await uploadImageApi(file) // API trả về đường dẫn tương đối
+    console.log('==>ảnh', res)
+    
+    room_image.value = res // chỉ lưu đường dẫn tương đối
+    toast.success('Tải ảnh lên thành công!')
+  } catch (err) {
+    console.error(err)
+    toast.error('Lỗi khi tải ảnh!')
   }
 }
 
 const submitForm = async () => {
   if (!props.roomType) return
   try {
-    const formData = new FormData()
-    formData.append('type_name', type_name.value)
-    formData.append('number_room', number_room.value.toString())
-    formData.append('description', description.value)
-    if (fileUpload.value) {
-      formData.append('room_image', fileUpload.value)
+    const updatedData = {
+      type_name: type_name.value,
+      number_room: number_room.value,
+      description: description.value,
+      room_image: room_image.value // gửi đường dẫn tương đối về server
     }
 
-    await updateRoomTypeApi(props.roomType.room_type_id, formData)
+    const res = await updateRoomTypeApi(props.roomType.room_type_id, updatedData)
+    console.log('==>ảnh cập nhật', res)
+    
     toast.success('Cập nhật loại phòng thành công!')
     emit('updated')
     emit('close')
