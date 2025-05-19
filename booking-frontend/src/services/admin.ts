@@ -6,7 +6,9 @@ import {
   Hotel,
   // CreateHotelPayload,
   ApiResponse,
-  Residence
+  // Residence,
+  InfoHotel,
+  HotelDetail
 } from '@/types/admin'
 
 export interface BaseResponse<T> {
@@ -96,19 +98,23 @@ export const deleteSupplierApi = async (supplierId: number): Promise<void> => {
 //   )
 // }
 
-// export const updateSupplierApi = async (
-//   supplierId: number,
-//   supplierData: CreateHotelPayload
-// ): Promise<Hotel> => {
-//   return $api(
-//     `/management-supplier/${supplierId}`,
-//     {
-//       method: 'PUT',
-//       body: supplierData,
-//     },
-//     true,
-//   )
-// }
+export const updateSupplierApi = async (
+  supplierId: number,
+  supplierData: InfoHotel
+): Promise<HotelDetail> => {
+  return $api(
+    `/management-supplier/${supplierId}`,
+    {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(supplierData),
+    },
+    true,
+  )
+}
+
 
 // export const deleteSupplierApi = async (supplierId: number): Promise<void> => {
 //   return $api(

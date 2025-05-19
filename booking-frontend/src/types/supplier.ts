@@ -274,3 +274,74 @@ export interface HotelDetail {
   description: string | null;
   account: HotelAccount;
 }
+//manager bôking
+// BookingInterfaces.ts
+
+export interface Booking {
+  bookingId: number;
+  checkInDate: string;      // YYYY-MM-DD
+  checkOutDate: string;     // YYYY-MM-DD
+  checkInTime: string;      // HH:mm:ss
+  checkOutTime: string;     // HH:mm:ss
+  numberPeople: number;
+  status: string;
+  hotel: HotelBooking;
+  rooms: BookingRoom[];
+  services: BookingService[];
+  bill: BookingBill;
+  user: BookingUser;
+  contactName: string;
+  contactEmail: string;
+  contactPhone: string;
+  contactAddress: string;
+  specialRequests: string;
+  statusDisplay: string;
+}
+
+export interface HotelBooking {
+  hotelId: number;
+  name: string;
+  address: string;
+  email: string;
+  phone: string;
+  description: string;
+}
+
+export interface BookingRoom {
+  roomId: number;
+  roomTypeId: number;
+  roomTypeName: string;
+  numberOfRooms: number;
+  numberBeds: number;
+  pricePerRoom: number;
+  totalPrice: number;
+}
+
+export interface BookingService {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+}
+
+export interface BookingBill {
+  billId: number;
+  roomTotal: number;
+  serviceTotal: number;
+  total: number;
+  deposit: number;
+  numberOfDays: number;
+}
+
+export interface BookingUser {
+  user_id: number;
+  full_name: string;
+  gender: string;
+  address: string;
+  email: string;
+  phone: string;
+  birth_date: string;  
+  status: string;
+  username: string;
+}
+export type BookingList = Booking[];

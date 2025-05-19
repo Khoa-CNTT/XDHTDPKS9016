@@ -72,21 +72,38 @@
                   <strong>Số phòng:</strong> {{ roomType.numberRoom }} |
                   <strong>Giá trung bình:</strong> {{ roomType.averagePrice.toLocaleString() }} VNĐ
                 </p>
-                <div class="mt-2 text-sm text-gray-600">
-                  <strong>Phòng:</strong>
-                  <ul class="list-disc ml-6 mt-1">
-                    <li
-                      v-for="room in roomType.rooms"
-                      :key="room.roomId"
-                    >
-                      Phòng {{ room.roomId }} - {{ room.numberBeds }} giường - {{ room.price.toLocaleString() }} VNĐ -
-                      Trạng thái: 
-                      <span :class="room.status === 'AVAILABLE' ? 'text-green-600' : 'text-red-600'">
-                        {{ room.status }}
-                      </span>
-                    </li>
-                  </ul>
-                </div>
+               <div class="mt-4 text-sm text-gray-800">
+  <strong class="block mb-2">Phòng:</strong>
+  <div class="space-y-3">
+    <div
+      v-for="room in roomType.rooms"
+      :key="room.roomId"
+      class="border border-gray-200 rounded-lg p-3 shadow-sm hover:shadow-md transition"
+    >
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p class="font-medium text-blue-600">Phòng {{ room.roomId }}</p>
+          <p class="text-gray-600">
+            {{ room.numberBeds }} giường - {{ room.price.toLocaleString() }} VNĐ
+          </p>
+        </div>
+        <div class="mt-2 sm:mt-0">
+          <span
+            :class="[
+              'text-sm font-semibold px-2 py-1 rounded-full',
+              room.status === 'AVAILABLE'
+                ? 'bg-green-100 text-green-700'
+                : 'bg-red-100 text-red-700'
+            ]"
+          >
+            {{ room.status === 'AVAILABLE' ? 'Còn phòng' : 'Đã đặt' }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
               </div>
             </div>
           </div>
