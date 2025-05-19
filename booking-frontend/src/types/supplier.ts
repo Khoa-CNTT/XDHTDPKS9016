@@ -31,7 +31,7 @@ export interface GetService {
 export interface NewService {
   service_name: string
   service_price: number
-  service_image: string
+  service_image?: string
   description: string
 }
 
