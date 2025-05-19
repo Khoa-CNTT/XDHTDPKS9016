@@ -1,3 +1,4 @@
+<!-- HotelManagement.vue (component cha) -->
 <template>
   <div class="space-y-6 px-4 py-6">
     <div class="border rounded-lg p-6 bg-white shadow flex justify-between items-center">
@@ -9,7 +10,7 @@
         <Icon icon="mdi:plus-box" class="text-xl pr-2" width="24" height="24" /> Thêm mới khách sạn
       </button>
     </div>
-    <!-- Bảng danh sách khách sạn -->
+
     <div class="border rounded-lg p-6 bg-white shadow">
       <h3 class="text-lg font-semibold mb-4 text-blue-700 flex">
         <Icon icon="mdi:clipboard-list" width="24" height="24" class="mr-2" /> Danh sách khách sạn
@@ -29,20 +30,14 @@
         </thead>
         <tbody>
           <tr v-for="(hotel, index) in hotels" :key="hotel.idHotel" class="border-t align-top">
-            <!-- STT -->
             <td class="px-4 py-2">{{ index + 1 }}</td>
-            <!-- Tên khách sạn -->
             <td class="px-4 py-2">{{ hotel.name }}</td>
-            <!-- Ảnh -->
             <td class="px-4 py-2">
               <img :src="`http://157.66.101.165:8080${hotel.image}`" alt="Ảnh khách sạn"
                 class="w-20 h-14 object-cover rounded" />
             </td>
-            <!-- Địa chỉ -->
             <td class="px-4 py-2 whitespace-pre-line">{{ hotel.address }}</td>
-            <!-- Hotline -->
             <td class="px-4 py-2">{{ hotel.hotline }}</td>
-            <!-- Mô tả (truncate với ...) -->
             <td class="px-4 py-2">
               <div v-if="hotel.services.length">
                 <div v-for="svc in hotel.services" :key="svc.serviceId" class="truncate">
@@ -51,7 +46,6 @@
               </div>
               <div v-else class="italic text-gray-500">Không có</div>
             </td>
-            <!-- Loại phòng (xuống dòng) -->
             <td class="px-4 py-2">
               <div v-if="hotel.roomTypes.length">
                 <div v-for="rt in hotel.roomTypes" :key="rt.roomTypeId" class="truncate">
@@ -61,40 +55,59 @@
               <div v-else class="italic text-gray-500">Không có</div>
             </td>
             <td class="px-4 py-2 text-center">
-              <div class="flex justify-center gap-2 flex">
-                <!-- Nút Xác nhận (với Icon) -->
-                <button @click="openEditModal" class="p-2 bg-green-500 hover:bg-green-600 text-white rounded transition">
-                  <Icon icon="mdi:pencil" width="20" height="20" class="mr-1" />
-
+              <div class="flex justify-center gap-2">
+                <button @click="openEditModal(hotel)"
+                  class="p-2 bg-green-500 hover:bg-green-600 text-white rounded transition">
+                  <Icon icon="mdi:pencil" width="20" height="20" />
                 </button>
-
-                <!-- Nút Hủy (với Icon) -->
-                <button class="p-2 bg-red-500 hover:bg-red-600 text-white rounded transition"
-                  @click="confirmDelete(hotel.idHotel)">
-                  <Icon icon="mdi:cancel" width="20" height="20" class="mr-1" />
-
+                <button @click="confirmDelete(hotel.idHotel)"
+                  class="p-2 bg-red-500 hover:bg-red-600 text-white rounded transition">
+                   <Icon icon="mdi:trash-can" width="20" height="20"/>
                 </button>
-
-                <!-- Nút Xem (với Icon) -->
-                <button class="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded transition"
-                  @click="handleView(hotel.idHotel)">
-                  <Icon icon="mdi:eye" width="20" height="20" class="mr-1" />
-
+                <button @click="handleView(hotel.idHotel)"
+                  class="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded transition">
+                  <Icon icon="mdi:eye" width="20" height="20" />
                 </button>
               </div>
             </td>
           </tr>
         </tbody>
       </table>
+
       <div class="pt-6 flex justify-center">
-        <Pagination :total="totalElements" :items-per-page="pageSize" :default-page="currentPage"
-          @page-change="fetchInfoHotel" />
+        <Pagination
+          :total="totalElements"
+          :items-per-page="pageSize"
+          :default-page="currentPage"
+          @page-change="fetchInfoHotel"
+        />
       </div>
     </div>
-    <CreateHotel v-if="showCreateHotel" @close="showCreateHotel = false" @refresh="fetchInfoHotel" />
-    <DeleteConfirmModal v-if="showDeleteModal" @cancel="showDeleteModal = false" @confirm="handleDelete" />
-    <SupplierDetailPopup v-if="showDetailPopup" :supplier="selectedSupplier" @close="showDetailPopup = false" />
-    <EditSupplierPopup v-if="showEditModal" :supplier="selectedHotelToEdit" @close="showEditModal = false" />
+
+    <CreateHotel
+      v-if="showCreateHotel"
+      @close="showCreateHotel = false"
+      @refresh="fetchInfoHotel"
+    />
+
+    <DeleteConfirmModal
+      v-if="showDeleteModal"
+      @cancel="showDeleteModal = false"
+      @confirm="handleDelete"
+    />
+
+    <SupplierDetailPopup
+      v-if="showDetailPopup"
+      :supplier="selectedSupplier"
+      @close="showDetailPopup = false"
+    />
+
+    <!-- <EditSupplierPopup
+      v-if="showEditModal"
+      :supplier="selectedHotelToEdit"
+      @close="showEditModal = false"
+      @save="handleHotelSave"
+    /> -->
   </div>
 </template>
 
@@ -102,19 +115,40 @@
 import { ref, onMounted } from 'vue'
 import Pagination from '@/components/base/Pagination.vue'
 import SupplierDetailPopup from './SupplierDetailPopup.vue'
-import { getManagementSupplier, getSupplierByIdApi, deleteSupplierApi } from '@/services/admin'
+import CreateHotel from './CreateHotel.vue'
 import DeleteConfirmModal from './DeleteConfirmModal.vue'
 import EditSupplierPopup from './EditSupplierPopup.vue'
-import CreateHotel from './CreateHotel.vue'
-const hotels = ref<any[]>([])
-const showDetailPopup = ref(false)
-const selectedSupplier = ref<any>(null)
+import {
+  getManagementSupplier,
+  getSupplierByIdApi,
+  deleteSupplierApi
+} from '@/services/admin'
+
+interface Hotel {
+  idHotel: number
+  name: string
+  image: string
+  address: string
+  hotline: string
+  description: string
+  services: { serviceId: number; serviceName: string }[]
+  roomTypes: { roomTypeId: number; typeName: string }[]
+}
+
+const hotels = ref<Hotel[]>([])
 const currentPage = ref(1)
 const pageSize = ref(10)
 const totalElements = ref(0)
+
 const showCreateHotel = ref(false)
 const showEditModal = ref(false)
-const selectedHotelToEdit = ref<any>(null)
+const showDeleteModal = ref(false)
+const showDetailPopup = ref(false)
+
+const selectedHotelToEdit = ref<Hotel | null>(null)
+const selectedSupplier = ref<any>(null)
+const deleteId = ref<number | null>(null)
+
 const fetchInfoHotel = async (page = 1) => {
   try {
     const res = await getManagementSupplier(page - 1)
@@ -127,6 +161,37 @@ const fetchInfoHotel = async (page = 1) => {
   }
 }
 
+const openEditModal = (hotel: Hotel) => {
+  selectedHotelToEdit.value = hotel
+  showEditModal.value = true
+}
+
+const handleHotelSave = (updated: Hotel) => {
+  // tìm index và thay thế bằng object mới
+  const idx = hotels.value.findIndex(h => h.idHotel === updated.idHotel)
+  if (idx !== -1) {
+    hotels.value.splice(idx, 1, updated)
+  }
+  showEditModal.value = false
+}
+
+const confirmDelete = (id: number) => {
+  deleteId.value = id
+  showDeleteModal.value = true
+}
+
+const handleDelete = async () => {
+  if (deleteId.value == null) return
+  try {
+    await deleteSupplierApi(deleteId.value)
+    await fetchInfoHotel(currentPage.value)
+    showDeleteModal.value = false
+    deleteId.value = null
+  } catch (error) {
+    console.error('Lỗi khi xóa nhà cung cấp:', error)
+  }
+}
+
 const handleView = async (id: number) => {
   try {
     const res = await getSupplierByIdApi(id)
@@ -135,28 +200,6 @@ const handleView = async (id: number) => {
   } catch (error) {
     console.error('Lỗi khi lấy chi tiết nhà cung cấp:', error)
   }
-}
-const showDeleteModal = ref(false)
-const deleteId = ref<number | null>(null)
-const confirmDelete = (id: number) => {
-  deleteId.value = id
-  showDeleteModal.value = true
-}
-const handleDelete = async () => {
-  if (deleteId.value === null) return
-
-  try {
-    await deleteSupplierApi(deleteId.value)
-    await fetchInfoHotel()
-    showDeleteModal.value = false
-    deleteId.value = null
-  } catch (error) {
-    console.error('Lỗi khi xóa nhà cung cấp:', error)
-  }
-}
-const openEditModal = (hotel: any) => {
-  selectedHotelToEdit.value = hotel
-  showEditModal.value = true
 }
 
 onMounted(() => {

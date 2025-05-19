@@ -111,3 +111,39 @@ export interface Residence {
   hotline: string;
   description: string;
 }
+
+//hotel
+export interface InfoHotel {
+  name: string;
+  image: string | null;
+  address: string;
+  hotline: string;
+  description: string | null;
+}
+
+export interface HotelProfile {
+  name: string;
+  email: string;
+  image: string | null;
+  address: string;
+  hotline: string;
+  description: string;
+  username: string;
+  password: string;
+  sendEmail: boolean;
+}
+export interface HotelAccount {
+  account_id: number;
+  username: string | null;
+  email: string | null;
+}
+
+export interface HotelDetail {
+  hotel_id: number;
+  name: string;
+  image: string | null;
+  address: string;
+  hotline: string;
+  description: string | null;
+  account: HotelAccount;
+}
