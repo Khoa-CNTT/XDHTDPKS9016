@@ -78,7 +78,6 @@ watch(() => props.service, (newVal) => {
   imageUrl.value = newVal.service_image || '';
 });
 
-// Xử lý upload ảnh
 const handleImageUpload = async (e: Event) => {
   const target = e.target as HTMLInputElement;
   const file = target.files?.[0];
@@ -87,10 +86,12 @@ const handleImageUpload = async (e: Event) => {
   imageName.value = file.name;
 
   try {
-    const res = await uploadImageApi(file); // gọi API upload
-    console.log('anh:',res);
-    
-    imageUrl.value = `http://157.66.101.165:8080${res}`; // nối đường dẫn ảnh
+    // Gọi uploadImageApi với file trực tiếp
+    const res = await uploadImageApi(file);
+
+    // res có dạng { url: string }, nối url đầy đủ
+    imageUrl.value = `http://157.66.101.165:8080${res}`;
+
     toast.success('Tải ảnh lên thành công!');
   } catch (error) {
     toast.error('Lỗi khi tải ảnh!');
@@ -98,7 +99,7 @@ const handleImageUpload = async (e: Event) => {
   }
 };
 
-// Gửi dữ liệu cập nhật
+
 const submitUpdate = async () => {
   try {
     await updateServiceApi(props.service.service_id, {
