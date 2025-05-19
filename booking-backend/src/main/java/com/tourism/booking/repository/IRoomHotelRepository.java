@@ -1,11 +1,11 @@
 package com.tourism.booking.repository;
 
 import com.tourism.booking.model.Room;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import java.util.List;
 
 
 public interface IRoomHotelRepository extends JpaRepository<Room, Long> {
@@ -16,7 +16,7 @@ public interface IRoomHotelRepository extends JpaRepository<Room, Long> {
                 JOIN h.account a
                 WHERE a.account_id = :accountId
             """)
-    Page<Room> findRoomsByHotelOwner(@Param("accountId") Long accountId, Pageable pageable);
+    List<Room> findRoomsByHotelOwner(@Param("accountId") Long accountId);
 
     @Query("SELECT COUNT(r) FROM Room r WHERE r.room_type.room_type_id = :roomTypeId")
     int countByRoomTypeId(@Param("roomTypeId") Long roomTypeId);

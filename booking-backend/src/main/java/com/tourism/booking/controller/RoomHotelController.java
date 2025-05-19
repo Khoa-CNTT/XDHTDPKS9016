@@ -1,7 +1,6 @@
 package com.tourism.booking.controller;
 
 
-import com.tourism.booking.dto.page.PageReponse;
 import com.tourism.booking.dto.room.RoomRequest;
 import com.tourism.booking.dto.room.RoomResponse;
 import com.tourism.booking.service.IAccountService;
@@ -9,13 +8,11 @@ import com.tourism.booking.service.impl.RoomHotelService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequestMapping("${api.prefix}/rooms-v1")
@@ -26,15 +23,13 @@ public class RoomHotelController {
     RoomHotelService roomHotelService;
     IAccountService accountService;
 
-        @GetMapping
-        public ResponseEntity<PageReponse<RoomResponse>> getMyRooms(Principal principal, @RequestParam(defaultValue = "0") int page,
-                                                                    @RequestParam(defaultValue = "50") int size) {
-            Long accountId = accountService.getAccountByUsername(principal.getName()).getAccount_id();
-            Pageable pageable = PageRequest.of(page, size);
+    @GetMapping
+    public ResponseEntity<List<RoomResponse>> getMyRooms(Principal principal) {
+        Long accountId = accountService.getAccountByUsername(principal.getName()).getAccount_id();
+        List<RoomResponse> rooms = roomHotelService.getRoomsByAccountId(accountId);
+        return ResponseEntity.ok(rooms);
+    }
 
-            Page<RoomResponse> rooms = roomHotelService.getRoomsByAccountId(accountId, pageable);
-            return ResponseEntity.ok(new PageReponse<>(rooms));
-        }
 
     @GetMapping("/{id}")
     public ResponseEntity<RoomResponse> getById(@PathVariable Long id) {
