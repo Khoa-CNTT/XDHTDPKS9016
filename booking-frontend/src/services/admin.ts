@@ -6,7 +6,7 @@ import {
   Hotel,
   // CreateHotelPayload,
   ApiResponse,
-  Residence
+  Residence,
 } from '@/types/admin'
 
 export interface BaseResponse<T> {
@@ -18,16 +18,35 @@ export interface BaseResponse<T> {
     size: number
   }
 }
-
+// export const getUsersApi = async (
+//   page: number,
+//   pageSize: number,
+// ): Promise<BaseResponse<User[]>> => {
+//   return $api(
+//     '/management-user',
+//     {
+//       method: 'GET',
+//       query: { page, pageSize },
+//     },
+//     true,
+//   )
+// }
 export const getUsersApi = async (
   page: number,
-  pageSize: number,
+  size: number,
+  keyword?: string,
+  gender?: string,
 ): Promise<BaseResponse<User[]>> => {
   return $api(
     '/management-user',
     {
       method: 'GET',
-      query: { page, pageSize },
+      query: {
+        page,
+        size,
+        keyword: keyword?.trim() || undefined,
+        gender: gender || undefined,
+      },
     },
     true,
   )

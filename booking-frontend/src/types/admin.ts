@@ -17,6 +17,10 @@ export interface User {
   comments: any[]
   ratings: any[]
 }
+export interface ApiUserResponse {
+  content: User[]
+  page: Page
+}
 
 // export interface Service {
 //   service_id: number
