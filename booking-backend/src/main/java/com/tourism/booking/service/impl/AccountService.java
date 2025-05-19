@@ -1,6 +1,7 @@
 package com.tourism.booking.service.impl;
 
 import com.tourism.booking.dto.account.AccountRequest;
+import com.tourism.booking.dto.account.ChangePasswordRequest;
 import com.tourism.booking.model.Account;
 import com.tourism.booking.model.Role;
 import com.tourism.booking.model.UserProfile;
@@ -24,6 +25,7 @@ public class AccountService implements IAccountService {
     IAccountRepository accountRepository;
     IRoleRepository roleRepository;
     IUserProfileRepository userProfileRepository;
+    PasswordEncoder passwordEncoder;
 
     @Override
     public Account register(AccountRequest accountRequest) {
@@ -64,5 +66,24 @@ public class AccountService implements IAccountService {
     public Account getAccountByUsername(String username) {
         return accountRepository.findByUsername(username);
     }
+
+
+    @Override
+    public void changePassword(Integer accountId, ChangePasswordRequest request) {
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(() -> new RuntimeException("Account not found"));
+
+        if (!passwordEncoder.matches(request.getPassword(), account.getPassword())) {
+            throw new RuntimeException("Old password is incorrect");
+        }
+
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            throw new RuntimeException("New password and confirmation do not match");
+        }
+
+        account.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        accountRepository.save(account);
+    }
+
 
 }
