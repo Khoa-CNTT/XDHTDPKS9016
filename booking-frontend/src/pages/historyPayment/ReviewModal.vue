@@ -1,79 +1,80 @@
 <template>
-  <div
-    class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50"
-    @click.self="close"
-  >
-    <div class="bg-white rounded-xl shadow-lg w-full max-w-lg p-6 relative">
-      <h3 class="text-lg font-semibold text-blue-700 flex items-center mb-4">
-        <Icon
-          icon="mdi:star-circle-outline"
-          class="mr-2"
-          width="24"
-          height="24"
-        />
-        Chi tiết đánh giá
-      </h3>
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white p-6 rounded-lg w-full max-w-lg">
+      <h3 class="text-lg font-semibold mb-4 text-blue-700">Đánh giá phòng</h3>
 
-      <div v-if="booking?.review">
-        <div class="mb-3">
-          <span class="font-semibold">Người đánh giá:</span>
-          {{ booking.user?.full_name || 'N/A' }}
-        </div>
+      <div class="space-y-4">
+        <textarea
+          v-model="comment"
+          placeholder="Nhập nhận xét..."
+          class="w-full border rounded p-3"
+        ></textarea>
 
-        <div class="mb-3">
-          <span class="font-semibold">Số sao:</span>
-          <span class="text-yellow-500">
-            <Icon
-              v-for="i in booking.review.rating"
+        <div class="flex items-center space-x-2">
+          <span class="text-sm text-gray-700">Đánh giá:</span>
+          <select
+            v-model.number="score"
+            class="border rounded p-2"
+          >
+            <option
+              v-for="i in 5"
               :key="i"
-              icon="mdi:star"
-              width="20"
-              height="20"
-            />
-          </span>
+              :value="i"
+            >
+              {{ i }} sao
+            </option>
+          </select>
         </div>
 
-        <div>
-          <span class="font-semibold">Nội dung đánh giá:</span>
-          <p class="mt-1 text-gray-700 whitespace-pre-line">
-            {{ booking.review.comment || 'Không có nội dung' }}
-          </p>
+        <div class="flex justify-end space-x-2 pt-4">
+          <button
+            @click="$emit('close')"
+            class="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded"
+          >
+            Hủy
+          </button>
+          <button
+            @click="submitReview"
+            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded"
+          >
+            Gửi đánh giá
+          </button>
         </div>
       </div>
-      <div
-        v-else
-        class="text-gray-500 italic"
-      >
-        Chưa có đánh giá nào.
-      </div>
-
-      <button
-        @click="close"
-        class="absolute top-3 right-3 text-gray-500 hover:text-gray-800 transition"
-      >
-        <Icon
-          icon="mdi:close"
-          width="24"
-          height="24"
-        />
-      </button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Icon } from '@iconify/vue'
+import { ref } from 'vue'
 import type { BookingListItem } from '@/types/booking'
+import { toast } from 'vue3-toastify'
+import { postCommentApi, postRatingApi } from '@/services/booking'
 
-defineProps<{
-  booking: BookingListItem | null
+const props = defineProps<{
+  booking: BookingListItem
 }>()
 
-const emit = defineEmits<{
-  (e: 'close'): void
-}>()
+const comment = ref('')
+const score = ref(5)
 
-function close() {
-  emit('close')
+const submitReview = async () => {
+  try {
+    const room = props.booking.rooms?.[0]
+    if (!room) throw new Error('Không tìm thấy thông tin phòng')
+
+    await postCommentApi(room.roomId, comment.value)
+    await postRatingApi(room.roomId, score.value)
+
+    toast.success('Đánh giá thành công!')
+    comment.value = ''
+    score.value = 5
+    emit('close')
+  } catch (error: any) {
+    console.error('Lỗi khi gửi đánh giá:', error)
+    toast.error(error.message || 'Gửi đánh giá thất bại')
+  }
 }
+
+const emit = defineEmits(['close'])
 </script>
