@@ -24,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -46,12 +47,12 @@ public class ServiceController {
     ServiceBookingService servicesService;
 
     @GetMapping
-    public ResponseEntity<?> getServicesByHotelId(Principal principal) {
+    public ResponseEntity<?> getServicesByHotelId(@PageableDefault(size = 5) Pageable pageable, Principal principal) {
         Account acc = accountService.getAccountByUsername(principal.getName());
         Hotel hotel = hotelService.getHotelByAccountId(acc.getAccount_id())
                 .orElseThrow(() -> new ApiException(ErrorCode.HOTEL_NOT_EXIST));
-        List<ServiceDTO> services = servicesService.getServicesByHotelId(hotel.getHotel_id());
-        return ResponseEntity.ok(services);
+        Page<ServiceDTO> services = servicesService.getServicesByHotelId(pageable, hotel.getHotel_id());
+        return ResponseEntity.ok(new PageReponse<>(services));
     }
 
     @GetMapping("/{id}")
