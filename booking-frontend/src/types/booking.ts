@@ -1,6 +1,6 @@
 interface RoomSelection {
   roomTypeId: number
-  numberOfRooms: number
+  roomId: number
 }
 
 export interface BookingRequest {

@@ -4,9 +4,14 @@
       <main class="grid grid-cols-1 md:grid-cols-4 gap-6">
         <!-- Sidebar -->
         <aside class="col-span-1 bg-white rounded-3xl shadow-lg p-5 border border-blue-200">
-          <h2 class="text-xl font-bold text-blue-700 mb-5">Địa điểm</h2>
+          <h2 class="text-xl font-bold text-blue-700 mb-5">Tìm kiếm theo địa điểm</h2>
+
+          <!-- Thanh tìm kiếm -->
+          <input v-model="searchCity" type="text" placeholder="Tìm kiếm thành phố..."
+            class="w-full mb-4 px-4 py-2 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" />
+
           <div class="space-y-3">
-            <div v-for="(city, index) in cities" :key="index"
+            <div v-for="(city, index) in filteredCities" :key="index"
               class="cursor-pointer bg-blue-50 hover:bg-blue-100 text-blue-700 hover:text-blue-900 text-sm font-medium px-4 py-2 rounded-lg border border-blue-200 transition text-center"
               @click="filterHotels(city)">
               {{ city }}
@@ -14,56 +19,45 @@
           </div>
         </aside>
 
+
         <!-- Danh sách khách sạn -->
-       <section class="col-span-1 md:col-span-3 space-y-6">
-  <article
-    v-for="(hotel, index) in hotelList"
-    :key="index"
-    class="flex flex-col md:flex-row bg-white rounded-3xl border border-indigo-200 shadow-lg hover:shadow-2xl transition overflow-hidden h-auto md:h-80"
-  >
-    <!-- Hình ảnh -->
-    <div class="w-full md:w-1/3 h-64 md:h-full overflow-hidden">
-      <img
-        v-if="hotel.image"
-        :src="'http://157.66.101.165:8080' + hotel.image"
-        alt="Hotel Image"
-        class="w-full h-full object-cover"
-      />
-    </div>
+        <section class="col-span-1 md:col-span-3 space-y-6">
+          <article v-for="(hotel, index) in hotelList" :key="index"
+            class="flex flex-col md:flex-row bg-white rounded-3xl border border-indigo-200 shadow-lg hover:shadow-2xl transition overflow-hidden h-auto md:h-80">
+            <!-- Hình ảnh -->
+            <div class="w-full md:w-1/3 h-64 md:h-full overflow-hidden">
+              <img v-if="hotel.image" :src="'http://157.66.101.165:8080' + hotel.image" alt="Hotel Image"
+                class="w-full h-full object-cover" />
+            </div>
 
-    <!-- Nội dung -->
-    <div class="flex-1 p-5 bg-gradient-to-r from-white to-indigo-50">
-      <div>
-        <h2 class="text-xl font-bold text-indigo-700 hover:text-indigo-900 transition cursor-pointer">
-          {{ hotel.name }}
-        </h2>
-        <p class="text-gray-600 text-sm mt-1 italic">{{ hotel.description }}</p>
+            <!-- Nội dung -->
+            <div class="flex-1 p-5 bg-gradient-to-r from-white to-indigo-50">
+              <div>
+                <h2 class="text-xl font-bold text-indigo-700 hover:text-indigo-900 transition cursor-pointer">
+                  {{ hotel.name }}
+                </h2>
+                <p class="text-gray-600 text-sm mt-1 italic">{{ hotel.description }}</p>
 
-        <p class="mt-2 text-indigo-600 font-medium">Địa điểm: {{ hotel.address }}</p>
+                <p class="mt-2 text-indigo-600 font-medium">Địa điểm: {{ hotel.address }}</p>
 
-        <!-- Badge tiện ích -->
-        <div class="mt-3 flex flex-wrap gap-2">
-          <span
-            v-for="(amenity, i) in hotel.amenities"
-            :key="i"
-            class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-semibold shadow"
-          >
-            {{ amenity }}
-          </span>
-        </div>
-      </div>
+                <!-- Badge tiện ích -->
+                <div class="mt-3 flex flex-wrap gap-2">
+                  <span v-for="(amenity, i) in hotel.amenities" :key="i"
+                    class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-semibold shadow">
+                    {{ amenity }}
+                  </span>
+                </div>
+              </div>
 
-      <div class="mt-5 text-right">
-        <button
-          @click="viewHotelDetail(hotel.hotel_id)"
-          class="bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white px-6 py-2 rounded-xl font-medium shadow-md hover:shadow-lg transition"
-        >
-          Xem chi tiết
-        </button>
-      </div>
-    </div>
-  </article>
-</section>
+              <div class="mt-5 text-right">
+                <button @click="viewHotelDetail(hotel.hotel_id)"
+                  class="bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white px-6 py-2 rounded-xl font-medium shadow-md hover:shadow-lg transition">
+                  Xem chi tiết
+                </button>
+              </div>
+            </div>
+          </article>
+        </section>
 
 
       </main>

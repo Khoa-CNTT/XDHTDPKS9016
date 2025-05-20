@@ -55,3 +55,10 @@ export interface Booking {
 }
 
 export type HotelSearchResponse = HotelSearchResult[];
+export interface Comment {
+  content: string;
+  comment_id: number;
+  comment_author: string;
+  comment_time: string;  // Format: "HH:mm:ss"
+  comment_date: string;  // Format: "YYYY-MM-DD"
+}
