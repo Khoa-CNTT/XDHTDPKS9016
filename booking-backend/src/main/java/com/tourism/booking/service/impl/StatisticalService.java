@@ -1,5 +1,6 @@
 package com.tourism.booking.service.impl;
 
+import com.tourism.booking.dto.statistical.QuarterlyStatDTO;
 import com.tourism.booking.dto.statistical.StatisticalDTO;
 import com.tourism.booking.repository.BookingRepository;
 import com.tourism.booking.service.IStatisticalService;
@@ -14,8 +15,14 @@ import org.springframework.stereotype.Service;
 public class StatisticalService implements IStatisticalService {
     BookingRepository bookingRepository;
 
+
     @Override
-    public StatisticalDTO getAll() {
-        return bookingRepository.getStatistical();
+    public StatisticalDTO getByQuarter(int year, int quarter) {
+        return bookingRepository.getStatisticalByQuarter(year, quarter);
+    }
+
+    @Override
+    public QuarterlyStatDTO quarterlyStat(Long accId, int year, int quarter) {
+        return bookingRepository.getHotelStatsByQuarter(accId, year, quarter);
     }
 }

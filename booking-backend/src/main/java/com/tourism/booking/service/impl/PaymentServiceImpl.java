@@ -14,6 +14,8 @@ import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,9 +43,9 @@ public class PaymentServiceImpl implements IPaymentService {
     private IBookingService bookingService;
 
     @Override
-    public List<PaymentResponseDTO> getAllPayments() {
-        List<Payment> payments = paymentRepository.findAll();
-        return payments.stream().map(this::convertToDTO).collect(Collectors.toList());
+    public Page<PaymentResponseDTO> getAllPayments(Pageable pageable) {
+        Page<Payment> payments = paymentRepository.findAll(pageable);
+        return payments.map(this::convertToDTO);
     }
 
     @Override
