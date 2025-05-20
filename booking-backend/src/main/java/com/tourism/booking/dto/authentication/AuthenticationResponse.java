@@ -11,4 +11,5 @@ import lombok.experimental.FieldDefaults;
 @Builder
 public class AuthenticationResponse {
     String token;
+    UserAuthResponse user;
 }

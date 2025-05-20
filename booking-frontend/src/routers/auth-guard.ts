@@ -14,6 +14,7 @@ export const authGuard: NavigationGuardWithThis<any> = async (to, from, next) =>
   } else {
     isPublicRoute ? next() : next({ name: 'login' })
   }
+  // next()
 }
 
 export const workspaceGuard: NavigationGuardWithThis<any> = async (to, from, next) => {

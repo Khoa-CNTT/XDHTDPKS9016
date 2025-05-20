@@ -21,6 +21,6 @@ public class PageCustom<T> {
         this.totalElements = (int) page.getTotalElements();
         this.totalPages = page.getTotalPages();
         this.number = page.getNumber();
-        this.size = page.getSize();
+        this.size = 5;
     }
 }

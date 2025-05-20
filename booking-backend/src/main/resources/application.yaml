@@ -3,7 +3,6 @@ server:
 api:
   prefix: /api/v1
 
-
 spring:
   datasource:
     url: ${DBMS_CONNECTION:jdbc:mysql://localhost:3306/booking_management?createDatabaseIfNotExist=true}
@@ -14,8 +13,26 @@ spring:
     hibernate:
       ddl-auto: validate
     show-sql: true
-
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: tranvulam2392003@gmail.com
+    password: evziqbsxocpovesr
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
 jwt:
   signerKey: "NGqcTenEeF3c21PqKhCWjAcpUNz1gJYFIZ1mbj8uFs3RmO9QlNEjLijajUO/mQse"
   valid-duration: 6000 # in second
   refreshable-duration: 36000 # in seconds
+
+gemini:
+  api:
+    key: "AIzaSyAX8spVWG7wkzb0ENFmHKhZ8IKR4seT_S0"

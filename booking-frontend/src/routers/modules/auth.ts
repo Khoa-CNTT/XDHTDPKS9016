@@ -4,7 +4,9 @@ export const authRoute: RouteRecordRaw[] = [
   {
     path: '/login',
     name: 'login',
+   
     component: () => import('@/pages/auth/login.vue'),
+    
   },
   {
     path: '/register',
@@ -12,6 +14,7 @@ export const authRoute: RouteRecordRaw[] = [
       {
         path: '',
         name: 'register',
+       
         component: () => import('@/pages/auth/register/register.vue'),
       },
       {
@@ -29,6 +32,11 @@ export const authRoute: RouteRecordRaw[] = [
         path: 'forgot',
         name: 'password-forgot',
         component: () => import('@/pages/auth/password/forgot.vue'),
+      },
+      {
+        path: 'verify-otp',
+        name: 'verify-otp',
+        component: () => import('@/pages/auth/password/confirm.vue'),
       },
       {
         path: 'reset',

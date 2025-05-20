@@ -1,5 +1,6 @@
 package com.tourism.booking.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -24,5 +25,6 @@ public class Role {
     String role_name;
 
     @ManyToMany(mappedBy = "roles") // Bên này sẽ không tạo cột mà chỉ ánh xạ theo bảng trung gian
+    @JsonIgnore
     Set<Account> acc = new HashSet<>();
 }

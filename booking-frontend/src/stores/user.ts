@@ -1,4 +1,3 @@
-// refactor user store
 import { defineStore } from 'pinia'
 import type { IUser } from '@/types'
 import { getUserApi } from '@/services/user'

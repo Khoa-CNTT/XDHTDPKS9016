@@ -1,14 +1,17 @@
 package com.tourism.booking.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tourism.booking.constant.Gender;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Getter
 @Setter
@@ -40,7 +43,9 @@ public class UserProfile {
     String phone;
 
     @Column(name = "birth_date")
-    LocalDateTime birth_date;
+    @JsonFormat(pattern = "dd-MM-yyyy")
+    @DateTimeFormat(pattern = "dd-MM-yyyy")
+    LocalDate birth_date;
 
     @Column(name = "status")
     String status;

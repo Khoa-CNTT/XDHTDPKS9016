@@ -1,20 +1,42 @@
+import { $api } from '@/api/ofetch'
 import type { BaseResponse } from '@/types/api'
+import { Import } from 'lucide-vue-next'
+import {User} from '@/types/user'
 
+// export const loginApi = async (
+//   username: string,
+//   password: string,
+// ): Promise<
+//   BaseResponse<{
+//   token: string
+//     // refresh_token: string
+//   }>
+// > => {
+//   return $api(
+//     '/auth/login',
+//     {
+//       method: 'POST',
+//       body: {
+//         username,
+//         password,
+//       },
+//     },
+//     false,
+//   )
+// }
 export const loginApi = async (
-  email: string,
+  username: string,
   password: string,
-): Promise<
-  BaseResponse<{
-    access_token: string
-    refresh_token: string
-  }>
-> => {
+): Promise<{
+  token: string
+  user: User;
+}> => {
   return $api(
     '/auth/login',
     {
       method: 'POST',
       body: {
-        email,
+        username,
         password,
       },
     },
@@ -25,11 +47,15 @@ export const loginApi = async (
 interface RegisterBody {
   email: string
   password: string
-  name: string
+  username: string
 }
 
 export const registerApi = async (data: RegisterBody): Promise<any> => {
   return $api('/auth/register', { body: data, method: 'POST' }, false)
+}
+
+export const logoutApi = async (data: { token: string }): Promise<any> => {
+  return $api('/auth/logout', { body: data, method: 'POST' }, false)
 }
 
 export const confirmEmailApi = async (token: string): Promise<any> => {
@@ -37,24 +63,37 @@ export const confirmEmailApi = async (token: string): Promise<any> => {
 }
 
 export const forgotPasswordApi = async (email: string): Promise<any> => {
-  return $api('/users/forgot-password', {
+  return $api(`/forgotPassword/verifyMail/${email}`, {
     method: 'POST',
-    body: { email },
   })
 }
-
-interface ChangePasswordPayload {
-  old_password: string
-  new_password: string
-  confirm_new_password: string
+export const confirmOtpApi = async (otp: string, email: string): Promise<any> => {
+  return $api(`/forgotPassword/verifyOtp/${otp}/${encodeURIComponent(email)}`, {
+    method: 'POST',
+  })
 }
-export const changePasswordApi = async (payload: ChangePasswordPayload): Promise<any> => {
-  return $api('/users/change-password', {
+// interface ChangePasswordPayload {
+//   old_password: string
+//   new_password: string
+//   confirm_new_password: string
+// }
+// export const changePasswordApi = async (payload: ChangePasswordPayload): Promise<any> => {
+//   return $api('/users/change-password', {
+//     method: 'POST',
+//     body: payload,
+//   })
+// }
+interface ChangePasswordPayload {
+  password: string
+  repeatPassword: string
+}
+
+export const changePasswordApi = async (email: string, payload: ChangePasswordPayload): Promise<any> => {
+  return $api(`/forgotPassword/changePassword/${encodeURIComponent(email)}`, {
     method: 'POST',
     body: payload,
   })
 }
-
 interface ProfileBody {
   first_name: string
   last_name: string

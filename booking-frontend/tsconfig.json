@@ -1,23 +1,17 @@
-// {
-//   "files": [],
-//   "references": [
-//     {
-//       "path": "./tsconfig.node.json"
-//     },
-//     {
-//       "path": "./tsconfig.app.json"
-//     }
-//   ]
-// }
 {
   "compilerOptions": {
-    // ...
-    "baseUrl": ".",
+    "module": "esnext", // Hoặc "es2020", "es2022", "node16" tùy thuộc vào môi trường bạn đang sử dụng
+    "target": "esnext", // Hoặc "es2020", "es2022"
+    "baseUrl": ".", // Đảm bảo rằng baseUrl được cấu hình
+    // "allowSyntheticDefaultImports": true,
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
-    }
-    // ...
-  }
+      "@/*": ["./src/*"] // Định nghĩa alias cho thư mục src nếu cần
+    },
+    "moduleResolution": "node", // Chế độ module resolution để xử lý modules như Node.js
+    "esModuleInterop": true, // Đảm bảo hỗ trợ việc import các module CommonJS
+    "skipLibCheck": true, // Bỏ qua kiểm tra thư viện, có thể giúp tăng tốc biên dịch
+    "strict": true // Kích hoạt tất cả các kiểm tra strict của TypeScript
+  },
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.vue"], // Bao gồm tất cả các tệp TypeScript trong src
+  "exclude": ["node_modules"] // Loại trừ thư mục node_modules
 }
