@@ -8,7 +8,8 @@ import {
   ApiResponse,
   // Residence,
   InfoHotel,
-  HotelDetail
+  HotelDetail,
+  DashboardStats
 } from '@/types/admin'
 
 export interface BaseResponse<T> {
@@ -125,3 +126,17 @@ export const updateSupplierApi = async (
 //     true,
 //   )
 // }
+
+//thong ke
+export const getAdminStatisticsApi = async (
+  year: number,
+  quarter: number
+): Promise<DashboardStats> => {
+  return $api(
+    `/management-statistical/admin?year=${year}&quarter=${quarter}`,
+    {
+      method: 'GET',
+    },
+    true
+  );
+};

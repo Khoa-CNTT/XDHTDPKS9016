@@ -1,207 +1,128 @@
 <template>
-  <div class="card">
-    <div class="card-header flex justify-center gap-4 mb-6">
-      <!-- User Button -->
-      <button
-        @click="currentTab = 'user'"
-        :class="['tab-button', currentTab === 'user' ? 'active' : '']"
-      >
-        Người dùng
-      </button>
+  <div class="card p-4">
+    <!-- Bộ chọn năm và quý -->
+    <div class="flex justify-center gap-4 mb-6">
+      <select v-model="selectedYear" class="border rounded px-3 py-1">
+        <option v-for="year in years" :key="year" :value="year">{{ year }}</option>
+      </select>
 
-      <!-- Supplier Button -->
-      <button
-        @click="currentTab = 'supplier'"
-        :class="['tab-button', currentTab === 'supplier' ? 'active' : '']"
-      >
-        Khách sạn
+      <select v-model="selectedQuarter" class="border rounded px-3 py-1">
+        <option v-for="q in 4" :key="q" :value="q">Quý {{ q }}</option>
+      </select>
+
+      <button @click="fetchStats" class="px-4 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">
+        Xem thống kê
       </button>
     </div>
 
+    <!-- Nút chọn loại thống kê -->
+    <div class="card-header flex justify-center gap-4 mb-6">
+      <button
+        v-for="key in statKeys"
+        :key="key"
+        :class="['tab-button', selectedStat === key ? 'active' : '']"
+        @click="selectedStat = key"
+      >
+        {{ statLabels[key] }}
+      </button>
+    </div>
+
+    <!-- Vùng hiển thị biểu đồ -->
     <div class="card-body w-full flex flex-wrap gap-8 justify-center">
-      <!-- Nội dung User -->
-     <div
-  v-show="currentTab === 'user'"
-  class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl"
->
-  <div class="flex justify-center">
-    <DoughnutChart
-      :chartData="userStatusDoughnutChartData"
-      :chartOptions="userStatusDoughnutChartOptions"
-      class="w-64 h-64"
-    />
-  </div>
-
-  <div class="flex justify-center">
-    <PolarAreaChart
-      :chartData="userStatusPolarChartData"
-      :chartOptions="userStatusPolarChartOptions"
-      class="w-64 h-64"
-    />
-  </div>
-</div>
-
-
-      <!-- Nội dung Nhà Cung Cấp -->
-     <div
-  v-show="currentTab === 'supplier'"
-  class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl"
->
-  <div class="flex justify-center">
-    <DoughnutChart
-      :chartData="supplierStatusDoughnutChartData"
-      :chartOptions="supplierStatusDoughnutChartOptions"
-      class="w-64 h-64"
-    />
-  </div>
-
-  <div class="flex justify-center">
-    <PolarAreaChart
-      :chartData="supplierStatusPolarChartData"
-      :chartOptions="supplierStatusPolarChartOptions"
-      class="w-64 h-64"
-    />
-  </div>
-</div>
-
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl">
+        <div class="flex justify-center">
+          <DoughnutChart :chartData="chartData" :chartOptions="chartOptions" class="w-64 h-64" />
+        </div>
+        <div class="flex justify-center">
+          <PolarChart :chartData="chartData" :chartOptions="chartOptions" class="w-64 h-64" />
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
-
-
-
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import DoughnutChart from '@/components/base/DoughnutChart.vue';
-import PolarAreaChart from '@/components/base/PolarChart.vue';
+import PolarChart from '@/components/base/PolarChart.vue';
+import { getAdminStatisticsApi } from '@/services/admin';
+import type { DashboardStats } from '@/types/admin';
 
-const currentTab = ref('user');
+const years = [2023, 2024, 2025]; // Hoặc lấy động
+const selectedYear = ref(2025);
+const selectedQuarter = ref(2);
 
-// Dữ liệu cho User
-const userStatusDoughnutChartData = {
-  labels: ['Hoạt động', 'Tạm dừng', 'Không hoạt động'],
-  datasets: [
-    {
-      data: [5000, 1200, 800],
-      backgroundColor: ['#4dc9c0', '#ff6347', '#f39c12'],
-      borderWidth: 1,
-    },
-  ],
+const dataStats = ref<DashboardStats | null>(null);
+
+// Các key trong dữ liệu để hiển thị nút chọn
+const statKeys = ['accountHotel', 'accountCount', 'bookingCount', 'totalPayment'] as const;
+type StatKey = typeof statKeys[number];
+const selectedStat = ref<StatKey>('accountHotel');
+
+// Định nghĩa tên hiển thị cho các key
+const statLabels: Record<StatKey, string> = {
+  accountHotel: 'Tài khoản khách sạn',
+  accountCount: 'Tổng số tài khoản đăng ký',
+  bookingCount: 'Tài khoản người dùng',
+  totalPayment: 'Tổng số tiền thanh toán',
+}
+
+// Hàm fetch data theo năm & quý
+const fetchStats = async () => {
+  try {
+    const data = await getAdminStatisticsApi(selectedYear.value, selectedQuarter.value);
+    dataStats.value = data;
+  } catch (error) {
+    console.error('Lỗi khi fetch thống kê:', error);
+  }
 };
 
-const userStatusDoughnutChartOptions = {
+// Gọi fetch lần đầu khi component mount
+fetchStats();
+
+const chartData = ref<any>({
+  labels: [],
+  datasets: [],
+});
+
+const chartOptions = {
   responsive: true,
   plugins: {
-    title: {
-      display: true,
-      text: 'Tỷ lệ người dùng theo trạng thái',
-    },
     legend: {
-      position: 'top',
+      position: 'bottom' as const,
     },
   },
 };
 
-const userStatusPolarChartData = {
-  labels: ['Hoạt động', 'Tạm dừng', 'Không hoạt động'],
-  datasets: [
-    {
-      data: [5000, 1200, 800],
-      backgroundColor: ['#4dc9c0', '#ff6347', '#f39c12'],
-      borderWidth: 1,
-    },
-  ],
-};
+// Cập nhật dữ liệu biểu đồ khi dataStats hoặc selectedStat thay đổi
+watch([dataStats, selectedStat], () => {
+  if (!dataStats.value) {
+    chartData.value = { labels: [], datasets: [] };
+    return;
+  }
 
-const userStatusPolarChartOptions = {
-  responsive: true,
-  plugins: {
-    title: {
-      display: true,
-      text: 'Phân bố người dùng theo trạng thái',
-    },
-    legend: {
-      position: 'top',
-    },
-  },
-};
+  const label = selectedStat.value;
+  const value = dataStats.value[label];
 
-// Dữ liệu cho Nhà Cung Cấp
-const supplierStatusDoughnutChartData = {
-  labels: ['Hoạt động', 'Tạm dừng', 'Không hoạt động'],
-  datasets: [
-    {
-      data: [3000, 1000, 500],
-      backgroundColor: ['#36a2eb', '#ff9f40', '#ffcd56'],
-      borderWidth: 1,
-    },
-  ],
-};
-
-const supplierStatusDoughnutChartOptions = {
-  responsive: true,
-  plugins: {
-    title: {
-      display: true,
-      text: 'Tỷ lệ nhà cung cấp theo trạng thái',
-    },
-    legend: {
-      position: 'top',
-    },
-  },
-};
-
-const supplierStatusPolarChartData = {
-  labels: ['Hoạt động', 'Tạm dừng', 'Không hoạt động'],
-  datasets: [
-    {
-      data: [3000, 1000, 500],
-      backgroundColor: ['#36a2eb', '#ff9f40', '#ffcd56'],
-      borderWidth: 1,
-    },
-  ],
-};
-
-const supplierStatusPolarChartOptions = {
-  responsive: true,
-  plugins: {
-    title: {
-      display: true,
-      text: 'Phân bố nhà cung cấp theo trạng thái',
-    },
-    legend: {
-      position: 'top',
-    },
-  },
-};
+  chartData.value = {
+    labels: [statLabels[label], 'Other'],
+    datasets: [
+      {
+        label: statLabels[label],
+        data: [value || 0, 100], // Ví dụ: giá trị thật và giả lập "Other"
+        backgroundColor: ['#36A2EB', '#FF6384'],
+        hoverOffset: 30,
+      },
+    ],
+  };
+});
 </script>
+
 <style scoped>
-.card-body {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 20px;
-}
-
 .tab-button {
-  padding: 12px 24px;
-  background-color: #f0f0f0;
-  border: 2px solid #ddd;
-  border-radius: 10px;
-  color: #333;
-  cursor: pointer;
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  @apply px-4 py-2 border rounded bg-gray-100 hover:bg-gray-200 cursor-pointer;
 }
-
 .tab-button.active {
-  background-color: #36a2eb;
-  color: white;
-  border-color: #1d7ed2;
-}
-
-.tab-button:not(.active):hover {
-  background-color: #e0e0e0;
+  @apply bg-blue-500 text-white;
 }
 </style>
