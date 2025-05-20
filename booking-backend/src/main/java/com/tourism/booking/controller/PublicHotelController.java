@@ -38,13 +38,22 @@ public class PublicHotelController {
             @PathVariable Long id,
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkIn,
-            @RequestParam(defaultValue = "1") int los
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkOut
     ) {
-        LocalDate effectiveCheckIn = (checkIn != null) ? checkIn : LocalDate.now();
+        LocalDate ci = (checkIn != null) ? checkIn : LocalDate.now();
+        LocalDate co = (checkOut != null) ? checkOut : ci.plusDays(1); // mặc định ở lại 1 đêm
 
-        return hotelService.getHotelDetail(id, effectiveCheckIn, los)
-                .map(ResponseEntity::ok)
+        if (!ci.isBefore(co)) {
+            throw new ApiException(ErrorCode.INVALID_DATE_RANGE);
+        }
+
+        HotelDetailPublicDTO dto = hotelService
+                .getHotelDetail(id, ci, co)
                 .orElseThrow(() -> new ApiException(ErrorCode.HOTEL_NOT_EXIST));
+
+        return ResponseEntity.ok(dto);
     }
 }
+
 
