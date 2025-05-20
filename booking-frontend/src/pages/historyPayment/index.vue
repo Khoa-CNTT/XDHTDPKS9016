@@ -18,7 +18,6 @@
             <tr>
               <th class="px-4 py-2 text-left">STT</th>
               <th class="px-4 py-2 text-left">Tên người đặt</th>
-              <!-- Thêm cột này -->
               <th class="px-4 py-2 text-left">Ngày nhận phòng</th>
               <th class="px-4 py-2 text-left">Ngày trả phòng</th>
               <th class="px-4 py-2 text-left">Tổng tiền</th>
@@ -33,10 +32,11 @@
             >
               <td class="px-4 py-2">{{ index + 1 }}</td>
               <td class="px-4 py-2">{{ booking.user?.full_name || 'N/A' }}</td>
-              <!-- Hiển thị tên người đặt -->
               <td class="px-4 py-2">{{ formatDate(booking.checkInDate) }}</td>
               <td class="px-4 py-2">{{ formatDate(booking.checkOutDate) }}</td>
-              <td class="px-4 py-2">{{ formatCurrency(booking.bill?.total || 0) }}</td>
+              <td class="px-4 py-2">
+                {{ formatCurrency(booking.bill?.total || 0) }}
+              </td>
               <td class="px-4 py-2">
                 <span
                   :class="statusClass(booking.statusDisplay)"
@@ -45,13 +45,25 @@
                   {{ booking.statusDisplay }}
                 </span>
               </td>
-              <td class="px-4 py-2 text-center">
+              <td class="px-4 py-2 text-center space-x-2">
                 <button
                   @click="viewBooking(booking)"
                   class="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded transition"
                 >
                   <Icon
                     icon="mdi:eye"
+                    width="20"
+                    height="20"
+                  />
+                </button>
+
+                <button
+                  v-if="canReview(booking.checkOutDate)"
+                  @click="openReviewModal(booking)"
+                  class="p-2 bg-green-500 hover:bg-green-600 text-white rounded transition"
+                >
+                  <Icon
+                    icon="mdi:star"
                     width="20"
                     height="20"
                   />
@@ -76,6 +88,13 @@
       :booking="selectedBooking"
       @close="showModal = false"
     />
+
+    <!-- Modal đánh giá -->
+    <ReviewModal
+      v-if="showReviewModal"
+      :booking="bookingToReview"
+      @close="showReviewModal = false"
+    />
   </div>
 </template>
 
@@ -85,10 +104,15 @@ import { Icon } from '@iconify/vue'
 import { getBookingListApi } from '@/services/booking'
 import type { BookingListItem } from '@/types/booking'
 import UpdateInfo from './UpdateInfo.vue'
+import ReviewModal from './ReviewModal.vue'
 
 const bookings = ref<BookingListItem[]>([])
 const showModal = ref(false)
 const selectedBooking = ref<BookingListItem | null>(null)
+
+// Đánh giá
+const showReviewModal = ref(false)
+const bookingToReview = ref<BookingListItem | null>(null)
 
 onMounted(async () => {
   try {
@@ -104,16 +128,14 @@ function viewBooking(booking: BookingListItem) {
   showModal.value = true
 }
 
+function openReviewModal(booking: BookingListItem) {
+  bookingToReview.value = booking
+  showReviewModal.value = true
+}
+
 function formatDate(dateStr: string): string {
   const d = new Date(dateStr)
   return d.toLocaleDateString('vi-VN')
-}
-
-function getDays(start: string, end: string): number {
-  const startDate = new Date(start)
-  const endDate = new Date(end)
-  const diffTime = Math.abs(endDate.getTime() - startDate.getTime())
-  return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
 }
 
 function formatCurrency(amount: number): string {
@@ -137,5 +159,11 @@ function statusClass(status: string): string {
     default:
       return 'border border-gray-400 bg-gray-100 text-gray-700'
   }
+}
+
+function canReview(checkOutDate: string): boolean {
+  const now = new Date()
+  const checkOut = new Date(checkOutDate)
+  return now > checkOut
 }
 </script>

@@ -16,6 +16,7 @@ public enum ErrorCode {
     ROOM_NOT_EXIST(40404, "Room is not found", HttpStatus.NOT_FOUND),
     ROOM_TYPE_NOT_EXIST(40405, "Room type is not found", HttpStatus.NOT_FOUND),
     OTP_INVALID(40001, "OTP is invalid", HttpStatus.BAD_REQUEST),
+    INVALID_DATE_RANGE(40002, "Invalid date range", HttpStatus.BAD_REQUEST),
 
     UNAUTHENTICATION(40102, "Username or password is incorrect !", HttpStatus.UNAUTHORIZED),
     FORBIDDEN(40103, "You don't have permission to access this resource", HttpStatus.FORBIDDEN),

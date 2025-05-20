@@ -17,5 +17,4 @@ public class RoomTypePublicDTO {
     String description;
     String room_image;
     List<RoomPublicDTO> rooms;
-    String status;
 }

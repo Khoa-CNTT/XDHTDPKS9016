@@ -2,6 +2,7 @@ package com.tourism.booking.controller;
 
 import com.tourism.booking.dto.booking.PaymentRequestDTO;
 import com.tourism.booking.dto.booking.PaymentResponseDTO;
+import com.tourism.booking.dto.page.PageReponse;
 import com.tourism.booking.service.IPaymentService;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -10,6 +11,8 @@ import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,9 +35,9 @@ public class PaymentBookingController {
      * Nghiệp vụ: Quản lý xem danh sách giao dịch thanh toán
      */
     @GetMapping("/history")
-    public ResponseEntity<List<PaymentResponseDTO>> getAllPayments() {
-        List<PaymentResponseDTO> payments = paymentService.getAllPayments();
-        return ResponseEntity.ok(payments);
+    public ResponseEntity<?> getAllPayments(Pageable pageable) {
+        Page<PaymentResponseDTO> payments = paymentService.getAllPayments(pageable);
+        return ResponseEntity.ok(new PageReponse<>(payments));
     }
 
     /**
