@@ -16,6 +16,8 @@ import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -195,11 +197,9 @@ public class PaymentService implements IPaymentService {
      * Nghiệp vụ: Hiển thị danh sách thanh toán cho quản lý
      */
     @Override
-    public List<PaymentResponseDTO> getAllPayments() {
-        List<Payment> payments = paymentRepository.findAll();
-        return payments.stream()
-                .map(this::convertToDetailedDTO)
-                .collect(Collectors.toList());
+    public Page<PaymentResponseDTO> getAllPayments(Pageable pageable) {
+        Page<Payment> payments = paymentRepository.findAll(pageable);
+        return payments.map(this::convertToDetailedDTO);
     }
 
     /**
