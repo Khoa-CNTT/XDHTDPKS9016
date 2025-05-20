@@ -147,3 +147,12 @@ export interface HotelDetail {
   description: string | null;
   account: HotelAccount;
 }
+
+
+// thong ke
+export interface DashboardStats {
+  accountHotel: number;
+  accountCount: number;
+  bookingCount: number;
+  totalPayment: number | null;
+}

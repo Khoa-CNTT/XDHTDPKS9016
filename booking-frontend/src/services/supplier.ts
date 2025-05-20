@@ -4,7 +4,7 @@ import { $api } from '@/api/ofetch'
 import { GetService , AddService, Service,NewService,AddServiceResponse, Room } from "@/types/supplier"
 import { RoomTypeResponse,RoomTypeSummary,RoomType,RoomTypeDetail,UpdateRoomTypeBody} from "@/types/supplier"
 import { HotelInfo,InfoHotel,HotelProfile, HotelDetail} from "@/types/supplier"
-import { IBookingList,BookingList} from "@/types/supplier"
+import { IBookingList,BookingList,DashboardStatsPartial} from "@/types/supplier"
 import { PaymentHistory} from "@/types/supplier"
 //service
 export const getServiceListApi = async (): Promise<GetService[]> => {
@@ -154,5 +154,19 @@ export const createRoomApi = async (roomData: Partial<Room>): Promise<Room> => {
   }, true);
 //history payment
 export const getPaymentHistory = async (): Promise<PaymentHistory[]> => {
-  return $api('payments/history', { method: 'GET' }, true);
+  return $api('/payments/history', { method: 'GET' }, true);
+};
+
+//thong ke
+export const getHotelStatisticsApi = async (
+  year: number,
+  quarter: number
+): Promise<DashboardStatsPartial> => {
+  return $api(
+    `/management-statistical/hotel?year=${year}&quarter=${quarter}`,
+    {
+      method: 'GET',
+    },
+    true
+  );
 };

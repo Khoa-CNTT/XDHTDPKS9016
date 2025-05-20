@@ -36,37 +36,21 @@ const emit = defineEmits(['page-change'])
 </script>
 
 <template>
-  <Pagination
-    v-slot="{ page }"
-    :items-per-page="props.itemsPerPage"
-    :total="props.total"
-    :sibling-count="props.siblingCount"
-    show-edges
-    :default-page="props.defaultPage"
-    @update:page="emit('page-change', $event)"
-  >
+  <Pagination v-slot="{ page }" :items-per-page="props.itemsPerPage" :total="props.total"
+    :sibling-count="props.siblingCount" show-edges :default-page="props.defaultPage"
+    @update:page="emit('page-change', $event)">
     <PaginationList v-slot="{ items }" class="flex items-center gap-1">
       <PaginationFirst />
       <PaginationPrev />
 
       <template v-for="(item, index) in items" :key="index">
-        <PaginationListItem
-          v-if="item.type === 'page'"
-          :value="item.value"
-          as-child
-        >
-          <Button
-            class="w-10 h-10 p-0"
-            :variant="item.value === page ? 'default' : 'outline'"
-          >
+        <PaginationListItem v-if="item.type === 'page'" :value="item.value" as-child>
+          <Button type="button" class="w-10 h-10 p-0" :variant="item.value === page ? 'default' : 'outline'">
             {{ item.value }}
           </Button>
         </PaginationListItem>
 
-        <PaginationEllipsis
-          v-else
-          :index="index"
-        />
+        <PaginationEllipsis v-else :index="index" />
       </template>
 
       <PaginationNext />

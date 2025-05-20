@@ -84,7 +84,7 @@ import type { RoomTypeSummary } from '@/types/supplier'
 
 const roomTypes = ref<RoomTypeSummary[]>([])
 const totalElements = ref(0)
-const currentPage = ref(0) // page từ backend (bắt đầu từ 0)
+const currentPage = ref(0) 
 const size = ref(5)
 
 const showModal = ref(false)
