@@ -18,12 +18,12 @@ import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -115,10 +115,10 @@ public class RoomHotelService implements IRoomHotelService {
     }
 
     @Override
-    public Page<RoomResponse> getRoomsByAccountId(Long accountId, Pageable pageable) {
-        Page<Room> rooms = roomHotelRepository.findRoomsByHotelOwner(accountId, pageable);
+    public List<RoomResponse> getRoomsByAccountId(Long accountId) {
+        List<Room> rooms = roomHotelRepository.findRoomsByHotelOwner(accountId);
 
-        return rooms.map(room -> {
+        return rooms.stream().map(room -> {
             RoomResponse roomResponse = mapper.toResponse(room);
 
             Optional<BookingRoom> current = bookingRoomRepository
@@ -139,10 +139,8 @@ public class RoomHotelService implements IRoomHotelService {
             }
 
             return roomResponse;
-        });
+        }).collect(Collectors.toList());
     }
-
-
 
 
     private void updateRoomCount(RoomType type) {

@@ -5,6 +5,7 @@ import { GetService , AddService, Service,NewService,AddServiceResponse, Room } 
 import { RoomTypeResponse,RoomTypeSummary,RoomType,RoomTypeDetail,UpdateRoomTypeBody} from "@/types/supplier"
 import { HotelInfo,InfoHotel,HotelProfile, HotelDetail} from "@/types/supplier"
 import { IBookingList,BookingList} from "@/types/supplier"
+import { PaymentHistory} from "@/types/supplier"
 //service
 export const getServiceListApi = async (): Promise<GetService[]> => {
   return $api('/management-service', { method: 'GET' }, true);
@@ -76,8 +77,11 @@ export const updateHotelInfoApi = async (hotelData: InfoHotel): Promise<HotelInf
 };
 
 ///type room
-export const getRoomTypesApi = async (): Promise<RoomTypeResponse> => {
-  return $api('/room-types', { method: 'GET' }, true);
+// export const getRoomTypesApi = async (): Promise<RoomTypeResponse> => {
+//   return $api('/room-types', { method: 'GET' }, true);
+// };
+export const getRoomTypesApi = async (page = 0, size = 5): Promise<RoomTypeResponse> => {
+  return $api(`/room-types?page=${page}&size=${size}`, { method: 'GET' }, true);
 };
 export const createRoomTypeApi = async (roomTypeData: RoomTypeDetail): Promise<RoomType> => {
   return $api('/room-types', {
@@ -148,4 +152,7 @@ export const createRoomApi = async (roomData: Partial<Room>): Promise<Room> => {
     },
     body: JSON.stringify(roomData),
   }, true);
+//history payment
+export const getPaymentHistory = async (): Promise<PaymentHistory[]> => {
+  return $api('payments/history', { method: 'GET' }, true);
 };

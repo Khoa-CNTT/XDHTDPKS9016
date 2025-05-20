@@ -358,3 +358,18 @@ export interface Room {
   status: RoomStatus
   room_type_id: number
 }
+//history payment
+export interface PaymentHistory {
+  paymentId: number;
+  bookingId: number;
+  billId: number;
+  amount: number;
+  paymentMethod: string;
+  transactionId: string;
+  status: string;
+  paymentDate: string; 
+  paymentTime: string; 
+  customerName: string;
+  accountNumber: string;
+  statusDisplay: string | null;
+}

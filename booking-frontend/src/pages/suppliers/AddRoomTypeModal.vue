@@ -26,8 +26,8 @@
         <div class="col-span-2">
           <label class="block text-sm font-medium mb-1">Ảnh</label>
           <input @change="handleFileUpload" type="file" accept="image/*" class="input" />
-          <div v-if="form.room_image" class="mt-2">
-            <img :src="form.room_image" alt="Ảnh đã chọn" class="w-32 h-auto border rounded" />
+          <div v-if="previewImage" class="mt-2">
+            <img :src="previewImage" alt="Ảnh đã chọn" class="w-32 h-auto border rounded" />
           </div>
         </div>
         <div class="hidden">
@@ -62,14 +62,18 @@ const form = ref<RoomTypeDetail>({
 })
 
 // ✅ Hàm upload ảnh và lưu URL
+const previewImage = ref<string | null>(null)
+
 const handleFileUpload = async (event: Event) => {
   const target = event.target as HTMLInputElement;
   const file = target.files?.[0];
   if (file) {
     try {
-      const uploadedUrl = await uploadImageApi(file)
-      form.value.room_image = uploadedUrl
-      console.log('Uploaded image URL:', uploadedUrl)
+      const uploadedFilename = await uploadImageApi(file)
+      const baseUrl = 'http://157.66.101.165:8080'
+      previewImage.value = baseUrl + uploadedFilename
+      form.value.room_image = uploadedFilename
+      console.log('URL hiển thị ảnh:', previewImage.value)
     } catch (error) {
       console.error('Lỗi upload ảnh:', error)
     }

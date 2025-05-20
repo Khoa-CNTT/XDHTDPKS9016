@@ -47,34 +47,39 @@ const sendChat = async () => {
       <!-- Cửa sổ chat -->
       <transition name="fade-slide">
         <div v-if="showChat"
-          class="fixed bottom-20 right-6 w-96 bg-white shadow-2xl rounded-lg border border-gray-300 z-50 flex flex-col max-h-[80vh]">
+          class="fixed bottom-24 right-6 w-80 sm:w-96 bg-white shadow-xl rounded-xl border border-gray-200 z-50 flex flex-col max-h-[80vh] overflow-hidden">
+
           <!-- Header -->
-          <div class="p-4 border-b font-semibold bg-blue-600 text-white rounded-t-lg flex justify-between items-center">
-            <span>Chat với chúng tôi</span>
-            <button @click="toggleChat" class="text-white text-xl font-bold">✕</button>
+          <div class="p-4 bg-blue-600 text-white rounded-t-xl flex justify-between items-center">
+            <span class="font-medium">💬 Hỗ trợ trực tuyến</span>
+            <button @click="toggleChat" class="hover:text-red-200 text-xl font-bold transition">✕</button>
           </div>
 
           <!-- Nội dung chat -->
-          <div class="p-4 flex-1 overflow-y-auto space-y-3 text-sm text-gray-800 bg-gray-50">
-            <div v-for="(msg, index) in chatHistory" :key="index" class="flex px-2"
-              :class="msg.from === 'user' ? 'justify-end' : 'justify-start'">
+          <div class="flex-1 overflow-y-auto space-y-3 px-4 py-3 text-sm bg-gray-50 scroll-smooth max-h-[400px]">
+            <div v-for="(msg, index) in chatHistory" :key="index"
+              :class="msg.from === 'user' ? 'flex justify-end' : 'flex justify-start'">
               <div :class="msg.from === 'user' ? 'bg-blue-100 text-blue-800' : 'bg-gray-200 text-gray-800'"
-                class="px-4 py-2 rounded-lg max-w-[75%] whitespace-pre-line leading-relaxed break-words shadow">
+                class="px-4 py-2 rounded-2xl max-w-[75%] leading-relaxed break-words shadow-sm text-sm">
                 {{ msg.message }}
               </div>
             </div>
           </div>
-          <!-- Input & gửi -->
-          <div class="p-3 border-t flex items-center gap-2">
+
+          <!-- Input -->
+          <div class="p-3 bg-white border-t flex items-center gap-2">
             <input type="text" v-model="chatMessage" placeholder="Nhập tin nhắn..."
-              class="flex-1 border rounded px-3 py-2 text-sm focus:outline-none" @keyup.enter="sendChat" />
+              class="flex-1 border border-gray-300 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+              @keyup.enter="sendChat" />
             <button @click="sendChat"
-              class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded text-sm transition">
+              class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-full text-sm font-medium transition-all">
               Gửi
             </button>
           </div>
         </div>
       </transition>
+
+
     </div>
     <Footer class="footer" />
   </div>

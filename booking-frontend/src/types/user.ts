@@ -71,3 +71,9 @@ export interface CreateUserResponse {
   status: string
   username: string
 }
+
+export interface ChangePasswordPayload {
+  password: string;
+  newPassword: string;
+  confirmPassword: string;
+}
