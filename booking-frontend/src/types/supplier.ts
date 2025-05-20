@@ -345,3 +345,16 @@ export interface BookingUser {
   username: string;
 }
 export type BookingList = Booking[];
+
+export type RoomStatus = 'AVAILABLE' | 'UNAVAILABLE'
+
+export interface Room {
+  id_room: number
+  number_rooms: number | null
+  number_bed: number
+  price: number
+  full_name: string | null
+  type_name: string
+  status: RoomStatus
+  room_type_id: number
+}

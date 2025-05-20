@@ -1,7 +1,7 @@
 
 
 import { $api } from '@/api/ofetch'
-import { GetService , AddService, Service,NewService,AddServiceResponse } from "@/types/supplier"
+import { GetService , AddService, Service,NewService,AddServiceResponse, Room } from "@/types/supplier"
 import { RoomTypeResponse,RoomTypeSummary,RoomType,RoomTypeDetail,UpdateRoomTypeBody} from "@/types/supplier"
 import { HotelInfo,InfoHotel,HotelProfile, HotelDetail} from "@/types/supplier"
 import { IBookingList,BookingList} from "@/types/supplier"
@@ -119,4 +119,33 @@ export const createHotel = async (roomTypeData: HotelProfile): Promise<HotelDeta
 // manager booking
 export const getBookingsManager = async (): Promise<BookingList> => {
   return $api('/bookings/hotel', { method: 'GET' }, true);
+};
+
+export const getRoomsApi = async (): Promise<Room[]> => {
+  return $api('/rooms-v1', { method: 'GET' }, true);
+}
+export const updateRoomApi = async (id_room: number, roomData: Partial<Room>): Promise<Room> => {
+  return $api(`/rooms-v1/${id_room}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(roomData),
+  }, true);
+};
+
+export const deleteRoomApi = async (id_room: number): Promise<void> => {
+  return $api(`/rooms-v1/${id_room}`, {
+    method: 'DELETE',
+  }, true);
+};
+
+export const createRoomApi = async (roomData: Partial<Room>): Promise<Room> => {
+  return $api('/rooms-v1', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(roomData),
+  }, true);
 };
