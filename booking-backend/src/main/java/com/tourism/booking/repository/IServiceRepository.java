@@ -26,7 +26,7 @@ public interface IServiceRepository extends JpaRepository<Services, Long> {
                         FROM service s
                         WHERE s.hotel_id = :hotelId
                         """, nativeQuery = true)
-        List<Services> findByHotelId(Long hotelId);
+        Page<Services> findByHotelId(Pageable pageable, Long hotelId);
 
         @Query(value = """
                         SELECT s.service_id, s.service_name, s.service_price, s.service_image,
