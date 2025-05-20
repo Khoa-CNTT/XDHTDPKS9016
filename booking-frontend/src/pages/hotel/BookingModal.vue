@@ -47,7 +47,7 @@
 
                     <!-- Chọn loại phòng và số lượng -->
                     <div class="p-4 border rounded bg-gray-50 space-y-4">
-                        <h3 class="font-semibold mb-2">Chọn loại phòng và số lượng:</h3>
+                        <!-- <h3 class="font-semibold mb-2">Chọn loại phòng và số lượng:</h3> -->
                         <div v-for="(roomSel, index) in body.roomSelections" :key="index"
                             class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
                             <div>
@@ -55,17 +55,21 @@
                                 <div class="w-full border rounded px-3 py-2 bg-gray-100">
                                     {{ roomType.room_type_id }}
                                 </div>
+                                <div class="w-full border rounded px-3 py-2 bg-gray-100 mt-2">
+                                    {{ room.id_room }}
+                                </div>
                             </div>
-                            <div>
+
+                            <!-- <div>
                                 <label class="block font-medium mb-1">Số lượng phòng</label>
-                                <input type="number" v-model="roomSel.numberOfRooms" min="1"
+                                <input type="number" v-model="roomSel.roomId" min="1"
                                     class="w-full border rounded px-3 py-2" />
                             </div>
                             <div>
                                 <label class="block font-medium mb-1">Số khách</label>
                                 <input type="number" v-model="body.numberOfPeople" min="1"
                                     class="w-full border rounded px-3 py-2" />
-                            </div>
+                            </div> -->
                         </div>
                     </div>
 
@@ -95,13 +99,13 @@
                     <div class="space-y-4">
                         <input v-model="contact.bookingId" type="number" placeholder="Mã đặt lịch (Booking ID)"
                             class="w-full border rounded px-4 py-2" />
-                        <input v-model="contact.name" type="text" placeholder="Họ và tên"
+                        <input v-model="contact.contactName" type="text" placeholder="Họ và tên"
                             class="w-full border rounded px-4 py-2" />
-                        <input v-model="contact.email" type="email" placeholder="Email"
+                        <input v-model="contact.contactEmail" type="email" placeholder="Email"
                             class="w-full border rounded px-4 py-2" />
-                        <input v-model="contact.phone" type="text" placeholder="Số điện thoại"
+                        <input v-model="contact.contactPhone" type="text" placeholder="Số điện thoại"
                             class="w-full border rounded px-4 py-2" />
-                        <input v-model="contact.address" type="text" placeholder="Địa chỉ"
+                        <input v-model="contact.contactAddress" type="text" placeholder="Địa chỉ"
                             class="w-full border rounded px-4 py-2" />
                         <textarea v-model="contact.specialRequests" placeholder="Yêu cầu đặc biệt" rows="3"
                             class="w-full border rounded px-4 py-2"></textarea>
@@ -132,31 +136,34 @@
     </div>
 </template>
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { initializeBookingApi, contactInfoPaymentApi } from '@/services/booking'
+import { toast } from 'vue3-toastify'
 const props = defineProps({
     show: Boolean,
     room: Object,
     hotel: Object,
     roomType: Object
 })
-defineEmits(['close'])
+console.log();
+
+const emit = defineEmits(['close'])
 
 const step = ref(1)
 const contact = ref({
     bookingId: null,
-    name: '',
-    phone: '',
-    email: '',
-    address: '',
+    contactName: '',
+    contactPhone: '',
+    contactEmail: '',
+    contactAddress: '',
     specialRequests: ''
 })
 const selectedServices = ref([])
 
-const stepClass = (s) => {
-    return `font-medium px-2 py-1 rounded ${step.value === s ? 'text-blue-700 font-bold border-b-2 border-blue-700' : 'text-gray-500'
-        }`
-}
+const today = new Date().toISOString().split('T')[0]
+const errorCheckInDate = ref('')
+const errorCheckOutDate = ref('')
+const loading = ref(false)
 
 const body = ref({
     checkInDate: '',
@@ -166,81 +173,77 @@ const body = ref({
     numberOfPeople: 1,
     roomSelections: [
         {
-            // roomTypeId: props.roomType.room_type_id,
-            numberOfRooms: 1
+            roomTypeId: null,
+            roomId: null
         }
     ],
     serviceIds: []
 })
-const loading = ref(false)
+
+// Watch để cập nhật roomTypeId khi props thay đổi
+watch(
+    [() => props.room, () => props.roomType],
+    ([newRoom, newRoomType]) => {
+        if (newRoom?.id_room) {
+            body.value.roomSelections[0].roomId = newRoom.id_room
+        }
+        if (newRoomType?.room_type_id) {
+            body.value.roomSelections[0].roomTypeId = newRoomType.room_type_id
+        }
+        console.log('✅ roomSelections đã được cập nhật:', body.value.roomSelections)
+    },
+    { immediate: true }
+)
+
 function formatTimeToHHMMSS(time) {
-    // time có thể là "14:00" hoặc "14:00:00"
     if (!time) return ''
-    if (time.length === 5) {
-        // dạng "HH:mm" => thêm ":00"
-        return time + ':00'
-    }
+    if (time.length === 5) return time + ':00'
     return time
 }
 
-const today = new Date().toISOString().split('T')[0]
-const errorCheckInDate = ref('')
-const errorCheckOutDate = ref('')
-// Watch ngày nhận phòng
-watch(() => body.value.checkInDate, (newVal) => {
-    if (newVal && newVal < today) {
-        errorCheckInDate.value = 'Ngày nhận phòng không được chọn trước ngày hôm nay'
-    } else {
-        errorCheckInDate.value = ''
-    }
+const stepClass = (s) => {
+    return `font-medium px-2 py-1 rounded ${step.value === s
+            ? 'text-blue-700 font-bold border-b-2 border-blue-700'
+            : 'text-gray-500'
+        }`
+}
 
-    // Nếu ngày trả phòng nhỏ hơn ngày nhận phòng thì cảnh báo ngay
-    if (body.value.checkOutDate && body.value.checkOutDate < newVal) {
-        errorCheckOutDate.value = 'Ngày trả phòng không được nhỏ hơn ngày nhận phòng'
-    } else {
-        errorCheckOutDate.value = ''
-    }
-})
-
-// Watch ngày trả phòng
-watch(() => body.value.checkOutDate, (newVal) => {
-    if (newVal && body.value.checkInDate && newVal < body.value.checkInDate) {
-        errorCheckOutDate.value = 'Ngày trả phòng không được nhỏ hơn ngày nhận phòng'
-    } else {
-        errorCheckOutDate.value = ''
-    }
-})
 async function handleNextStep() {
     console.log('handleNextStep được gọi')
 
     if (step.value === 1) {
+        // Format lại thời gian check-in/out về định dạng HH:mm:ss
         body.value.checkInTime = formatTimeToHHMMSS(body.value.checkInTime)
         body.value.checkOutTime = formatTimeToHHMMSS(body.value.checkOutTime)
-        // 1. Gán serviceIds từ checkbox người dùng đã chọn
-        body.value.serviceIds = [...selectedServices.value]
-        console.log('Dữ liệu gửi API:', JSON.stringify(body.value, null, 2))
 
-        // 2. Kiểm tra xem đã chọn ngày giờ chưa
+        // Gán dịch vụ đã chọn từ checkbox
+        body.value.serviceIds = [...selectedServices.value]
+
+        // Kiểm tra ngày và giờ có được nhập không
         if (
             !body.value.checkInDate ||
             !body.value.checkInTime ||
             !body.value.checkOutDate ||
             !body.value.checkOutTime
         ) {
-            console.warn('Ngày giờ check-in hoặc check-out bị thiếu')
+            console.warn('Vui lòng nhập đầy đủ ngày và giờ check-in/check-out')
             return
         }
 
+        console.log('Dữ liệu gửi initializeBookingApi:', JSON.stringify(body.value, null, 2))
 
-        // 4. Gọi API
         loading.value = true
         try {
             const res = await initializeBookingApi(body.value)
             console.log('API trả về:', res)
 
-            // 5. Lưu bookingId từ API vào contact
-            contact.value.bookingId = res.bookingId
-            step.value++ // sang bước 2
+            // Gán bookingId từ API cho biến contact
+            if (res && res.bookingId) {
+                contact.value.bookingId = res.bookingId
+                step.value++ // Chuyển sang bước tiếp theo
+            } else {
+                console.error('Không nhận được bookingId từ API')
+            }
         } catch (error) {
             console.error('Lỗi khi gọi initializeBookingApi:', error)
         } finally {
@@ -248,31 +251,33 @@ async function handleNextStep() {
         }
     }
 }
-const submitBooking = async () => {
-    try {
-        const payload = {
-            bookingId: contact.value.bookingId,
-            contactName: contact.value.name,
-            contactEmail: contact.value.email,
-            contactPhone: contact.value.phone,
-            contactAddress: contact.value.address,
-            specialRequests: contact.value.specialRequests,
-        };
+async function submitBooking() {
+    loading.value = true;
 
-        const res = await contactInfoPaymentApi(payload); // Lưu lại kết quả
-        console.log('API trả về:', res);
-        if (res.paymentUrl) {
-            // Chuyển hướng sang trang thanh toán
-            window.open(res.paymentUrl, '_blank');
-            emit('close');
+    try {
+        const res = await contactInfoPaymentApi(contact.value);
+
+        if (res && res.paymentUrl) {
+            // ✅ Hiển thị toast thành công
+            toast.success('🎉 Đặt phòng thành công! Đang chuyển hướng đến trang thanh toán...', {
+                autoClose: 1500, // thời gian hiển thị toast
+                position: 'top-center',
+            });
+
+            // ✅ Sau 1.5s thì mở paymentUrl và đóng modal
+            setTimeout(() => {
+                window.open(res.paymentUrl, '_blank'); // mở tab mới
+                emit('close'); // đóng modal
+            }, 1500);
         } else {
-            console.error("Không tìm thấy paymentUrl trong response");
+            toast.error('Không nhận được link thanh toán từ hệ thống.');
         }
-        // toast.success("Đặt lịch khám thành công!");
-        // router.push(`/dat-lich/xac-nhan/${contact.value.bookingId}`);
-    } catch (error) {
-        // toast.error("Đặt lịch không thành công. Vui lòng thử lại!");
-        console.error("Lỗi khi gửi dữ liệu đặt lịch:", error);
+    } catch (err) {
+        console.error('Lỗi khi gọi contactInfoPaymentApi:', err);
+        toast.error('❌ Đặt phòng thất bại. Vui lòng thử lại sau.');
+    } finally {
+        loading.value = false;
     }
-};
+}
+
 </script>

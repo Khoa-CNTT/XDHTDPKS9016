@@ -32,13 +32,16 @@
 
           </p>
           <div class="bg-white p-6 rounded-lg shadow-lg pb-2" v-if="hotel?.services?.length">
-            <h2 class="text-xl font-bold text-blue-700">Dịch vụ & Tiện ích</h2>
-            <ul class="list-disc pl-5 text-gray-700">
-              <li v-for="(service, index) in hotel.services" :key="index">
-                {{ service.service_name }}
+            <h2 class="text-xl font-bold text-blue-700 mb-4">Dịch vụ & Tiện ích</h2>
+            <ul class="space-y-2">
+              <li v-for="(service, index) in hotel.services" :key="index"
+                class="flex items-center p-2 bg-gray-50 rounded-lg shadow-sm hover:bg-blue-50 transition duration-200">
+                <Icon icon="mdi:check-circle-outline" class="text-green-500 mr-2" />
+                <span class="text-gray-800">{{ service.service_name }}</span>
               </li>
             </ul>
           </div>
+
         </div>
       </div>
 
@@ -102,11 +105,11 @@
                 <li>📦 Phòng trống: {{ room.number_room }}</li>
               </ul>
 
-              <ul class="text-sm text-gray-700 list-disc list-inside mb-4">
+              <!-- <ul class="text-sm text-gray-700 list-disc list-inside mb-4">
                 <li v-for="r in room.rooms" :key="r.id_room">
                   🛏️ {{ r.number_bed }} giường
                 </li>
-              </ul>
+              </ul> -->
             </div>
 
             <button @click="goToRooms"
@@ -171,10 +174,48 @@
         </ul>
       </div>
     </div>
-    <div class="container mx-auto px-8">
+    <div class="container mx-auto px-8 mb-6">
       <h2 class="text-xl font-bold text-text">Phòng</h2>
       <div class="w-12 h-1 bg-blue-700 mb-6"></div>
+
+      <!-- Các ô date và nút lọc -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Ngày đến -->
+        <div class="flex flex-col">
+          <label for="checkIn" class="mb-1 text-sm font-medium text-gray-700">Ngày đến</label>
+          <input type="date" id="checkIn" v-model="checkInDate" class="border rounded px-3 py-2" />
+        </div>
+
+        <!-- Ngày đi -->
+        <div class="flex flex-col">
+          <label for="checkOut" class="mb-1 text-sm font-medium text-gray-700">Ngày đi</label>
+          <input type="date" id="checkOut" v-model="checkOutDate" class="border rounded px-3 py-2" />
+        </div>
+
+        <div class="flex items-end">
+          <button @click="filterRooms" class="inline-flex items-center gap-1
+           bg-gradient-to-r from-purple-600 to-indigo-600
+           hover:from-purple-700 hover:to-indigo-700
+           text-white font-semibold text-sm
+           px-4 py-2 rounded-full shadow-md
+           transition-transform duration-150
+           active:scale-95 active:shadow-inner
+           focus:outline-none focus:ring-2 focus:ring-purple-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L15 14.414V19a1 1 0 01-1.447.894l-4-2A1 1 0 019 17v-2.586L3.293 6.707A1 1 0 013 6V4z" />
+            </svg>
+            <span>Lọc phòng</span>
+          </button>
+        </div>
+
+
+
+      </div>
+
     </div>
+
     <div class="bg-gradient-to-r from-gray-100 to-blue-100 py-1">
       <div class="container mx-auto px-4 md:px-8">
         <div class="flex flex-col md:flex-row gap-8 border border-gray-300 p-6 rounded-xl shadow-lg">
@@ -197,84 +238,74 @@
                 <li v-for="comment in comments" :key="comment.comment_id" class="border rounded p-3 bg-gray-50">
                   <p class="text-gray-800 mb-1">{{ comment.content }}</p>
                   <div class="text-xs text-gray-500">
-                    <span>{{ comment.comment_author || 'Khách ẩn danh' }}</span> ·
-                    <span>{{ comment.comment_date }} {{ comment.comment_time }}</span>
+                    <span>{{ comment.comment_author || 'Khách ẩn danh' }}</span>
+                    <br />
+                    <span>{{ comment.comment_date }}&nbsp;&nbsp;{{ comment.comment_time }}</span>
+
                   </div>
                 </li>
               </ul>
             </div>
-             <!-- Form thêm bình luận -->
-    <form @submit.prevent="addComment" class="mt-4">
-      <textarea
-        v-model="newComment"
-        placeholder="Viết bình luận..."
-        class="w-full border rounded p-2 resize-none"
-        rows="3"
-        required
-      ></textarea>
-      <button
-        type="submit"
-        class="mt-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-      >
-        Gửi bình luận
-      </button>
-    </form>
           </div>
 
           <!-- Cột phải - Danh sách các phòng còn chỗ -->
           <div class="md:w-2/3 space-y-6">
             <template v-for="(roomType, index) in hotel.roomTypes" :key="index">
-              <template v-for="(room, idx) in roomType.rooms" :key="room.id_room">
-                <div
-                  class="flex flex-col sm:flex-row border border-gray-300 rounded-lg overflow-hidden bg-white shadow-sm transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-[0_10px_20px_rgba(168,85,247,0.4)] hover:ring-2 hover:ring-purple-300 cursor-pointer">
+              <div
+                class="flex flex-col sm:flex-row border border-gray-300 rounded-lg overflow-hidden bg-white shadow-sm transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-[0_10px_20px_rgba(168,85,247,0.4)] hover:ring-2 hover:ring-purple-300 cursor-pointer">
 
-                  <!-- Thông tin loại phòng -->
-                  <div class="sm:w-1/3 p-4 border-b sm:border-b-0 sm:border-r border-gray-300">
-                    <strong class="block mb-2">{{ roomType.type_name }}</strong>
-                    <ul class="list-none space-y-1 text-sm">
-                      <li>🛏️ Số giường: {{ room.number_bed }}</li>
-                      <li>{{ roomType.description }}</li>
-                      <li>{{ roomType.room_type_id }}</li>
-                      <li>✔ Có bữa sáng tuyệt hảo (519.481 ₫ /người)</li>
-                      <li>✘ Không hoàn tiền (Giá thấp!)</li>
-                      <li>✔ Đặt và trả tiền ngay</li>
-                    </ul>
-                  </div>
+                <!-- Thông tin loại phòng -->
+                <div class="sm:w-1/3 p-4 border-b sm:border-b-0 sm:border-r border-gray-300">
+                  <img :src="`http://157.66.101.165:8080${roomType.room_image}`" alt="room"
+                    class="w-full h-40 object-cover rounded mb-2" />
+                  <strong class="block text-lg mb-2">{{ roomType.type_name }}</strong>
 
-                  <!-- Biểu tượng -->
-                  <div
-                    class="sm:w-1/12 flex items-center justify-center text-xl border-b sm:border-b-0 sm:border-r border-gray-300">
-                    👥 ℹ️
-                  </div>
+                  <ul class="list-none space-y-1 text-sm">
+                    <li>{{ roomType.description }}</li>
+                    <li>✔ Có bữa sáng tuyệt hảo</li>
+                    <li>✘ Không hoàn tiền (Giá thấp!)</li>
+                    <li>✔ Đặt và trả tiền ngay</li>
+                    <li>🛏️ Tổng số phòng: {{ roomType.number_room }}</li>
+                  </ul>
 
-                  <!-- Giá -->
-                  <div class="sm:w-1/4 p-4 text-red-700 border-b sm:border-b-0 sm:border-r border-gray-300">
-                    <div class="bg-red-100 text-red-600 text-sm font-bold p-1 mb-1">
-                      📍 Giá tốt nhất hiện tại
-                    </div>
-                    <div class="line-through text-gray-600 text-sm">
-                      {{ room.price + 100 }} ₫ <span class="text-red-500 ml-1">-20%</span>
-                    </div>
-                    <div class="text-xl font-bold">{{ room.price.toLocaleString() }} ₫</div>
-                    <div class="text-xs text-gray-500">Giá mỗi đêm chưa gồm thuế và phí</div>
-                  </div>
-
-                  <!-- Số lượng còn lại -->
-                  <div
-                    class="sm:w-1/12 flex items-center justify-center border-b sm:border-b-0 sm:border-r border-gray-300">
-                    {{ roomType.number_room }}
-                  </div>
-
-                  <!-- Nút đặt -->
-                  <div class="sm:w-1/4 flex flex-col items-center justify-center px-4 py-2">
-                    <button @click="openBooking(room, roomType)"
-                      class="bg-blue-600 text-white px-4 py-2 rounded mb-1 w-full">Đặt ngay</button>
-                    <div class="text-green-600 text-sm font-semibold">Còn phòng</div>
+                  <!-- Thông báo nếu không có phòng -->
+                  <div v-if="!roomType.rooms || roomType.rooms.length === 0"
+                    class="mt-4 text-red-600 font-semibold text-sm">
+                    Hiện tại chưa có phòng nào thuộc loại này.
                   </div>
                 </div>
-              </template>
+
+
+                <!-- Danh sách rooms bên phải -->
+                <div class="sm:w-2/3 p-4 space-y-4">
+                  <template v-for="(room, idx) in roomType.rooms" :key="room.id_room">
+                    <div
+                      class="flex flex-col sm:flex-row items-center justify-between border border-gray-200 rounded p-3">
+                      <!-- Info phòng -->
+                      <div class="flex-1 mb-2 sm:mb-0">
+                        <p class="text-sm">🛏️ Số giường: {{ room.number_bed }}</p>
+                        <p class="text-sm text-gray-500">Mã phòng: {{ room.id_room }}</p>
+                      </div>
+
+                      <!-- Giá -->
+                      <div class="text-red-700 text-center mb-2 sm:mb-0 sm:text-right sm:mr-4">
+                        <div class="text-sm bg-red-100 text-red-600 font-semibold px-2 py-1 rounded">Giá mỗi đêm</div>
+                        <div class="text-lg font-bold mt-1">{{ room.price.toLocaleString() }} ₫</div>
+                      </div>
+
+                      <!-- Nút đặt -->
+                      <div>
+                        <button @click="openBooking(room, roomType)"
+                          class="bg-blue-600 text-white px-4 py-2 rounded w-full">Đặt ngay</button>
+                        <div class="text-green-600 text-sm font-semibold text-center mt-1">Còn phòng</div>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+              </div>
             </template>
           </div>
+
         </div>
       </div>
     </div>
@@ -296,7 +327,8 @@ import ListRoom from './ListRoom.vue';
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { getHotelByIdApi } from '@/services/home';
-import { getHotelListApi } from '@/services/home';
+import { getHotelListApi, getCommentPublicApi } from '@/services/home';
+
 import BookingModal from '@/pages/hotel/BookingModal.vue';
 const route = useRoute();
 const hotel = ref(null);
@@ -307,44 +339,74 @@ const router = useRouter();
 const showBookingModal = ref(false)
 const showAllHotels = ref(false);
 const hotelId = route.params.id
-const comments = [
-  {
-    comment_id: 1,
-    content: "Phòng rất đẹp và sạch sẽ lamas xzxzc",
-    comment_author: null,
-    comment_date: "2025-05-17",
-    comment_time: "12:42:51",
-  },
-  {
-    comment_id: 2,
-    content: "Dịch vụ thân thiện, tiện nghi đầy đủ.",
-    comment_author: "Nguyễn Văn A",
-    comment_date: "2025-05-15",
-    comment_time: "10:20:00",
-  },
-  {
-    comment_id: 3,
-    content: "Vị trí khách sạn thuận tiện, dễ đi lại.",
-    comment_author: "Trần Thị B",
-    comment_date: "2025-05-16",
-    comment_time: "14:05:30",
-  }
-];
+const comments = ref([])
 
-onMounted(async () => {
-  const hotelId = route.params.id;
-  console.log('=======', hotelId);
 
+const fetchComments = async () => {
   try {
-    const response = await getHotelByIdApi(hotelId);
-    hotel.value = response;
-    console.log('----////', hotel.value);
+    comments.value = await getCommentPublicApi(hotelId)
+    console.log('comment', comments);
 
   } catch (error) {
-    console.error('Error fetching hotel details:', error);
+    console.error('Lỗi khi lấy comment:', error)
+  }
+}
+
+onMounted(() => {
+  fetchComments()
+})
+const checkInDate = ref('');
+const checkOutDate = ref('');
+console.log('Init dates:', checkInDate.value, checkOutDate.value);
+// onMounted(async () => {
+//   const hotelId = route.params.id;
+//   console.log('=======', hotelId);
+
+//   try {
+//     const response = await getHotelByIdApi(hotelId);
+//     hotel.value = response;
+//     console.log('----////', hotel.value);
+
+//   } catch (error) {
+//     console.error('Error fetching hotel details:', error);
+//   }
+// });
+// 1. Load trước data hotel (không filter)
+onMounted(async () => {
+  const hotelId = Number(route.params.id);
+  try {
+    hotel.value = await getHotelByIdApi(hotelId, '', '');
+    console.log('Đã load hotel:', hotel.value);
+  } catch (e) {
+    console.error('Lỗi load hotel ban đầu:', e);
   }
 });
+// 2. Hàm gọi lại API khi filter
+const filterRooms = async () => {
+  const id = Number(route.params.id);
 
+  // Validate đơn giản
+  if (!checkInDate.value || !checkOutDate.value) {
+    alert('Vui lòng chọn cả ngày đến và ngày đi!');
+    return;
+  }
+  if (checkInDate.value > checkOutDate.value) {
+    alert('Ngày đến phải trước hoặc bằng ngày đi!');
+    return;
+  }
+
+  try {
+    // Gọi API với 2 param ngày
+    hotel.value = await getHotelByIdApi(
+      id,
+      checkInDate.value,
+      checkOutDate.value
+    );
+    console.log('Kết quả filter:', hotel.value);
+  } catch (error) {
+    console.error('Lỗi khi lọc phòng:', error);
+  }
+};
 const fetchHotelList = async () => {
   try {
     const response = await getHotelListApi();
@@ -365,7 +427,7 @@ const openBooking = (room, roomType) => {
   selectedRoom.value = room
   selectedRoomType.value = roomType // nếu bạn muốn lưu thêm loại phòng
 
-  console.log('Room:', selectedRoom.value)
+  console.log('Room:', selectedRoom.value.id_room)
   console.log('RoomType ID:', roomType.room_type_id)
 
   showBooking.value = true

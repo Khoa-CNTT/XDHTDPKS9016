@@ -58,9 +58,9 @@ export const logoutApi = async (data: { token: string }): Promise<any> => {
   return $api('/auth/logout', { body: data, method: 'POST' }, false)
 }
 
-export const confirmEmailApi = async (token: string): Promise<any> => {
-  return $api('/users/confirm', { query: { token: token } })
-}
+// export const confirmEmailApi = async (token: string): Promise<any> => {
+//   return $api('/users/confirm', { query: { token: token } })
+// }
 
 export const forgotPasswordApi = async (email: string): Promise<any> => {
   return $api(`/forgotPassword/verifyMail/${email}`, {
