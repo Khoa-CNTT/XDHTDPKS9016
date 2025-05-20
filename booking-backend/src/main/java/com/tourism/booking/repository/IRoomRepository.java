@@ -71,4 +71,22 @@ public interface IRoomRepository extends JpaRepository<Room, Long> {
                         @Param("roomTypeId") Long roomTypeId,
                         @Param("checkInDate") LocalDate checkInDate,
                         @Param("checkOutDate") LocalDate checkOutDate);
+
+        @Query("""
+        SELECT r FROM Room r
+        WHERE r.room_type.hotel.hotel_id = :hotelId
+          AND r.id_room NOT IN (
+            SELECT br.room.id_room
+            FROM BookingRoom br
+            JOIN br.booking b
+            WHERE b.status != 'CANCELLED'
+              AND :checkIn < b.check_out_date
+              AND :checkOut > b.check_in_date
+          )
+    """)
+        List<Room> findAvailableRoomsByHotelAndDateRange(
+                @Param("hotelId") Long hotelId,
+                @Param("checkIn") LocalDate checkIn,
+                @Param("checkOut") LocalDate checkOut
+        );
 }

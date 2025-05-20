@@ -8,11 +8,12 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 public interface IPublicHotelRepository extends JpaRepository<Hotel, Long> {
+
     @Query("""
-                SELECT h FROM Hotel h
-                LEFT JOIN FETCH h.services s
-                LEFT JOIN FETCH h.roomTypes rt
-                WHERE h.hotel_id = :hotelId
-            """)
-    Optional<Hotel> findDetailById(@Param("hotelId") Long hotelId);
+        SELECT DISTINCT h
+        FROM Hotel h
+        LEFT JOIN FETCH h.services s
+        WHERE h.hotel_id = :hotelId
+    """)
+    Optional<Hotel> findDetailWithServicesById(@Param("hotelId") Long hotelId);
 }

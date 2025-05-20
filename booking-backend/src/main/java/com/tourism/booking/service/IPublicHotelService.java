@@ -10,6 +10,6 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 public interface IPublicHotelService {
-    Optional<HotelDetailPublicDTO> getHotelDetail(Long hotelId, LocalDate checkIn, int los);
+    Optional<HotelDetailPublicDTO> getHotelDetail(Long hotelId, LocalDate checkIn, LocalDate checkOut);
     Page<HotelPublicDTO> getHotels(Pageable pageable);
 }

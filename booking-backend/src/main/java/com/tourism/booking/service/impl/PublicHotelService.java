@@ -2,88 +2,98 @@ package com.tourism.booking.service.impl;
 
 
 import com.tourism.booking.dto.publicHotel.*;
+import com.tourism.booking.exception.ApiException;
+import com.tourism.booking.exception.ErrorCode;
 import com.tourism.booking.model.Hotel;
+import com.tourism.booking.model.Room;
+import com.tourism.booking.model.RoomType;
 import com.tourism.booking.repository.IPublicHotelRepository;
 import com.tourism.booking.repository.IRoomRepository;
 import com.tourism.booking.service.IPublicHotelService;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PublicHotelService implements IPublicHotelService {
-    IPublicHotelRepository hotelRepository;
-    IRoomRepository roomRepository;
+    private final IPublicHotelRepository hotelRepository;
+    private final IRoomRepository roomRepository;
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<HotelDetailPublicDTO> getHotelDetail(Long hotelId, LocalDate checkIn, int los) {
-        LocalDate checkOut = checkIn.plusDays(los);
+    public Optional<HotelDetailPublicDTO> getHotelDetail(Long hotelId, LocalDate checkIn, LocalDate checkOut) {
+        // 1) validate
+        if (checkIn == null || checkOut == null || !checkIn.isBefore(checkOut)) {
+            throw new ApiException(ErrorCode.INVALID_DATE_RANGE);
+        }
 
-        return hotelRepository.findDetailById(hotelId)
-                .map(hotel -> {
-                    // 1) Map dịch vụ
-                    var services = hotel.getServices().stream()
-                            .map(s -> ServicePublicDTO.builder()
-                                    .service_id(s.getService_id())
-                                    .service_name(s.getService_name())
+        // 2) lấy hotel (nếu không tìm thấy sẽ throw)
+        Hotel hotel = hotelRepository.findById(hotelId)
+                .orElseThrow(() -> new ApiException(ErrorCode.HOTEL_NOT_EXIST));
+
+        // 3) lấy danh sách phòng trống
+        List<Room> availableRooms = roomRepository.findAvailableRoomsByHotelAndDateRange(
+                hotelId, checkIn, checkOut
+        );
+
+        // 4) nhóm theo roomType
+        Map<RoomType, List<Room>> roomsGroupedByType = availableRooms.stream()
+                .collect(Collectors.groupingBy(Room::getRoom_type));
+
+        // 5) tạo danh sách RoomTypePublicDTO
+        List<RoomTypePublicDTO> roomTypeDTOs = roomsGroupedByType.entrySet().stream()
+                .map(entry -> {
+                    RoomType roomType = entry.getKey();
+                    List<Room> rooms = entry.getValue();
+
+                    List<RoomPublicDTO> roomDTOs = rooms.stream()
+                            .map(r -> RoomPublicDTO.builder()
+                                    .id_room(r.getId_room())
+                                    .number_bed(r.getNumber_bed())
+                                    .price(r.getPrice())
                                     .build())
                             .collect(Collectors.toList());
 
-                    // 2) Map roomTypes + lọc phòng trống theo ngày
-                    var roomTypes = hotel.getRoomTypes().stream()
-                            .map(rt -> {
-                                // Gọi repository lọc phòng trống
-                                var availableRooms = roomRepository.findAvailableRoomsByDateRange(
-                                        rt.getRoom_type_id(),
-                                        checkIn,
-                                        checkOut
-                                );
-
-                                var roomsDto = availableRooms.stream()
-                                        .map(r -> RoomPublicDTO.builder()
-                                                .id_room(r.getId_room())
-                                                .number_bed(r.getNumber_bed())
-                                                .price(r.getPrice())
-                                                .build())
-                                        .collect(Collectors.toList());
-
-                                String status = availableRooms.isEmpty() ? "Hết phòng" : "Còn phòng";
-
-                                return RoomTypePublicDTO.builder()
-                                        .room_type_id(rt.getRoom_type_id())
-                                        .type_name(rt.getType_name())
-                                        .number_room(rt.getNumber_room())
-                                        .description(rt.getDescription())
-                                        .room_image(rt.getRoom_image())
-                                        .rooms(roomsDto)
-                                        .status(status)
-                                        .build();
-                            })
-                            .collect(Collectors.toList());
-
-                    // 3) Build DTO tổng
-                    return HotelDetailPublicDTO.builder()
-                            .hotel_id(hotel.getHotel_id())
-                            .name(hotel.getName())
-                            .image(hotel.getImage())
-                            .address(hotel.getAddress())
-                            .hotline(hotel.getHotline())
-                            .description(hotel.getDescription())
-                            .services(services)
-                            .roomTypes(roomTypes)
+                    return RoomTypePublicDTO.builder()
+                            .room_type_id(roomType.getRoom_type_id())
+                            .type_name(roomType.getType_name())
+                            .description(roomType.getDescription())
+                            .number_room(roomDTOs.size())
+                            .room_image(roomType.getRoom_image())
+                            .rooms(roomDTOs)
                             .build();
-                });
+                }).collect(Collectors.toList());
+
+        // 6) map services
+        List<ServicePublicDTO> services = hotel.getServices().stream()
+                .map(s -> ServicePublicDTO.builder()
+                        .service_id(s.getService_id())
+                        .service_name(s.getService_name())
+                        .build())
+                .collect(Collectors.toList());
+
+        // 7) build DTO chính
+        HotelDetailPublicDTO dto = HotelDetailPublicDTO.builder()
+                .hotel_id(hotel.getHotel_id())
+                .name(hotel.getName())
+                .image(hotel.getImage())
+                .address(hotel.getAddress())
+                .hotline(hotel.getHotline())
+                .description(hotel.getDescription())
+                .services(services)
+                .roomTypes(roomTypeDTOs)
+                .build();
+
+        return Optional.of(dto);
     }
 
 
