@@ -47,7 +47,6 @@ public class PublicHotelController {
         if (!ci.isBefore(co)) {
             throw new ApiException(ErrorCode.INVALID_DATE_RANGE);
         }
-//
         HotelDetailPublicDTO dto = hotelService
                 .getHotelDetail(id, ci, co)
                 .orElseThrow(() -> new ApiException(ErrorCode.HOTEL_NOT_EXIST));
