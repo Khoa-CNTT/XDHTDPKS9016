@@ -31,27 +31,18 @@ public class PaymentBookingController {
     IPaymentService paymentService;
     private static final Logger logger = LoggerFactory.getLogger(PaymentBookingController.class);
 
-    /**
-     * API lấy tất cả giao dịch thanh toán
-     * Nghiệp vụ: Quản lý xem danh sách giao dịch thanh toán
-     */
     @GetMapping("/history")
     public ResponseEntity<?> getAllPayments(@PageableDefault(size = 5) Pageable pageable) {
         Page<PaymentResponseDTO> payments = paymentService.getAllPayments(pageable);
         return ResponseEntity.ok(new PageReponse<>(payments));
     }
 
-    /**
-     * API cập nhật trạng thái thanh toán
-     * Nghiệp vụ: Quản lý xác nhận hoặc huỷ thanh toán
-     */
     @PutMapping("/{paymentId}/status")
     public ResponseEntity<?> updatePaymentStatus(
             @PathVariable Long paymentId,
             @RequestParam String status) {
         try {
             logger.info("Nhận request cập nhật trạng thái thanh toán: paymentId={}, status={}", paymentId, status);
-            // Kiểm tra tham số status hợp lệ
             if (!isValidPaymentStatus(status)) {
                 logger.warn("Trạng thái không hợp lệ: {}", status);
                 return ResponseEntity
@@ -82,48 +73,23 @@ public class PaymentBookingController {
         }
     }
 
-    // Helper method để kiểm tra status hợp lệ
+
     private boolean isValidPaymentStatus(String status) {
         return Arrays.asList("PAID", "COMPLETED", "CANCELLED").contains(status);
     }
 
-    /**
-     * API xử lý thanh toán cho luồng 3 bước
-     * Nghiệp vụ: Hoàn tất booking và tạo thanh toán
-     */
-    // @PostMapping("/booking/{bookingId}/finalize")
-    // public ResponseEntity<PaymentResponseDTO> processPaymentWithFinalization(
-    // @PathVariable Long bookingId,
-    // @RequestBody PaymentRequestDTO request) {
-    // PaymentResponseDTO payment =
-    // paymentService.processPaymentWithBookingFinalization(request, bookingId);
-    // return new ResponseEntity<>(payment, HttpStatus.CREATED);
-    // }
-
-    /**
-     * API xử lý thanh toán
-     * Nghiệp vụ: Tạo bản ghi thanh toán khi người dùng thanh toán
-     */
     @PostMapping
     public ResponseEntity<PaymentResponseDTO> processPayment(@RequestBody PaymentRequestDTO request) {
         PaymentResponseDTO payment = paymentService.processPayment(request);
         return new ResponseEntity<>(payment, HttpStatus.CREATED);
     }
 
-    /**
-     * API lấy lịch sử thanh toán của một hóa đơn
-     * Nghiệp vụ: Hiển thị lịch sử thanh toán cho người dùng hoặc khách sạn
-     */
     @GetMapping("/bill/{billId}")
     public ResponseEntity<List<PaymentResponseDTO>> getPaymentsByBillId(@PathVariable Long billId) {
         List<PaymentResponseDTO> payments = paymentService.getPaymentsByBillId(billId);
         return ResponseEntity.ok(payments);
     }
 
-    /**
-     * API kiểm tra tình trạng thanh toán của một booking
-     * Nghiệp vụ: Kiểm tra xem booking đã thanh toán đủ chưa
-     */
     @GetMapping("/booking/{bookingId}/status")
     public ResponseEntity<Boolean> isBookingFullyPaid(@PathVariable Long bookingId) {
         boolean isFullyPaid = paymentService.isFullyPaid(bookingId);
