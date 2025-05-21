@@ -373,3 +373,9 @@ export interface PaymentHistory {
   accountNumber: string;
   statusDisplay: string | null;
 }
+
+//thong ke
+export interface DashboardStatsPartial {
+  bookingCount: number;
+  totalPayment: number | null;
+}

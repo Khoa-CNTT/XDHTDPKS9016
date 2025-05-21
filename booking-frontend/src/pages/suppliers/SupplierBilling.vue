@@ -29,8 +29,49 @@
             <th class="px-4 py-2 text-center">Hành động</th>
           </tr>
         </thead>
+<tbody>
+  <tr v-if="paymentList.length === 0">
+    <td class="px-4 py-2 text-center" :colspan="10">
+      Không có giao dịch nào
+    </td>
+  </tr>
 
-        <tbody>
+  <tr v-else v-for="(row, index) in paymentList" :key="row.paymentId" class="border-t">
+    <td class="px-4 py-2">{{ index + 1 }}</td>
+    <td class="px-4 py-2 truncate max-w-[180px]" :title="row.customerName">{{ row.customerName }}</td>
+    <td class="px-4 py-2">{{ row.amount.toLocaleString() }} VND</td>
+    <td class="px-4 py-2 truncate max-w-[160px]" :title="row.accountNumber">{{ row.accountNumber }}</td>
+    <td class="px-4 py-2 truncate max-w-[160px]" :title="row.transactionId">{{ row.transactionId }}</td>
+    <td class="px-4 py-2">{{ row.paymentDate }}</td>
+    <td class="px-4 py-2">{{ row.paymentTime }}</td>
+    <td class="px-4 py-2 truncate max-w-[140px]" :title="row.paymentMethod">{{ row.paymentMethod }}</td>
+    <td class="px-4 py-2">
+      <span
+        class="px-2 py-1 rounded font-semibold border"
+        :class="{
+          'bg-yellow-100 text-yellow-700 border-yellow-300': row.status === 'Pending',
+          'bg-green-100 text-green-700 border-green-300': row.status === 'Completed' || row.status === 'PAID' || row.status === 'PROCESSED',
+          'bg-red-100 text-red-700 border-red-300': row.status === 'Cancelled'
+        }"
+      >
+        {{ row.status }}
+      </span>
+    </td>
+    <td class="px-4 py-2 text-center">
+      <div class="flex justify-center gap-2 flex-wrap">
+        <button
+          v-if="row.status === 'Completed'"
+          class="p-2 bg-green-500 hover:bg-green-600 text-white rounded transition"
+          title="Đã hoàn tất"
+        >
+          <Icon icon="mdi:check-circle" width="20" height="20" />
+        </button>
+      </div>
+    </td>
+  </tr>
+</tbody>
+
+        <!-- <tbody>
           <tr v-for="(row, index) in paymentList" :key="row.paymentId" class="border-t">
             <td class="px-4 py-2">{{ index + 1 }}</td>
 
@@ -69,7 +110,7 @@
 
             <td class="px-4 py-2 text-center">
               <div class="flex justify-center gap-2 flex-wrap">
-                <!-- Chỉ hiển thị icon nếu status là 'Completed' -->
+               
                 <button v-if="row.status === 'Completed'" 
                   class="p-2 bg-green-500 hover:bg-green-600 text-white rounded transition" 
                   title="Đã hoàn tất">
@@ -78,7 +119,7 @@
               </div>
             </td>
           </tr>
-        </tbody>
+        </tbody> -->
       </table>
     </div>
   </div>

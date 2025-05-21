@@ -7,6 +7,8 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,9 +27,9 @@ public class ServiceBookingService {
      * Lấy danh sách dịch vụ của một khách sạn
      * Nghiệp vụ: Hiển thị các dịch vụ có thể chọn khi đặt phòng
      */
-    public List<ServiceDTO> getServicesByHotelId(Long hotelId) {
-        List<Services> services = serviceRepository.findByHotelId(hotelId);
-        return services.stream().map(this::convertToDTO).collect(Collectors.toList());
+    public Page<ServiceDTO> getServicesByHotelId(Pageable pageable, Long hotelId) {
+        Page<Services> services = serviceRepository.findByHotelId(pageable, hotelId);
+        return services.map(this::convertToDTO);
     }
 
     /**

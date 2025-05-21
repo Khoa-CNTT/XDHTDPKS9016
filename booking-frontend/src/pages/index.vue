@@ -53,33 +53,41 @@
           <div class="bg-white p-6 rounded-b-lg shadow-xl">
             <div class="grid grid-cols-1 md:grid-cols-1 gap-6">
               <!-- Ô input tìm kiếm -->
-              <div class="flex items-center bg-gray-50 border border-gray-200 rounded-lg p-4 w-full">
-                <span class="mr-3 text-xl">🔍</span>
-                <input v-model="location" type="text" placeholder="Sea Sand 2 Hotel Da Nang"
-                  class="w-full bg-transparent outline-none text-lg" />
-              </div>
+             <div class="flex items-center bg-gray-50 border border-gray-200 rounded-lg p-4 w-full">
+          <span class="mr-3 text-xl">🔍</span>
+          <input
+            v-model="location"
+            type="text"
+            placeholder="Sea Sand 2 Hotel Da Nang"
+            class="w-full bg-transparent outline-none text-lg"
+          />
+        </div>
             </div>
 
             <!-- Nút tìm kiếm -->
             <div class="flex justify-center mt-6">
-              <button @click="handleSearch"
+              <!-- <button @click="handleSearch"
                 class="bg-blue-500 text-white font-bold py-4 px-16 rounded-md text-xl uppercase hover:bg-blue-600 transition duration-300">
                 TÌM
-              </button>
+              </button> -->
             </div>
 
             <!-- Kết quả tìm kiếm -->
             <div v-if="searchResults.length" class="mt-8">
               <h2 class="text-2xl font-semibold mb-4 text-gray-800">🔎 Kết quả tìm kiếm:</h2>
               <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div v-for="hotel in searchResults" :key="hotel.hotel_id"
-                  @click="viewHotelDetail(hotel.hotel_id)"
-                  class="border rounded-lg overflow-hidden shadow-md hover:shadow-lg transition">
-                 <img :src="`http://157.66.101.165:8080${hotel.image}`" alt="Hotel Image" class="w-full h-48 object-cover" />
+                <div v-for="hotel in searchResults" :key="hotel.hotel_id" @click="viewHotelDetail(hotel.hotel_id)"
+                  class="border rounded-lg overflow-hidden shadow-md hover:shadow-lg transition cursor-pointer">
+                  <img :src="`http://157.66.101.165:8080${hotel.image}`" alt="Hotel Image"
+                    class="w-full h-48 object-cover" />
                   <div class="p-4">
                     <h3 class="text-xl font-bold text-gray-800 mb-1">{{ hotel.name }}</h3>
-                    <p class="text-gray-600 text-sm mb-1"><strong>Địa chỉ:</strong> {{ hotel.address }}</p>
-                    <p class="text-gray-600 text-sm"><strong>Hotline:</strong> {{ hotel.hotline }}</p>
+                    <p class="text-gray-600 text-sm mb-1">
+                      <strong>Địa chỉ:</strong> {{ hotel.address }}
+                    </p>
+                    <p class="text-gray-600 text-sm">
+                      <strong>Hotline:</strong> {{ hotel.hotline }}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -204,7 +212,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { getHotelListApi, searchHotelsApi } from '@/services/home'
 import { Swiper, SwiperSlide } from 'swiper/vue'
@@ -251,25 +259,25 @@ const viewHotelDetail = (hotelId) => {
 // Biến chứa từ khóa tìm kiếm và kết quả
 const location = ref('')
 const searchResults = ref([]) // Kết quả từ API
+let debounceTimer = null
+watch(location, newVal => {
+  if (debounceTimer) clearTimeout(debounceTimer)
 
-const handleSearch = async () => {
-  const query = location.value.trim()
-  if (!query) {
-    console.warn('Vui lòng nhập từ khóa tìm kiếm.')
+  if (!newVal || !newVal.trim()) {
     searchResults.value = []
     return
   }
 
-  try {
-    const response = await searchHotelsApi(query)
-    console.log('Search API response:', response)
-    // Nếu API trả về response.content thì sửa lại:
-    searchResults.value = response || []
-    console.log('Search API response:', searchResults.value)
-  } catch (error) {
-    console.error('Lỗi khi tìm kiếm khách sạn:', error)
-  }
-}
+  debounceTimer = setTimeout(async () => {
+    try {
+      const resp = await searchHotelsApi(newVal.trim())
+      // Nếu API trả về resp.content thì dùng resp.content
+      searchResults.value = resp.content || resp || []
+    } catch (err) {
+      console.error('Lỗi khi tìm kiếm khách sạn:', err)
+    }
+  }, 300)
+})
 onMounted(() => {
   fetchHotelList()
 })

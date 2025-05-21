@@ -1,166 +1,153 @@
 <template>
-  <div class="card">
-    <div class="card-header flex justify-center gap-4 mb-6">
-      <button
-        @click="currentTab = 'count'"
-        :class="['tab-button', currentTab === 'count' ? 'active' : '']"
-      >
-        Số lượng đặt phòng
-      </button>
-      <button
-        @click="currentTab = 'revenue'"
-        :class="['tab-button', currentTab === 'revenue' ? 'active' : '']"
-      >
-        Doanh thu
+  <div class="card p-4">
+    <!-- Bộ chọn năm và quý -->
+    <div class="flex justify-center gap-4 mb-6">
+      <select v-model="selectedYear" class="border rounded px-3 py-1">
+        <option v-for="year in years" :key="year" :value="year">{{ year }}</option>
+      </select>
+
+      <select v-model="selectedQuarter" class="border rounded px-3 py-1">
+        <option v-for="q in 4" :key="q" :value="q">Quý {{ q }}</option>
+      </select>
+
+      <button @click="fetchStats" class="px-4 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">
+        Xem thống kê
       </button>
     </div>
 
-    <div class="card-body">
-      <!-- Khi chọn Số lượng đặt phòng: hiển thị Doughnut và Polar -->
-   <div v-show="currentTab === 'count'" class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl">
-  <div class="flex justify-center">
-    <DoughnutChart
-      :chartData="bookingCountDoughnutChartData"
-      :chartOptions="bookingCountDoughnutChartOptions"
-      class="w-64 h-64"
-    />
-  </div>
+    <!-- Nút chọn loại thống kê -->
+    <div class="card-header flex justify-center gap-4 mb-6">
+      <button
+        v-for="key in statKeys"
+        :key="key"
+        :class="['tab-button', selectedStat === key ? 'active' : '']"
+        @click="selectedStat = key"
+      >
+        {{ statLabels[key] }}
+      </button>
+    </div>
 
-  <div class="flex justify-center">
-    <PolarAreaChart
-      :chartData="bookingCountPolarChartData"
-      :chartOptions="bookingCountPolarChartOptions"
-      class="w-64 h-64"
-    />
-  </div>
-</div>
+    <!-- Vùng hiển thị thông báo hoặc biểu đồ -->
+    <div class="card-body w-full flex flex-col items-center gap-4">
+      <div v-if="noDataMessage" class="text-red-600 font-semibold mb-4">
+        {{ noDataMessage }}
+      </div>
 
-
-      <!-- Khi chọn Doanh thu: hiển thị Doughnut và Polar -->
-     <div v-show="currentTab === 'revenue'" class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl">
-  <div class="flex justify-center">
-    <DoughnutChart
-      :chartData="revenueDoughnutChartData"
-      :chartOptions="revenueDoughnutChartOptions"
-      class="w-64 h-64"
-    />
-  </div>
-
-  <div class="flex justify-center">
-    <PolarAreaChart
-      :chartData="revenuePolarChartData"
-      :chartOptions="revenuePolarChartOptions"
-      class="w-64 h-64"
-    />
-  </div>
-</div>
-
+      <div v-else class="flex flex-wrap gap-8 justify-center">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl">
+          <div class="flex justify-center">
+            <DoughnutChart :chartData="chartData" :chartOptions="chartOptions" class="w-64 h-64" />
+          </div>
+          <div class="flex justify-center">
+            <PolarChart :chartData="chartData" :chartOptions="chartOptions" class="w-64 h-64" />
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import DoughnutChart from '@/components/base/DoughnutChart.vue';
-import PolarAreaChart from '@/components/base/PolarChart.vue';
+import PolarChart from '@/components/base/PolarChart.vue';
+import { getHotelStatisticsApi } from '@/services/supplier';
+import type { DashboardStatsPartial } from '@/types/supplier';
 
-const currentTab = ref<'count' | 'revenue'>('count');
+const years = [2023, 2024, 2025];
+const selectedYear = ref(2025);
+const selectedQuarter = ref(2);
 
-// Dữ liệu cho Báo Cáo Số lượng đặt phòng
-// Số lượng phòng đã đặt và số phòng đã hủy trong tháng
-const bookingCountDoughnutChartData = {
-  labels: ['Đã đặt', 'Đã hủy'],
-  datasets: [{
-    data: [1500, 200],
-    backgroundColor: ['#845EC2', '#D65DB1'],
-    borderWidth: 1
-  }]
-};
-const bookingCountDoughnutChartOptions = {
-  responsive: true,
-  plugins: {
-    title: { display: true, text: 'Số lượng đặt phòng vs hủy (Tháng này)' },
-    legend: { position: 'top' }
-  }
-};
-const bookingCountPolarChartData = {
-  labels: ['Đã đặt', 'Đã hủy'],
-  datasets: [{
-    data: [1500, 200],
-    backgroundColor: ['#4dc9c0', '#ff6347'],
-    borderWidth: 1
-  }]
-};
-const bookingCountPolarChartOptions = {
-  responsive: true,
-  plugins: {
-    title: { display: true, text: 'Phân bố đặt phòng vs hủy (Tháng này)' },
-    legend: { position: 'top' }
-  }
+const dataStats = ref<DashboardStatsPartial | null>(null);
+const noDataMessage = ref('');
+
+// Các key trong dữ liệu để hiển thị nút chọn
+const statKeys = ['bookingCount','totalPayment'] as const;
+type StatKey = typeof statKeys[number];
+const selectedStat = ref<StatKey>('bookingCount');
+
+// Định nghĩa tên hiển thị cho các key
+const statLabels: Record<StatKey, string> = {
+  bookingCount: 'Số lượt đặt chỗ',
+  totalPayment: 'Tổng số tiền thanh toán',
 };
 
-// Dữ liệu cho Báo Cáo Doanh thu
-// Tổng doanh thu thu về trong tháng
-const revenueDoughnutChartData = {
-  labels: ['Tổng doanh thu'],
-  datasets: [{
-    data: [500000000],
-    backgroundColor: ['#00C9A7'],
-    borderWidth: 1
-  }]
-};
-const revenueDoughnutChartOptions = {
-  responsive: true,
-  plugins: {
-    title: { display: true, text: 'Tổng doanh thu (Tháng này) - VND' },
-    legend: { position: 'top' }
+// Hàm fetch data theo năm & quý
+const fetchStats = async () => {
+  try {
+    const data = await getHotelStatisticsApi(selectedYear.value, selectedQuarter.value);
+    dataStats.value = data;
+
+    // Kiểm tra data trả về cho thống kê hiện tại
+    const label = selectedStat.value;
+    const value = data ? data[label] : null;
+
+    if (!value || value === 0) {
+      noDataMessage.value = 'Không có dữ liệu cho năm và quý bạn chọn.';
+    } else {
+      noDataMessage.value = '';
+    }
+  } catch (error) {
+    console.error('Lỗi khi fetch thống kê:', error);
+    noDataMessage.value = 'Lỗi khi lấy dữ liệu thống kê.';
   }
 };
-const revenuePolarChartData = {
-  labels: ['Tổng doanh thu'],
-  datasets: [{
-    data: [500000000],
-    backgroundColor: ['#36a2eb'],
-    borderWidth: 1
-  }]
-};
-const revenuePolarChartOptions = {
+
+// Gọi fetch lần đầu khi component mount
+fetchStats();
+
+const chartData = ref<any>({
+  labels: [],
+  datasets: [],
+});
+
+const chartOptions = {
   responsive: true,
   plugins: {
-    title: { display: true, text: 'Phân bố doanh thu (Tháng này) - VND' },
-    legend: { position: 'top' }
-  }
+    legend: {
+      position: 'bottom' as const,
+    },
+  },
 };
+
+// Cập nhật dữ liệu biểu đồ khi dataStats hoặc selectedStat thay đổi
+watch([dataStats, selectedStat], () => {
+  if (!dataStats.value) {
+    chartData.value = { labels: [], datasets: [] };
+    noDataMessage.value = 'Không có dữ liệu.';
+    return;
+  }
+
+  const label = selectedStat.value;
+  const value = dataStats.value[label];
+
+  if (!value || value === 0) {
+    noDataMessage.value = 'Không có dữ liệu cho thống kê này.';
+    chartData.value = { labels: [], datasets: [] };
+    return;
+  } else {
+    noDataMessage.value = '';
+  }
+
+  chartData.value = {
+    labels: [statLabels[label], 'Other'],
+    datasets: [
+      {
+        label: statLabels[label],
+        data: [value, 100],
+        backgroundColor: ['#36A2EB', '#FF6384'],
+        hoverOffset: 30,
+      },
+    ],
+  };
+});
 </script>
 
 <style scoped>
-.card-body {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  gap: 1rem;
-  padding: 20px;
-}
-.card-header {
-  padding: 20px 0;
-}
 .tab-button {
-  padding: 12px 24px;
-  background-color: #f0f0f0;
-  border: 2px solid #ddd;
-  border-radius: 10px;
-  color: #333;
-  cursor: pointer;
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  @apply px-4 py-2 border rounded bg-gray-100 hover:bg-gray-200 cursor-pointer;
 }
 .tab-button.active {
-  background-color: #36a2eb;
-  color: white;
-  border-color: #1d7ed2;
-}
-.tab-button:not(.active):hover {
-  background-color: #e0e0e0;
+  @apply bg-blue-500 text-white;
 }
 </style>
