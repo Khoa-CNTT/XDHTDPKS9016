@@ -1,9 +1,11 @@
 package com.tourism.booking.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,11 +27,23 @@ public class Account {
     @Column(name = "password")
     String password;
 
+    @Column(name = "email")
+    String email;
+
+    @Column(name = "created_at ")
+    LocalDateTime created_at;
+
+    @OneToOne(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonIgnore
+    ForgotPassword forgotPassword;
+
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "role_account", // Tên bảng trung gian
+    @JoinTable(name = "role_account", // Tên bảng trung gian
             joinColumns = @JoinColumn(name = "account_id"), // Cột khóa ngoại tham chiếu đến User
             inverseJoinColumns = @JoinColumn(name = "role_id") // Cột khóa ngoại tham chiếu đến Role
     )
     Set<Role> roles = new HashSet<>();
+
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Hotel> hotels = new HashSet<>();
 }

@@ -20,10 +20,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 
@@ -32,6 +29,7 @@ import java.text.ParseException;
 @RequestMapping("${api.prefix}/auth")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
+@CrossOrigin("http://localhost:5173/")
 public class AuthenticationController {
 
     IAuthenticationService authenticationService;

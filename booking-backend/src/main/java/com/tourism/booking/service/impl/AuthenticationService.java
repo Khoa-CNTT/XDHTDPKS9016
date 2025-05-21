@@ -5,10 +5,7 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-import com.tourism.booking.dto.authentication.AuthenticationRequest;
-import com.tourism.booking.dto.authentication.AuthenticationResponse;
-import com.tourism.booking.dto.authentication.IntrospectRequest;
-import com.tourism.booking.dto.authentication.IntrospectResponse;
+import com.tourism.booking.dto.authentication.*;
 import com.tourism.booking.dto.logout.LogoutRequest;
 import com.tourism.booking.exception.ApiException;
 import com.tourism.booking.exception.ErrorCode;
@@ -32,7 +29,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
-import java.util.List;
 import java.util.StringJoiner;
 import java.util.UUID;
 
@@ -52,17 +48,24 @@ public class AuthenticationService implements IAuthenticationService {
     public AuthenticationResponse login(AuthenticationRequest authenticationRequest) {
         Account acc = accountRepository.findByUsername(authenticationRequest.getUsername());
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
-
-        if(acc == null || !passwordEncoder.matches(authenticationRequest.getPassword(), acc.getPassword())) {
+        UserAuthResponse user = accountRepository.getUserAuthResponse(authenticationRequest.getUsername());
+        if (acc == null || !passwordEncoder.matches(authenticationRequest.getPassword(), acc.getPassword())) {
             throw new ApiException(ErrorCode.UNAUTHENTICATION);
         }
         return AuthenticationResponse.builder()
                 .token(generateToken(acc))
+                .user(
+                        UserAuthResponse.builder()
+                                .id(user.getId())
+                                .username(user.getUsername())
+                                .role(user.getRole())
+                                .build()
+                )
                 .build();
     }
 
     @Override
-    public IntrospectResponse introspect(IntrospectRequest introspectRequest)  {
+    public IntrospectResponse introspect(IntrospectRequest introspectRequest) {
         try {
             verifyToken(introspectRequest.getToken());
             return IntrospectResponse.builder()
@@ -97,6 +100,7 @@ public class AuthenticationService implements IAuthenticationService {
                 ))
                 // Thêm một custom claim (thông tin tùy chỉnh) vào JWT, chứa thông tin về đối tượng Student
                 .claim("scope", getRoles(acc))
+                .claim("accountId", acc.getAccount_id())
                 .jwtID(UUID.randomUUID().toString())
                 .build(); // Xây dựng đối tượng JWTClaimsSet
 

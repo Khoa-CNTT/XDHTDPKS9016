@@ -5,4 +5,7 @@ export * from './quiz'
 export * from './hotel'
 export * from './about'
 export * from './contact'
-export * from './room'
+export * from './supplier'
+export * from './admin'
+
+

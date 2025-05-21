@@ -48,7 +48,7 @@ const colorComputed = computed(() => {
       class="cursor-pointer"
       @click="$emit('delete', id)"
     >
-      <Icon icon="hugeicons:cancel-01" />
+      <Icon icon="hugeicons:cancel-01" class="h-8 w-8"/>
     </div>
   </div>
 </template>

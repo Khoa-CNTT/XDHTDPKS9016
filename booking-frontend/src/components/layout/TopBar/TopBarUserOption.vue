@@ -20,7 +20,7 @@ function openProfile() {
 
 function handleLogout() {
   authStore.logout()
-  location.reload()
+  // location.reload()
 }
 </script>
 <template>

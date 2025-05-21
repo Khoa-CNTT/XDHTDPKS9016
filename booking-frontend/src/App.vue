@@ -4,6 +4,8 @@ import ConfirmModal from './components/base/ConfirmDialog.vue'
 import { useLoadingStore } from './stores/loading'
 import { showToast } from './utils/toast'
 import { useConfirmDialog } from './stores/modal'
+import { useRoute } from 'vue-router'
+import { computed, onMounted } from 'vue'
 const route = useRoute()
 
 const layout = computed(() => {

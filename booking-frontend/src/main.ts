@@ -18,6 +18,7 @@ import 'tippy.js/dist/tippy.css'
 import 'vue-awesome-paginate/dist/style.css'
 import { i18n } from './plugins/i18n'
 import Vue3Toastify from './plugins/toast'
+import { initAuthStore } from './stores'
 
 const initApp = async () => {
   app.component('Icon', Icon)
@@ -44,7 +45,7 @@ const initApp = async () => {
   app.component('NoSideBarLayout', NoSideBarLayout)
   app.component('QuizCreateLayout', QuizCreateLayout)
   app.use(createPinia())
-  // await initAuthStore();
+  await initAuthStore();
   // await initWebSocketStore();
   // await initMasterStore();
   app.use(router)

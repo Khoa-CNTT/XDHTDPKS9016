@@ -1,6 +1,9 @@
 package com.tourism.booking.model;
 
-
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -11,53 +14,47 @@ import java.util.Set;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
 @Table(name = "room")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id_room")
 public class Room {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long room_id;
+    @Column(name = "id_room")
+    Long id_room;
 
-    @Column(name = "room_number")
-    String room_number;
+    @Column(name = "number_rooms", nullable = false)
+    Integer number_rooms;
 
-    @Column(name = "room_type")
-    String room_type;
-
-    @Column(name = "number_bed")
+    @Column(name = "number_bed", nullable = false)
     int number_bed;
 
-    @Column(name = "maximum_people")
-    int maximum_people;
-
-    @Column(name = "price")
+    @Column(name = "price", precision = 10, scale = 2, nullable = false)
     BigDecimal price;
 
-    @Column(name = "room_image")
-    String room_image;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_type_id", nullable = false)
+    RoomType room_type;
 
-    @Column(name = "description")
-    String description;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    UserProfile user_profile;
 
-    @Column(name = "status")
+    @Column(name = "status", length = 50)
     String status;
 
-    @ManyToOne
-    @JoinColumn(name = "hotel_id", nullable = false)
-    Hotel hotel;
-
-    // Quan hệ 1-N với Rating
+    @JsonIgnore
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
-    Set<Rating> ratings = new HashSet<>();
+    Set<RoomRating> roomRatings = new HashSet<>();
 
-    // Quan hệ 1-N với Comment
+    @JsonIgnore
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
-    Set<Comment> comments = new HashSet<>();
+    Set<BookingRoom> bookingRooms = new HashSet<>();
 
-    // Quan hệ 1-N với Booking
+    @JsonIgnore
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
-    Set<Booking> bookings = new HashSet<>();
+    Set<RoomComment> roomComments = new HashSet<>();
 }

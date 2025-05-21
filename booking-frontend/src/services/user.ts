@@ -1,28 +1,25 @@
+import { $api } from '@/api/ofetch'
 import type { BaseResponse } from '@/types/api'
-import type { IUser } from '@/types/user'
+import { UserInfo, CreateUserRequest, CreateUserResponse,ChangePasswordPayload } from '@/types/user'
 
-interface UserProfile {
-  first_name: string
-  last_name: string
-}
-export const getInfoApi = async (): Promise<BaseResponse<IUser>> => {
-  return $api('/users/my-info', {
-    method: 'GET',
-  })
+// export const getInfoApi = async (id: number): Promise<BaseResponse<UserInfo>> => {
+//   return $api('/user-profile', { method: 'GET' })
+// }
+
+export const getInfoApi = async (): Promise<UserInfo> => {
+  return $api('/user-profile', { method: 'GET' })
 }
 
-export const getUserApi = async (id: string): Promise<BaseResponse<IUser[]>> => {
-  return $api(`/users/profiles`, {
-    method: 'GET',
-    query: {
-      ids: id,
+//change password user
+export const updateUserApi = async (
+  value: ChangePasswordPayload
+): Promise<void> => {
+  await $api(
+    '/accounts/change-password',
+    {
+      method: 'PUT',
+      body: value,
     },
-  })
-}
-
-export const createProfileApi = async (payload: UserProfile): Promise<BaseResponse<IUser>> => {
-  return $api('/users/info', {
-    method: 'POST',
-    body: payload,
-  })
-}
+    true
+  );
+};

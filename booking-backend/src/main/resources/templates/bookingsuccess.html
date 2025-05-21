@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh toán thành công</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            max-width: 800px;
+            width: 100%;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background-color: #4CAF50;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            animation: scaleIn 0.5s ease-out;
+        }
+        .success-icon span {
+            color: white;
+            font-size: 40px;
+        }
+        @keyframes scaleIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+        h1 {
+            color: #2c3e50;
+            font-size: 32px;
+            margin: 0;
+            font-weight: 700;
+        }
+        .subtitle {
+            color: #7f8c8d;
+            margin-top: 10px;
+            font-size: 16px;
+        }
+        .booking-details {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            border: 1px solid #e9ecef;
+        }
+        .detail-group {
+            margin-bottom: 25px;
+        }
+        .detail-group:last-child {
+            margin-bottom: 0;
+        }
+        .detail-label {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 500;
+        }
+        .detail-value {
+            color: #2c3e50;
+            font-size: 18px;
+            font-weight: 500;
+        }
+        .amount {
+            font-size: 24px;
+            color: #4CAF50;
+            font-weight: 700;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 8px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .actions {
+            margin-top: 40px;
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+        .button {
+            padding: 12px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+        .primary-button {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .primary-button:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        }
+        .secondary-button {
+            background-color: #fff;
+            color: #4CAF50;
+            border: 2px solid #4CAF50;
+        }
+        .secondary-button:hover {
+            background-color: #f8f9fa;
+            transform: translateY(-2px);
+        }
+        .divider {
+            height: 1px;
+            background-color: #e9ecef;
+            margin: 30px 0;
+        }
+        .note {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-top: 30px;
+        }
+        .hotel-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+            margin-bottom: 20px;
+        }
+        .hotel-icon {
+            font-size: 24px;
+            color: #4CAF50;
+        }
+        .hotel-details {
+            flex: 1;
+        }
+        .hotel-name {
+            font-weight: 500;
+            color: #2c3e50;
+            margin: 0;
+        }
+        .hotel-address {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin: 5px 0 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="success-icon">
+                <span>✓</span>
+            </div>
+            <h1>Thanh toán thành công!</h1>
+            <p class="subtitle">Cảm ơn bạn đã đặt phòng. Dưới đây là chi tiết đặt phòng của bạn.</p>
+        </div>
+
+        <div class="hotel-info">
+            <div class="hotel-icon">🏨</div>
+            <div class="hotel-details">
+                <h3 class="hotel-name" th:text="${hotelName}">Thông tin khách sạn</h3>
+                <p class="hotel-address" th:text="${hotelAddress}">Hội An Old Town Residence</p>
+            </div>
+        </div>
+
+        <div class="booking-details">
+            <div class="detail-group">
+                <div class="detail-label">Người nhận phòng</div>
+                <div class="detail-value" th:text="${contactName}">BK-12345</div>
+            </div>
+
+            <div class="detail-group">
+                <div class="detail-label">Số tiền thanh toán</div>
+                <div class="detail-value amount" th:text="${amount + ' VNĐ'}">1,000,000 VNĐ</div>
+            </div>
+
+            <div class="detail-group">
+                <div class="detail-label">Thời gian thanh toán</div>
+                <div class="detail-value" th:text="${paymentTime}">01/01/2024 15:30:00</div>
+            </div>
+
+            <div class="detail-group">
+                <div class="detail-label">Trạng thái</div>
+                <div class="detail-value">
+                    <span class="status-badge">Đã thanh toán</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="actions">
+            <a href="http://localhost:5173/booking-history" class="button primary-button">Xem lịch sử đặt phòng</a>
+            <a href="http://localhost:5173" class="button secondary-button">Về trang chủ</a>
+        </div>
+
+        <p class="note">
+            Xác nhận đặt phòng đã được gửi đến email của bạn. 
+            Nếu bạn cần hỗ trợ, vui lòng liên hệ với chúng tôi qua hotline: 1900 1234
+        </p>
+    </div>
+</body>
+</html> 
