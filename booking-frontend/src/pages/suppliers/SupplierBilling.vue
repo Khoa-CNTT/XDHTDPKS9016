@@ -49,7 +49,8 @@
             :key="row.paymentId"
             class="border-t"
           >
-            <td class="px-4 py-2">{{ index + 1 }}</td>
+            <!-- STT tính theo tổng trang (phân trang) -->
+            <td class="px-4 py-2">{{ (currentPage * size) + index + 1 }}</td>
             <td class="px-4 py-2 truncate max-w-[180px]" :title="row.customerName">
               {{ row.customerName }}
             </td>
@@ -107,28 +108,60 @@
           </tr>
         </tbody>
       </table>
+
+      <!-- Pagination -->
+      <div class="mt-5 flex justify-center">
+        <Pagination
+          :total="totalElements"
+          :items-per-page="size"
+          :default-page="currentPage + 1"
+          :sibling-count="1"
+          @page-change="handlePageChange"
+        />
+      </div>
     </div>
   </div>
 </template>
+
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { getPaymentHistory as fetchPaymentHistory, updatePaymentStatus } from '@/services/supplier';
 import type { PaymentHistory } from '@/types/supplier';
-import { toast } from 'vue3-toastify'
+import { toast } from 'vue3-toastify';
+import Pagination from '@/components/base/Pagination.vue';
 
 const paymentList = ref<PaymentHistory[]>([]);
 const isLoading = ref(true);
 
-const loadPaymentHistory = async () => {
+// Phân trang
+const totalElements = ref(0);
+const totalPages = ref(0);
+const size = ref(5);          // số phần tử trên 1 trang (để trùng với dữ liệu page.size)
+const currentPage = ref(0);   // page bắt đầu từ 0
+
+// Hàm load dữ liệu theo trang
+const loadPaymentHistory = async (page = 0) => {
+  isLoading.value = true;
   try {
-    const res = await fetchPaymentHistory();
+    // Gọi API có tham số page (nếu API hỗ trợ)
+    const res = await fetchPaymentHistory(page, size.value);
+
     paymentList.value = res.content;
+    totalElements.value = res.page.totalElements;
+    totalPages.value = res.page.totalPages;
+    size.value = res.page.size;
+    currentPage.value = res.page.number;
   } catch (error) {
     console.error('Lỗi khi lấy lịch sử thanh toán:', error);
     toast.error('Lấy lịch sử thanh toán thất bại');
   } finally {
     isLoading.value = false;
   }
+};
+
+const handlePageChange = (page: number) => {
+  // page bắt đầu từ 1, đổi về index 0-based
+  loadPaymentHistory(page - 1);
 };
 
 const handleUpdateStatus = async (

@@ -155,9 +155,17 @@ export const createRoomApi = async (roomData: Partial<Room>): Promise<Room> => {
   }, true);
 }
 //history payment
-export const getPaymentHistory = async (): Promise<PaymentHistoryResponse> => {
-  return $api('/payments/history', { method: 'GET' }, true);
+export const getPaymentHistory = async (
+  page: number = 0,
+  size: number = 5
+): Promise<PaymentHistoryResponse> => {
+  return $api(
+    `/payments/history?page=${page}&size=${size}`,
+    { method: 'GET' },
+    true
+  );
 };
+
 //update status history payment
 export const updatePaymentStatus = async (
   paymentId: number,
