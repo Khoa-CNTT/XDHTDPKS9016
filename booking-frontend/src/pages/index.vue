@@ -5,7 +5,9 @@
       <div class="absolute inset-0 w-full h-[350px]">
         <img
           src="https://cms-origin.gotadi.com/wp-content/uploads/2025/04/sl38-t4-2025-voucher-100k-ks-vivumuale-web-1.png"
-          alt="Banner khách sạn" class="w-full h-full object-cover object-center" />
+          alt="Banner khách sạn"
+          class="w-full h-full object-cover object-center"
+        />
         <!-- Lớp overlay để làm tối hình ảnh -->
         <!-- <div class="absolute inset-0 bg-black bg-opacity-40"></div> -->
       </div>
@@ -53,15 +55,17 @@
           <div class="bg-white p-6 rounded-b-lg shadow-xl">
             <div class="grid grid-cols-1 md:grid-cols-1 gap-6">
               <!-- Ô input tìm kiếm -->
-             <div class="flex items-center bg-gray-50 border border-gray-200 rounded-lg p-4 w-full">
-          <span class="mr-3 text-xl">🔍</span>
-          <input
-            v-model="location"
-            type="text"
-            placeholder="Sea Sand 2 Hotel Da Nang"
-            class="w-full bg-transparent outline-none text-lg"
-          />
-        </div>
+              <div
+                class="flex items-center bg-gray-50 border border-gray-200 rounded-lg p-4 w-full"
+              >
+                <span class="mr-3 text-xl">🔍</span>
+                <input
+                  v-model="location"
+                  type="text"
+                  placeholder="Sea Sand 2 Hotel Da Nang"
+                  class="w-full bg-transparent outline-none text-lg"
+                />
+              </div>
             </div>
 
             <!-- Nút tìm kiếm -->
@@ -73,13 +77,23 @@
             </div>
 
             <!-- Kết quả tìm kiếm -->
-            <div v-if="searchResults.length" class="mt-8">
+            <div
+              v-if="searchResults.length"
+              class="mt-8"
+            >
               <h2 class="text-2xl font-semibold mb-4 text-gray-800">🔎 Kết quả tìm kiếm:</h2>
               <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div v-for="hotel in searchResults" :key="hotel.hotel_id" @click="viewHotelDetail(hotel.hotel_id)"
-                  class="border rounded-lg overflow-hidden shadow-md hover:shadow-lg transition cursor-pointer">
-                  <img :src="`http://157.66.101.165:8080${hotel.image}`" alt="Hotel Image"
-                    class="w-full h-48 object-cover" />
+                <div
+                  v-for="hotel in searchResults"
+                  :key="hotel.hotel_id"
+                  @click="viewHotelDetail(hotel.hotel_id)"
+                  class="border rounded-lg overflow-hidden shadow-md hover:shadow-lg transition cursor-pointer"
+                >
+                  <img
+                    :src="`${BASE_URL}${hotel.image}`"
+                    alt="Hotel Image"
+                    class="w-full h-48 object-cover"
+                  />
                   <div class="p-4">
                     <h3 class="text-xl font-bold text-gray-800 mb-1">{{ hotel.name }}</h3>
                     <p class="text-gray-600 text-sm mb-1">
@@ -95,7 +109,8 @@
           </div>
           <!-- Thông báo ưu đãi và quảng cáo -->
           <div
-            class="absolute top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg flex items-center space-x-2">
+            class="absolute top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg flex items-center space-x-2"
+          >
             <span class="text-lg">🔥</span>
             <span class="text-sm font-semibold">Ưu đãi: Đặt gói tiết kiệm - Mới!</span>
           </div>
@@ -103,16 +118,33 @@
       </div>
     </div>
 
-    <div v-if="groupedHotels.length > 0" class="container mx-auto p-4 pt-32">
-      <div v-for="group in groupedHotels" :key="group.location" class="mb-8">
+    <div
+      v-if="groupedHotels.length > 0"
+      class="container mx-auto p-4 pt-32"
+    >
+      <div
+        v-for="group in groupedHotels"
+        :key="group.location"
+        class="mb-8"
+      >
         <h2 class="text-2xl font-bold mb-4">{{ group.location }}</h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div v-for="hotel in group.hotels" :key="hotel.id" class="border p-4 rounded shadow">
-            <img :src="hotel.image" class="w-full h-48 object-cover mb-2" />
+          <div
+            v-for="hotel in group.hotels"
+            :key="hotel.id"
+            class="border p-4 rounded shadow"
+          >
+            <img
+              :src="hotel.image"
+              class="w-full h-48 object-cover mb-2"
+            />
             <h3 class="text-lg font-bold">{{ hotel.name }}</h3>
             <p class="text-gray-600">{{ hotel.description }}</p>
-            <button class="mt-2 px-4 py-2 bg-blue-600 text-white rounded" @click="goToDetail(hotel.id)">
+            <button
+              class="mt-2 px-4 py-2 bg-blue-600 text-white rounded"
+              @click="goToDetail(hotel.id)"
+            >
               Xem chi tiết
             </button>
           </div>
@@ -124,19 +156,47 @@
       <h1 class="text-2xl text-text font-bold mb-2 uppercase">Điểm đến nổi bật</h1>
       <hr class="mb-4 border-t-2 border-text" />
       <div class="grid grid-cols-2 gap-4 mb-4">
-        <div v-for="(city, index) in topCities" :key="index" class="relative">
-          <img :src="city.image" :alt="city.name" class="w-full h-48 object-cover rounded-lg" />
-          <div class="absolute top-0 left-0 bg-black bg-opacity-50 text-white text-sm p-1 rounded flex">
-            <img :src="city.img" :alt="city.name" class="w-8 h-5 object-cover rounded-lg" />
+        <div
+          v-for="(city, index) in topCities"
+          :key="index"
+          class="relative"
+        >
+          <img
+            :src="city.image"
+            :alt="city.name"
+            class="w-full h-48 object-cover rounded-lg"
+          />
+          <div
+            class="absolute top-0 left-0 bg-black bg-opacity-50 text-white text-sm p-1 rounded flex"
+          >
+            <img
+              :src="city.img"
+              :alt="city.name"
+              class="w-8 h-5 object-cover rounded-lg"
+            />
             {{ city.name }}
           </div>
         </div>
       </div>
       <div class="grid grid-cols-3 gap-4 pb-30">
-        <div v-for="(city, index) in bottomCities" :key="index" class="relative">
-          <img :src="city.image" :alt="city.name" class="w-full h-48 object-cover rounded" />
-          <div class="absolute top-0 left-0 bg-black bg-opacity-50 text-white text-sm p-1 rounded flex">
-            <img :src="city.img" :alt="city.name" class="w-8 h-5 object-cover rounded-lg" />
+        <div
+          v-for="(city, index) in bottomCities"
+          :key="index"
+          class="relative"
+        >
+          <img
+            :src="city.image"
+            :alt="city.name"
+            class="w-full h-48 object-cover rounded"
+          />
+          <div
+            class="absolute top-0 left-0 bg-black bg-opacity-50 text-white text-sm p-1 rounded flex"
+          >
+            <img
+              :src="city.img"
+              :alt="city.name"
+              class="w-8 h-5 object-cover rounded-lg"
+            />
             {{ city.name }}
           </div>
         </div>
@@ -145,10 +205,23 @@
     <div class="container mx-auto p-4 pt-14">
       <h1 class="text-2xl text-text font-bold mb-2 uppercase">Chương trình khuyến mãi</h1>
       <hr class="mb-4 border-t-2 border-text" />
-      <swiper :slides-per-view="3" :space-between="20" :loop="true" :autoplay="{ delay: 3000 }" navigation
-        class="rounded-lg relative">
-        <swiper-slide v-for="(img, i) in promoImages" :key="i">
-          <img :src="img" alt="Khuyến mãi" class="rounded-xl h-40 w-full object-cover" />
+      <swiper
+        :slides-per-view="3"
+        :space-between="20"
+        :loop="true"
+        :autoplay="{ delay: 3000 }"
+        navigation
+        class="rounded-lg relative"
+      >
+        <swiper-slide
+          v-for="(img, i) in promoImages"
+          :key="i"
+        >
+          <img
+            :src="img"
+            alt="Khuyến mãi"
+            class="rounded-xl h-40 w-full object-cover"
+          />
         </swiper-slide>
       </swiper>
     </div>
@@ -156,39 +229,61 @@
       <h1 class="text-2xl text-text font-bold mb-2 uppercase">Khách sạn nổi bật</h1>
       <hr class="mb-4 border-t-2 border-text" />
       <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-        <div v-for="(hotel, index) in hotelList.slice(0, displayCount)" :key="hotel.hotel_id"
-          class="bg-white p-3 shadow-md rounded-lg">
-          <img v-if="hotel.image" :src="'http://157.66.101.165:8080' + hotel.image" alt="Hotel Image"
-            class="w-full h-48 object-cover rounded-md" />
+        <div
+          v-for="(hotel, index) in hotelList.slice(0, displayCount)"
+          :key="hotel.hotel_id"
+          class="bg-white p-3 shadow-md rounded-lg"
+        >
+          <img
+            v-if="hotel.image"
+            :src="'http://localhost:8080' + hotel.image"
+            alt="Hotel Image"
+            class="w-full h-48 object-cover rounded-md"
+          />
           <div class="flex justify-between mt-2">
             <div>
               <h2 class="text-lg font-semibold">{{ hotel.name }}</h2>
               <p class="text-sm text-gray-600">{{ hotel.address }}</p>
             </div>
-            <button @click="viewHotelDetail(hotel.hotel_id)"
-              class="mt-2 px-4 py-2 bg-text text-white rounded-md self-start">
+            <button
+              @click="viewHotelDetail(hotel.hotel_id)"
+              class="mt-2 px-4 py-2 bg-text text-white rounded-md self-start"
+            >
               Xem chi tiết
             </button>
           </div>
         </div>
       </div>
       <div class="flex justify-center mt-4">
-        <button @click="toggleView"
-          class="px-4 py-2 bg-blue-600 text-white rounded-full text-sm font-semibold hover:bg-blue-700 transition-all duration-200 ease-in-out">
+        <button
+          @click="toggleView"
+          class="px-4 py-2 bg-blue-600 text-white rounded-full text-sm font-semibold hover:bg-blue-700 transition-all duration-200 ease-in-out"
+        >
           {{ isExpanded ? 'Thu gọn' : 'Xem thêm' }}
         </button>
       </div>
     </div>
     <div class="container mx-auto p-4">
-      <img src="https://top3.vn/uploads/source/levanty/saigonbptourist/banner-cat-2.jpg" alt="Hình khuyến mãi"
-        class="w-full h-64 object-cover rounded-xl shadow-md" />
+      <img
+        src="https://top3.vn/uploads/source/levanty/saigonbptourist/banner-cat-2.jpg"
+        alt="Hình khuyến mãi"
+        class="w-full h-64 object-cover rounded-xl shadow-md"
+      />
     </div>
 
     <div class="container mx-auto p-4 text-center">
       <hr class="mb-4 border-t-2 border-text" />
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div v-for="about in about" :key="about.id" class="p-6 flex flex-col items-center">
-          <img :src="about.image" alt="Hotel Image" class="w-24 h-24 object-cover rounded-full mb-4" />
+        <div
+          v-for="about in about"
+          :key="about.id"
+          class="p-6 flex flex-col items-center"
+        >
+          <img
+            :src="about.image"
+            alt="Hotel Image"
+            class="w-24 h-24 object-cover rounded-full mb-4"
+          />
           <h2 class="text-lg font-semibold mb-2">{{ about.name }}</h2>
           <p class="text-sm text-gray-600 mb-4">{{ about.description }}</p>
         </div>
@@ -204,8 +299,11 @@
         </p>
       </div>
       <div class="md:w-1/2 flex justify-center mt-6 md:mt-0">
-        <img src="https://homesun.com.vn/wp-content/uploads/2022/05/Tieu-chuan-sao-cua-khach-san-Viet-Nam.jpg"
-          alt="Hotel Image" class="rounded-lg shadow-lg" />
+        <img
+          src="https://homesun.com.vn/wp-content/uploads/2022/05/Tieu-chuan-sao-cua-khach-san-Viet-Nam.jpg"
+          alt="Hotel Image"
+          class="rounded-lg shadow-lg"
+        />
       </div>
     </div>
   </div>
@@ -220,13 +318,11 @@ import 'swiper/css'
 import 'swiper/css/navigation'
 import { Navigation, Autoplay } from 'swiper/modules'
 import 'swiper/css/autoplay'
-
+import { BASE_URL } from '@/utils/imageHelper'
 const hotelList = ref([])
 const displayCount = ref(6)
 const isExpanded = ref(false)
 const router = useRouter()
-
-
 
 const fetchHotelList = async () => {
   try {
@@ -260,7 +356,7 @@ const viewHotelDetail = (hotelId) => {
 const location = ref('')
 const searchResults = ref([]) // Kết quả từ API
 let debounceTimer = null
-watch(location, newVal => {
+watch(location, (newVal) => {
   if (debounceTimer) clearTimeout(debounceTimer)
 
   if (!newVal || !newVal.trim()) {
@@ -300,8 +396,6 @@ const promoImages = [
   'https://cdn6.agoda.net/images/WebCampaign/20250403_ka_eliteescapes/home_banner_web/en-us.png',
 ]
 const groupedHotels = ref([])
-
-
 
 const goToDetail = (hotelId) => {
   router.push({ name: 'HotelDetail', params: { id: hotelId } })

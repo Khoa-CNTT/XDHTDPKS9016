@@ -29,15 +29,18 @@
 
     <!-- Vùng hiển thị biểu đồ -->
     <div class="card-body w-full flex flex-wrap gap-8 justify-center">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl">
-        <div class="flex justify-center">
-          <DoughnutChart :chartData="chartData" :chartOptions="chartOptions" class="w-64 h-64" />
-        </div>
-        <div class="flex justify-center">
-          <PolarChart :chartData="chartData" :chartOptions="chartOptions" class="w-64 h-64" />
-        </div>
-      </div>
+  <div v-if="hasData" class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl">
+    <div class="flex justify-center">
+      <DoughnutChart :chartData="chartData" :chartOptions="chartOptions" class="w-64 h-64" />
     </div>
+    <div class="flex justify-center">
+      <PolarChart :chartData="chartData" :chartOptions="chartOptions" class="w-64 h-64" />
+    </div>
+  </div>
+  <div v-else class="text-center text-red-500 font-semibold">
+    Không có dữ liệu cho năm {{ selectedYear }} và quý {{ selectedQuarter }}.
+  </div>
+</div>
   </div>
 </template>
 
@@ -47,7 +50,7 @@ import DoughnutChart from '@/components/base/DoughnutChart.vue';
 import PolarChart from '@/components/base/PolarChart.vue';
 import { getAdminStatisticsApi } from '@/services/admin';
 import type { DashboardStats } from '@/types/admin';
-
+const hasData = ref(false);
 const years = [2023, 2024, 2025]; // Hoặc lấy động
 const selectedYear = ref(2025);
 const selectedQuarter = ref(2);
@@ -98,24 +101,35 @@ const chartOptions = {
 watch([dataStats, selectedStat], () => {
   if (!dataStats.value) {
     chartData.value = { labels: [], datasets: [] };
+    hasData.value = false;
     return;
   }
 
   const label = selectedStat.value;
   const value = dataStats.value[label];
 
+  // Nếu không có dữ liệu hoặc bằng 0 thì không hiển thị
+  if (!value || value === 0) {
+    chartData.value = { labels: [], datasets: [] };
+    hasData.value = false;
+    return;
+  }
+
   chartData.value = {
-    labels: [statLabels[label], 'Other'],
+    labels: [statLabels[label], 'Khác'],
     datasets: [
       {
         label: statLabels[label],
-        data: [value || 0, 100], // Ví dụ: giá trị thật và giả lập "Other"
+        data: [value, 100], // hoặc chỉ đơn giản là [value]
         backgroundColor: ['#36A2EB', '#FF6384'],
         hoverOffset: 30,
       },
     ],
   };
+
+  hasData.value = true;
 });
+
 </script>
 
 <style scoped>

@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-md mx-auto mt-10 p-8 bg-gradient-to-br from-white to-gray-100 rounded-2xl shadow-lg">
+  <div class="max-w-md mx-auto mt-10 p-8 bg-gradient-to-br from-white to-gray-100 rounded-2xl shadow-lg mb-5">
     <h2 class="text-3xl font-extrabold mb-6 text-center text-gray-800">🔒 Đổi mật khẩu</h2>
     <form @submit.prevent="onSubmit" class="space-y-6">
       <!-- Mật khẩu hiện tại -->

@@ -54,8 +54,9 @@ import { getInfoHotelApi } from '@/services/supplier'
 import UpdateInfo from './UpdateInfo.vue'
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
+  import {BASE_URL} from '@/utils/imageHelper'
 const showModal = ref(false)
-const baseUrl = 'http://157.66.101.165:8080'
+const baseUrl = 'http://localhost:8080'
 const hotel = ref({
   name: "",
   image: "",

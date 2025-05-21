@@ -1,37 +1,12 @@
 <template>
   <div class="space-y-6 px-4 py-6 relative">
     <!-- Bộ lọc -->
-    <div class="border rounded-lg p-4 bg-white shadow flex flex-wrap justify-between items-center gap-2">
-      <h3 class="text-lg font-semibold text-blue-700 flex items-center"></h3>
+    <div
+      class="border rounded-lg p-4 bg-white shadow flex flex-wrap justify-between items-center gap-2"
+    >
+      <h3 class="text-lg font-semibold text-blue-700 flex items-center">Quản lý đặt phòng</h3>
 
       <div class="relative">
-        <button
-          @click="toggleDropdown"
-          aria-label="Toggle Filter Dropdown"
-          class="text-blue-700 text-2xl hover:text-blue-900 focus:outline-none"
-        >
-          <Icon icon="mdi:filter-variant" width="24" height="24" class="mr-2" />
-        </button>
-
-        <!-- Dropdown -->
-        <transition name="fade">
-          <ul
-            v-if="isDropdownOpen"
-            class="absolute right-0 top-full mt-2 w-44 bg-white border border-gray-300 rounded shadow-lg z-10"
-          >
-            <li
-              v-for="state in states"
-              :key="state.value"
-              @click="selectStatus(state.value)"
-              :class="[
-                'px-4 py-2 cursor-pointer hover:bg-blue-100',
-                currentStatus === state.value ? 'bg-blue-500 text-white' : 'text-gray-700'
-              ]"
-            >
-              {{ state.label }}
-            </li>
-          </ul>
-        </transition>
       </div>
     </div>
 
@@ -39,9 +14,6 @@
     <div class="border rounded-lg p-4 bg-white shadow overflow-x-auto">
       <h3 class="text-lg font-semibold mb-4 text-blue-700 flex flex-wrap items-center gap-2">
         <span class="mr-2">📋</span> Danh sách đặt phòng
-        <span class="ml-auto text-sm text-gray-500">
-          (Lọc trạng thái: <strong>{{ displayStatus }}</strong>)
-        </span>
       </h3>
 
       <table class="min-w-full divide-y divide-gray-200 border text-sm">
@@ -58,7 +30,7 @@
             <th class="px-3 py-2 text-left max-w-[140px] truncate">Loại phòng</th>
             <th class="px-3 py-2 text-left whitespace-nowrap">Số phòng</th>
             <th class="px-3 py-2 text-left whitespace-nowrap">Trạng thái</th>
-            <th class="px-3 py-2 text-left whitespace-nowrap">Hành động</th>
+            <!-- <th class="px-3 py-2 text-left whitespace-nowrap">Hành động</th> -->
           </tr>
         </thead>
         <tbody>
@@ -87,34 +59,36 @@
               <span
                 class="inline-block px-2 py-1 rounded font-medium text-xs border whitespace-nowrap"
                 :class="{
-                  'bg-yellow-100 text-yellow-700 border-yellow-300': booking.status === 'CONFIRMED',
-                  'bg-green-100 text-green-700 border-green-300': booking.status === 'PAID',
+                  'bg-yellow-100 text-yellow-700 border-yellow-300': booking.status === 'PAID',
+                  'bg-blue-100 text-blue-700 border-blue-300': booking.status === 'CONFIRMED',
+                  'bg-green-100 text-green-700 border-green-300': booking.status === 'COMPLETED',
                 }"
               >
-                {{ booking.statusDisplay }}
+                {{ getStatusLabel(booking.status) }}
               </span>
-            </td>
-            <td class="px-3 py-2">
-              <button
-                v-if="booking.status === 'CONFIRMED'"
-                @click="confirmBooking(booking.bookingId)"
-                class="p-2 bg-green-500 hover:bg-green-600 text-white rounded transition"
-                title="Xác nhận đặt phòng"
-              >
-                <Icon icon="mdi:check" width="20" height="20" />
-              </button>
-              <!-- Nếu là PAID thì không hiển thị gì -->
-              <template v-else-if="booking.status === 'PAID'"></template>
-              <!-- Nếu là trạng thái khác thì hiển thị gạch ngang -->
-              <template v-else><span class="text-gray-400">—</span></template>
             </td>
           </tr>
 
           <tr v-if="filteredBookings.length === 0">
-            <td colspan="12" class="text-center py-4 text-gray-500">Không có dữ liệu phù hợp</td>
+            <td
+              colspan="12"
+              class="text-center py-4 text-gray-500"
+            >
+              Không có dữ liệu phù hợp
+            </td>
           </tr>
         </tbody>
       </table>
+      <!-- Pagination -->
+      <!-- <div class="mt-5 flex justify-center">
+        <Pagination
+          :total="totalElements"
+          :items-per-page="size"
+          :default-page="currentPage + 1"
+          :sibling-count="1"
+          @page-change="handlePageChange"
+        />
+      </div> -->
     </div>
   </div>
 </template>
@@ -123,23 +97,21 @@
 import { ref, computed, onMounted } from 'vue'
 import { Icon } from '@iconify/vue'
 import { getBookingsManager } from '@/services/supplier'
-
+import Pagination from '@/components/base/Pagination.vue'
 const bookings = ref<any[]>([])
 const isDropdownOpen = ref(false)
 const currentStatus = ref('ALL')
 
-const states = [
-  { value: 'ALL', label: 'Tất cả' },
-  { value: 'PAID', label: 'Đã thanh toán' },
-  { value: 'CONFIRMED', label: 'Đang xác nhận' },
-]
+const states = [{ value: 'PAID', label: 'Chờ xác nhận' }]
 
 onMounted(async () => {
   try {
     const res = await getBookingsManager()
+    console.log('data dat phong', res)
+
     bookings.value = res.map((booking: any) => ({
       ...booking,
-      statusDisplay: getStatusLabel(booking.status)
+      statusDisplay: getStatusLabel(booking.status),
     }))
   } catch (error) {
     console.error('Lỗi khi lấy danh sách đặt phòng:', error)
@@ -147,7 +119,7 @@ onMounted(async () => {
 })
 
 function getStatusLabel(status: string) {
-  const match = states.find(s => s.value === status)
+  const match = states.find((s) => s.value === status)
   return match ? match.label : status
 }
 
@@ -162,16 +134,16 @@ function selectStatus(status: string) {
 
 const filteredBookings = computed(() => {
   if (currentStatus.value === 'ALL') return bookings.value
-  return bookings.value.filter(b => b.status === currentStatus.value)
+  return bookings.value.filter((b) => b.status === currentStatus.value)
 })
 
 const displayStatus = computed(() => {
-  const found = states.find(s => s.value === currentStatus.value)
+  const found = states.find((s) => s.value === currentStatus.value)
   return found ? found.label : 'Tất cả'
 })
 
 function confirmBooking(bookingId: number) {
-  const booking = bookings.value.find(b => b.bookingId === bookingId)
+  const booking = bookings.value.find((b) => b.bookingId === bookingId)
   if (booking && booking.status === 'CONFIRMED') {
     booking.status = 'PAID'
     booking.statusDisplay = getStatusLabel('PAID')
@@ -180,10 +152,12 @@ function confirmBooking(bookingId: number) {
 </script>
 
 <style>
-.fade-enter-active, .fade-leave-active {
+.fade-enter-active,
+.fade-leave-active {
   transition: opacity 0.2s ease;
 }
-.fade-enter-from, .fade-leave-to {
+.fade-enter-from,
+.fade-leave-to {
   opacity: 0;
 }
 </style>

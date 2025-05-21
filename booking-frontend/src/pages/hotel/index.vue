@@ -26,7 +26,7 @@
               <div class="w-16 h-16 flex-shrink-0 overflow-hidden rounded-md mr-3">
                 <img
                   v-if="hotel.image"
-                  :src="`http://157.66.101.165:8080${hotel.image}`"
+                  :src="`http://localhost:8080${hotel.image}`"
                   alt="Hotel"
                   class="w-full h-full object-cover"
                 />
@@ -58,7 +58,7 @@
             <div class="w-full md:w-1/3 overflow-hidden">
               <img
                 v-if="hotel.image"
-                :src="'http://157.66.101.165:8080' + hotel.image"
+                :src="'http://localhost:8080' + hotel.image"
                 alt="Hotel Image"
                 class="w-full h-auto object-cover"
               />
@@ -140,7 +140,7 @@ import { Navigation, Autoplay } from 'swiper/modules'
 import 'swiper/css/autoplay'
 import { useRouter } from 'vue-router'
 import { getHotelListApi, searchHotelsApi } from '@/services/home'
-
+  import {BASE_URL} from '@/utils/imageHelper'
 const hotelList = ref([])
 const displayCount = ref(6)
 const isExpanded = ref(false)

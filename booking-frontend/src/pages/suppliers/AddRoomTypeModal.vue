@@ -49,6 +49,7 @@
 import { ref, defineEmits, defineProps } from 'vue'
 import { createRoomTypeApi, uploadImageApi } from '@/services/supplier'
 import { RoomTypeDetail } from '@/types/supplier'
+  import {BASE_URL} from '@/utils/imageHelper'
 const emit = defineEmits(['close', 'created', 'added'])
 const props = defineProps<{ isOpen: boolean, fetchRoomTypes: Function }>()
 const form = ref<RoomTypeDetail>({
@@ -70,7 +71,7 @@ const handleFileUpload = async (event: Event) => {
   if (file) {
     try {
       const uploadedFilename = await uploadImageApi(file)
-      const baseUrl = 'http://157.66.101.165:8080'
+      const baseUrl = 'http://localhost:8080'
       previewImage.value = baseUrl + uploadedFilename
       form.value.room_image = uploadedFilename
       console.log('URL hiển thị ảnh:', previewImage.value)

@@ -108,12 +108,12 @@ const submitForm = async () => {
   try {
     console.log('Dữ liệu form gửi đi:', form.value)
     await createServiceApi(form.value)
-    toast.success('Thêm dịch vụ thành công!')
+    // toast.success('Thêm dịch vụ thành công!', { autoClose: 5000, position: 'top-right' })
     emit('serviceAdded')
     emit('close')
   } catch (error) {
     console.error('Lỗi khi tạo dịch vụ mới:', error)
-    toast.error('Tạo dịch vụ thất bại!')
+    toast.error('Tạo dịch vụ thất bại!', { autoClose: 5000, position: 'top-right' })
   }
 }
 </script>

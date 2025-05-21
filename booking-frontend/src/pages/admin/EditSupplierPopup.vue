@@ -6,7 +6,7 @@
         Chỉnh sửa thông tin khách sạn
       </h3>
 
-      <form class="flex flex-col gap-6 flex-grow overflow-visible">
+      <form @submit.prevent="submitEdit" class="flex flex-col gap-6 flex-grow overflow-visible">
         <!-- 3 ô input ngang -->
         <div class="flex flex-col sm:flex-row gap-6">
           <div class="flex-1">
@@ -56,7 +56,10 @@
         <div class="flex justify-end gap-4">
           <button type="button" @click="$emit('close')"
             class="px-6 py-3 bg-gray-300 rounded-lg hover:bg-gray-400 transition">Hủy</button>
-          <button type="submit" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+          <button
+            type="submit"
+            class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+          >
             Lưu
           </button>
         </div>
@@ -114,32 +117,33 @@ const handleFileUpload = async (event: Event) => {
 }
 
 // Submit form
-// const submitEdit = async () => {
-//   try {
- 
-//     const payload = {
-//       id: props.supplier?.id,
-//       name: form.name,
-//       address: form.address,
-//       hotline: form.hotline,
-//       description: form.description,
-//       image: form.image
-//     }
+const submitEdit = async () => {
+  try {
+    const supplierId = props.supplier?.hotel_id || props.supplier?.id // tùy API trả về id
+    if (!supplierId) {
+      console.error('Không tìm thấy ID khách sạn')
+      return
+    }
 
+    const payload = {
+      name: form.name,
+      address: form.address,
+      hotline: form.hotline,
+      description: form.description,
+      image: form.image
+    }
 
-//     const response = await updateSupplierApi(supplierId, payload);
-//     console.log('API Response:', response)
+    const response = await updateSupplierApi(supplierId, payload)
+    console.log('API Response:', response)
 
-//     emit('save', response)
-//     emit('close')
-
-//     console.log('Supplier updated successfully:', response)
-//   } catch (error) {
-//     console.error('Lỗi cập nhật nhà cung cấp:', error)
-//   }
-// }
+    emit('save', response)
+    emit('close')
+  } catch (error) {
+    console.error('Lỗi cập nhật nhà cung cấp:', error)
+  }
+}
 </script>
 
 <style scoped>
-/* Add any additional styling here if needed */
+/* Nếu cần thêm style riêng */
 </style>
