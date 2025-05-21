@@ -28,6 +28,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -53,6 +54,7 @@ public class HotelService implements IHotelService {
         account.setUsername(request.getUsername());
         account.setPassword(request.getPassword());
         account.setEmail(request.getEmail());
+        account.setCreated_at(LocalDateTime.now());
 
         Set<Role> roles = new HashSet<>();
         // Lấy role có ID là 3 từ database
