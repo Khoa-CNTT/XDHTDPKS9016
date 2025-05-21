@@ -1,6 +1,7 @@
 package com.tourism.booking.repository;
 
 import com.tourism.booking.model.Booking;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -16,7 +17,7 @@ public interface IBookingRepository extends JpaRepository<Booking, Long> {
                         "LEFT JOIN FETCH b.user_profile " +
                         "LEFT JOIN FETCH b.bill " +
                         "WHERE b.user_profile.user_id = :userId")
-        List<Booking> findByUserProfileUserId(@Param("userId") Long userId);
+        Page<Booking> findByUserProfileUserId(Pageable pageable, @Param("userId") Long userId);
 
         @Query("SELECT DISTINCT b FROM Booking b " +
                         "JOIN FETCH b.bookingRooms br " +
@@ -24,7 +25,7 @@ public interface IBookingRepository extends JpaRepository<Booking, Long> {
                         "JOIN FETCH r.room_type rt " +
                         "JOIN FETCH rt.hotel h " +
                         "WHERE h.hotel_id = :hotelId")
-        List<Booking> findByRoomRoomTypeHotelHotelId(@Param("hotelId") Long hotelId);
+        Page<Booking> findByRoomRoomTypeHotelHotelId(Pageable pageable, @Param("hotelId") Long hotelId);
 
         @Query("SELECT DISTINCT b FROM Booking b " +
                         "JOIN b.bookingRooms br " +

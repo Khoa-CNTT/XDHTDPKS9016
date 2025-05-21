@@ -5,6 +5,8 @@ import com.tourism.booking.dto.booking.BookingResponseDTO;
 import com.tourism.booking.dto.booking.ContactInfoDTO;
 import com.tourism.booking.model.Booking;
 import com.tourism.booking.model.Services;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.security.Principal;
 import java.time.LocalDate;
@@ -31,9 +33,9 @@ public interface IBookingService {
 
     BookingResponseDTO updateContactInfo(ContactInfoDTO contactInfo);
 
-    List<BookingResponseDTO> getBookingsByUserId(Long userId);
+    Page<BookingResponseDTO> getBookingsByUserId(Pageable pageable, Long userId);
 
-    List<BookingResponseDTO> getBookingsByHotelId(Long hotelId);
+    Page<BookingResponseDTO> getBookingsByHotelId(Pageable pageable, Long hotelId);
 
     List<BookingResponseDTO> getBookingsByHotelIdAndStatus(Long hotelId, String status);
 

@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,7 +24,7 @@ public class ServiceBookingController {
      ServiceBookingService serviceService;
 
     @GetMapping("/hotel/{hotelId}")
-    public ResponseEntity<?> getServicesByHotelId(Pageable pageable, @PathVariable Long hotelId) {
+    public ResponseEntity<?> getServicesByHotelId(@PageableDefault(size = 5) Pageable pageable, @PathVariable Long hotelId) {
         Page<ServiceDTO> services = serviceService.getServicesByHotelId(pageable, hotelId);
         return ResponseEntity.ok(new PageReponse<>(services));
     }
