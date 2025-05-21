@@ -15,6 +15,8 @@ import com.tourism.booking.repository.UserRepository;
 import com.tourism.booking.service.IBookingService;
 import com.tourism.booking.service.IRoomAvailabilityService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -148,11 +150,9 @@ public class BookingServiceImpl implements IBookingService {
     }
 
     @Override
-    public List<BookingResponseDTO> getBookingsByUserId(Long userId) {
-        List<Booking> bookings = bookingRepository.findByUserProfileId(userId);
-        return bookings.stream()
-                .map(this::mapBookingToDTO)
-                .collect(Collectors.toList());
+    public Page<BookingResponseDTO> getBookingsByUserId(Pageable pageable, Long userId) {
+        Page<Booking> bookings = bookingRepository.findByUserProfileId(pageable, userId);
+        return bookings.map(this::mapBookingToDTO);
     }
 
     private BookingResponseDTO mapBookingToDTO(Booking booking) {
@@ -239,9 +239,9 @@ public class BookingServiceImpl implements IBookingService {
     }
 
     @Override
-    public List<BookingResponseDTO> getBookingsByHotelId(Long hotelId) {
+    public Page<BookingResponseDTO> getBookingsByHotelId(Pageable pageable, Long hotelId) {
         // Implementation needed
-        return new ArrayList<>();
+        return null;
     }
 
     @Override

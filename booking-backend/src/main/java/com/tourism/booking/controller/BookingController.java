@@ -5,6 +5,7 @@ import com.tourism.booking.dto.booking.BookingResponseDTO;
 import com.tourism.booking.dto.booking.ContactInfoDTO;
 import com.tourism.booking.dto.booking.RoomBookingRequest;
 import com.tourism.booking.dto.booking.RoomSelectionDTO;
+import com.tourism.booking.dto.page.PageReponse;
 import com.tourism.booking.model.Account;
 import com.tourism.booking.model.Hotel;
 import com.tourism.booking.model.UserProfile;
@@ -18,6 +19,9 @@ import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -163,13 +167,13 @@ public class BookingController {
     }
 
     @GetMapping("/user")
-    public ResponseEntity<List<BookingResponseDTO>> getBookingsByUserId(Principal principal) {
+    public ResponseEntity<?> getBookingsByUserId(@PageableDefault(size = 5) Pageable pageable, Principal principal) {
         try {
             Account acc = accountService.getAccountByUsername(principal.getName());
             UserProfile user = userProfileService.findUserProfileByAccoutId(acc.getAccount_id())
                     .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy người dùng"));
-            List<BookingResponseDTO> bookings = bookingService.getBookingsByUserId(user.getUser_id());
-            return ResponseEntity.ok(bookings);
+            Page<BookingResponseDTO> bookings = bookingService.getBookingsByUserId(pageable,user.getUser_id());
+            return ResponseEntity.ok(new PageReponse<>(bookings));
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.emptyList());
@@ -177,12 +181,12 @@ public class BookingController {
     }
 
     @GetMapping("/hotel")
-    public ResponseEntity<List<BookingResponseDTO>> getBookingsByHotelId(Principal principal) {
+    public ResponseEntity<?> getBookingsByHotelId(@PageableDefault(size = 5) Pageable pageable, Principal principal) {
         Account acc = accountService.getAccountByUsername(principal.getName());
         Hotel hotel = hotelService.getHotelByAccountId(acc.getAccount_id())
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy khach san"));
-        List<BookingResponseDTO> bookings = bookingService.getBookingsByHotelId(hotel.getHotel_id());
-        return ResponseEntity.ok(bookings);
+        Page<BookingResponseDTO> bookings = bookingService.getBookingsByHotelId(pageable, hotel.getHotel_id());
+        return ResponseEntity.ok(new PageReponse<>(bookings));
     }
 
     @GetMapping("/hotel/status/{status}")
@@ -237,7 +241,7 @@ public class BookingController {
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<BookingResponseDTO>> getUserBookings(@PathVariable Long userId) {
-        return ResponseEntity.ok(bookingService.getBookingsByUserId(userId));
+    public ResponseEntity<?> getUserBookings(@PageableDefault(size = 5) Pageable pageable, @PathVariable Long userId) {
+        return ResponseEntity.ok(bookingService.getBookingsByUserId(pageable, userId));
     }
 }
