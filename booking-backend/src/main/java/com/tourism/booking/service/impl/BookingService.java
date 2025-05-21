@@ -44,6 +44,7 @@ import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -393,7 +394,6 @@ public class BookingService implements IBookingService {
                                         + roomSelection.getRoomTypeId());
                     }
 
-
                     List<Room> availableRooms = roomRepository.findAvailableRoomsByDateRange(
                             roomSelection.getRoomTypeId(),
                             request.getCheckInDate(),
@@ -413,7 +413,8 @@ public class BookingService implements IBookingService {
                     bookedRoomDTO.setRoomId(room.getId_room());
                     bookedRoomDTO.setRoomTypeId(room.getRoom_type().getRoom_type_id());
                     bookedRoomDTO.setRoomTypeName(room.getRoom_type().getType_name());
-                    bookedRoomDTO.setNumberOfRooms(room.getNumber_rooms()); // Set default to 1 since we're booking specific rooms
+                    bookedRoomDTO.setNumberOfRooms(room.getNumber_rooms()); // Set default to 1 since we're booking
+                                                                            // specific rooms
                     bookedRoomDTO.setNumberBeds(room.getNumber_bed());
                     bookedRoomDTO.setPricePerRoom(roomPrice);
                     bookedRoomDTO.setTotalPrice(roomPrice);
@@ -833,7 +834,8 @@ public class BookingService implements IBookingService {
                     bookingRoom.setBooking(booking);
                     bookingRoom.setRoom(room);
                     bookingRoom.setRoomTypeId(room.getRoom_type().getRoom_type_id());
-                    bookingRoom.setNumberOfRooms(room.getNumber_rooms()); // Set default to 1 since we're booking specific rooms
+                    bookingRoom.setNumberOfRooms(room.getNumber_rooms()); // Set default to 1 since we're booking
+                                                                          // specific rooms
 
                     booking.getBookingRooms().add(bookingRoom);
 
@@ -856,7 +858,8 @@ public class BookingService implements IBookingService {
                     bookingRoom.setBooking(booking);
                     bookingRoom.setRoom(room);
                     bookingRoom.setRoomTypeId(bookedRoom.getRoomTypeId());
-                    bookingRoom.setNumberOfRooms(room.getNumber_rooms()); // Set default to 1 since we're booking specific rooms
+                    bookingRoom.setNumberOfRooms(room.getNumber_rooms()); // Set default to 1 since we're booking
+                                                                          // specific rooms
 
                     booking.getBookingRooms().add(bookingRoom);
 
@@ -941,6 +944,11 @@ public class BookingService implements IBookingService {
         // First check in temporary storage
         if (temporaryBookings.containsKey(bookingId)) {
             BookingResponseDTO tempBooking = temporaryBookings.get(bookingId);
+            // Add null check before accessing services
+            if (tempBooking.getServices() == null) {
+                logger.info("No services found for booking ID: {}", bookingId);
+                return Collections.emptySet();
+            }
             return serviceRepository.findAllByServiceIdIn(
                     tempBooking.getServices().stream()
                             .map(ServiceDTO::getId)
@@ -949,6 +957,7 @@ public class BookingService implements IBookingService {
 
         // If not in temporary storage, check database
         Booking booking = getBookingEntityById(bookingId);
-        return booking.getServices();
+        // Add null check for database services as well
+        return booking.getServices() != null ? booking.getServices() : Collections.emptySet();
     }
 }
