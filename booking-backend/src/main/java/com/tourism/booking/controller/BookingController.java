@@ -136,17 +136,6 @@ public class BookingController {
         if (request.getRoomSelections() == null || request.getRoomSelections().isEmpty()) {
             errors.add("At least one room must be selected");
         }
-//        else {
-//            for (RoomSelectionDTO room : request.getRoomSelections()) {
-//                if (room.getNumberOfRooms() == null || room.getNumberOfRooms() <= 0) {
-//                    errors.add("Number of rooms must be greater than 0");
-//                }
-//                if (room.getRoomTypeId() == null && room.getRoomId() == null) {
-//                    errors.add("Either roomTypeId or roomId must be specified");
-//                }
-//            }
-//        }
-
         if (!errors.isEmpty()) {
             throw new IllegalArgumentException(String.join(", ", errors));
         }
