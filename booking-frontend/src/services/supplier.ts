@@ -152,6 +152,7 @@ export const createRoomApi = async (roomData: Partial<Room>): Promise<Room> => {
     },
     body: JSON.stringify(roomData),
   }, true);
+}
 //history payment
 export const getPaymentHistory = async (): Promise<PaymentHistory[]> => {
   return $api('payments/history', { method: 'GET' }, true);
