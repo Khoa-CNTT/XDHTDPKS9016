@@ -14,7 +14,7 @@
       <!-- Ảnh và thông tin cơ bản -->
       <div class="flex flex-col md:flex-row gap-6 mb-6">
         <img
-          :src="`http://157.66.101.165:8080${supplier.image}`"
+          :src="`http://localhost:8080${supplier.image}`"
           alt="Ảnh khách sạn"
           class="w-full md:w-64 h-48 object-cover rounded-lg shadow"
         />
@@ -36,7 +36,7 @@
             class="border rounded-lg p-4 flex gap-4 items-start"
           >
             <img
-              :src="`http://157.66.101.165:8080${service.serviceImage}`"
+              :src="`http://localhost:8080${service.serviceImage}`"
               alt="Dịch vụ"
               class="w-24 h-24 object-cover rounded"
             />
@@ -61,7 +61,7 @@
           >
             <div class="flex flex-col md:flex-row gap-4">
               <img
-                :src="`http://157.66.101.165:8080${roomType.roomImage.trim()}`"
+                :src="`http://localhost:8080${roomType.roomImage.trim()}`"
                 alt="Loại phòng"
                 class="w-full md:w-64 h-40 object-cover rounded"
               />
@@ -125,6 +125,7 @@
 </template>
 
 <script setup lang="ts">
+  import {BASE_URL} from '@/utils/imageHelper'
 defineProps<{
   supplier: any
 }>()

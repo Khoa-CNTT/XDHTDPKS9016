@@ -49,6 +49,7 @@
 import { ref, defineEmits, defineProps } from 'vue'
 import { createRoomTypeApi, uploadImageApi } from '@/services/supplier'
 import { RoomTypeDetail } from '@/types/supplier'
+  import {BASE_URL} from '@/utils/imageHelper'
 const emit = defineEmits(['close', 'created', 'added'])
 const props = defineProps<{ isOpen: boolean, fetchRoomTypes: Function }>()
 const form = ref<RoomTypeDetail>({

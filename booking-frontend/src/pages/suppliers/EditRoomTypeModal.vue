@@ -52,7 +52,7 @@ import { ref, watch, computed } from 'vue'
 import type { RoomTypeSummary } from '@/types/supplier'
 import { updateRoomTypeApi, uploadImageApi } from '@/services/supplier'
 import { toast } from 'vue3-toastify'
-
+  import {BASE_URL} from '@/utils/imageHelper'
 const props = defineProps<{
   roomType: RoomTypeSummary | null
 }>()
@@ -65,7 +65,7 @@ const description = ref('')
 const room_image = ref('') // Chỉ lưu đường dẫn tương đối (ví dụ: /images/image1.jpg)
 
 // URL gốc của server chứa ảnh
-const baseUrl = 'http://157.66.101.165:8080'
+const baseUrl = 'http://localhost:8080'
 
 // Tạo đường dẫn đầy đủ để hiển thị ảnh
 const fullImageUrl = computed(() => {

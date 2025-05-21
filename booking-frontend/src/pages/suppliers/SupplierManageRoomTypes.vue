@@ -81,7 +81,7 @@ import EditRoomTypeModal from './EditRoomTypeModal.vue'
 import Pagination from '@/components/base/Pagination.vue'
 import { toast } from 'vue3-toastify'
 import type { RoomTypeSummary } from '@/types/supplier'
-
+  import {BASE_URL} from '@/utils/imageHelper'
 const roomTypes = ref<RoomTypeSummary[]>([])
 const totalElements = ref(0)
 const currentPage = ref(0) 

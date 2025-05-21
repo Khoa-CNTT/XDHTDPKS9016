@@ -102,12 +102,12 @@
       @close="showDetailPopup = false"
     />
 
-    <!-- <EditSupplierPopup
+    <EditSupplierPopup
       v-if="showEditModal"
       :supplier="selectedHotelToEdit"
       @close="showEditModal = false"
       @save="handleHotelSave"
-    /> -->
+    />
   </div>
 </template>
 

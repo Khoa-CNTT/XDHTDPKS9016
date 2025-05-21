@@ -464,6 +464,7 @@ import { getHotelByIdApi } from '@/services/home'
 import { getHotelListApi, getCommentPublicApi } from '@/services/home'
 import { useRouter } from 'vue-router'
 import BookingModal from '@/pages/hotel/BookingModal.vue'
+  import {BASE_URL} from '@/utils/imageHelper'
 const route = useRoute()
 const hotel = ref(null)
 const hotelList = ref([])
