@@ -41,3 +41,25 @@ export const getBookingListApi = async (): Promise<BookingListItem[]> => {
     true,
   )
 }
+
+export const postCommentApi = async (roomId: number, comment: string): Promise<void> => {
+  return $api(
+    `/comments/room/${roomId}`,
+    {
+      method: 'POST',
+      body: { comment },
+    },
+    true,
+  )
+}
+
+export const postRatingApi = async (roomId: number, score: number): Promise<void> => {
+  return $api(
+    `/ratings/${roomId}`,
+    {
+      method: 'POST',
+      body: { score },
+    },
+    true,
+  )
+}

@@ -1,13 +1,12 @@
 <template>
   <div class="space-y-6 px-4 py-6">
-    <!-- Bảng danh sách -->
     <div class="border rounded-lg p-6 bg-white shadow">
       <h3 class="text-lg font-semibold mb-4 text-blue-700 flex">
         <Icon
           icon="mdi:clipboard-list-outline"
+          class="mr-2"
           width="24"
           height="24"
-          class="mr-2"
         />
         LỊCH SỬ GIAO DỊCH
       </h3>
@@ -34,9 +33,7 @@
               <td class="px-4 py-2">{{ booking.user?.full_name || 'N/A' }}</td>
               <td class="px-4 py-2">{{ formatDate(booking.checkInDate) }}</td>
               <td class="px-4 py-2">{{ formatDate(booking.checkOutDate) }}</td>
-              <td class="px-4 py-2">
-                {{ formatCurrency(booking.bill?.total || 0) }}
-              </td>
+              <td class="px-4 py-2">{{ formatCurrency(booking.bill?.total || 0) }}</td>
               <td class="px-4 py-2">
                 <span
                   :class="statusClass(booking.statusDisplay)"
@@ -48,7 +45,7 @@
               <td class="px-4 py-2 text-center space-x-2">
                 <button
                   @click="viewBooking(booking)"
-                  class="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded transition"
+                  class="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded"
                 >
                   <Icon
                     icon="mdi:eye"
@@ -56,11 +53,10 @@
                     height="20"
                   />
                 </button>
-
                 <button
                   v-if="canReview(booking.checkOutDate)"
                   @click="openReviewModal(booking)"
-                  class="p-2 bg-green-500 hover:bg-green-600 text-white rounded transition"
+                  class="p-2 bg-green-500 hover:bg-green-600 text-white rounded"
                 >
                   <Icon
                     icon="mdi:star"
@@ -82,14 +78,6 @@
       </div>
     </div>
 
-    <!-- Modal xem chi tiết -->
-    <UpdateInfo
-      v-if="showModal"
-      :booking="selectedBooking"
-      @close="showModal = false"
-    />
-
-    <!-- Modal đánh giá -->
     <ReviewModal
       v-if="showReviewModal"
       :booking="bookingToReview"
@@ -103,14 +91,9 @@ import { ref, onMounted } from 'vue'
 import { Icon } from '@iconify/vue'
 import { getBookingListApi } from '@/services/booking'
 import type { BookingListItem } from '@/types/booking'
-import UpdateInfo from './UpdateInfo.vue'
 import ReviewModal from './ReviewModal.vue'
 
 const bookings = ref<BookingListItem[]>([])
-const showModal = ref(false)
-const selectedBooking = ref<BookingListItem | null>(null)
-
-// Đánh giá
 const showReviewModal = ref(false)
 const bookingToReview = ref<BookingListItem | null>(null)
 
@@ -123,37 +106,25 @@ onMounted(async () => {
   }
 })
 
-function viewBooking(booking: BookingListItem) {
-  selectedBooking.value = booking
-  showModal.value = true
-}
-
 function openReviewModal(booking: BookingListItem) {
   bookingToReview.value = booking
   showReviewModal.value = true
 }
 
-function formatDate(dateStr: string): string {
-  const d = new Date(dateStr)
-  return d.toLocaleDateString('vi-VN')
+function formatDate(dateStr: string) {
+  return new Date(dateStr).toLocaleDateString('vi-VN')
 }
 
-function formatCurrency(amount: number): string {
-  return amount.toLocaleString('vi-VN', {
-    style: 'currency',
-    currency: 'VND',
-  })
+function formatCurrency(amount: number) {
+  return amount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
 }
 
-function statusClass(status: string): string {
+function statusClass(status: string) {
   switch (status.toLowerCase()) {
-    case 'confirmed':
     case 'đã xác nhận':
       return 'border border-green-500 bg-green-100 text-green-700'
-    case 'pending':
     case 'chờ xác nhận':
       return 'border border-yellow-500 bg-yellow-100 text-yellow-700'
-    case 'canceled':
     case 'đã hủy':
       return 'border border-red-500 bg-red-100 text-red-700'
     default:
@@ -162,8 +133,6 @@ function statusClass(status: string): string {
 }
 
 function canReview(checkOutDate: string): boolean {
-  const now = new Date()
-  const checkOut = new Date(checkOutDate)
-  return now > checkOut
+  return new Date() > new Date(checkOutDate)
 }
 </script>
