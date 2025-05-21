@@ -149,7 +149,7 @@ onMounted(async () => {
     const found = roomTypes.value.find((t) => t.type_name === props.room.type_name)
     form.room_type_id = found ? found.room_type_id : 0
   } catch (error) {
-    toast.error('Lấy danh sách loại phòng thất bại')
+    toast.error('Lấy danh sách loại phòng thất bại', { autoClose: 5000, position: 'top-right' })
   }
 })
 
@@ -174,7 +174,7 @@ const closeModal = () => {
 
 const saveRoom = async () => {
   if (!form.room_type_id) {
-    toast.error('Vui lòng chọn loại phòng')
+    toast.error('Vui lòng chọn loại phòng', { autoClose: 5000, position: 'top-right' })
     return
   }
   loading.value = true
@@ -187,11 +187,11 @@ const saveRoom = async () => {
     }
 
     const updatedRoom = await updateRoomApi(props.room.id_room, payload)
-    toast.success('Sửa phòng thành công!')
+    toast.success('Sửa phòng thành công!', { autoClose: 5000, position: 'top-right' })
     emit('saved', updatedRoom)
     closeModal()
   } catch (error: any) {
-    toast.error('Lỗi khi sửa phòng')
+    toast.error('Lỗi khi sửa phòng', { autoClose: 5000, position: 'top-right' })
   } finally {
     loading.value = false
   }

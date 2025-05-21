@@ -52,7 +52,7 @@
           <!-- Lặp qua danh sách khách sạn từ API -->
           <div v-for="(hotel, index) in hotelList.slice(0, showAllHotels ? hotelList.length : 4)"
             class="bg-white rounded-lg shadow-md hover:scale-105 transition cursor-pointer ">
-            <img v-if="hotel.image" :src="'http://157.66.101.165:8080' + hotel.image" alt="Hotel Image"
+            <img v-if="hotel.image" :src="'http://localhost:8080' + hotel.image" alt="Hotel Image"
               class="w-full h-full object-cover" />
             <h3
               class="text-center text-text font-semibold p-3 hover:text-blue-600 cursor-pointer transition-colors duration-200">
@@ -93,7 +93,7 @@
         <div v-for="(room, index) in hotel.roomTypes" :key="index"
           class="w-full sm:w-[48%] md:w-[32%] bg-white border rounded-2xl shadow-lg overflow-hidden flex flex-col hover:shadow-xl transition-shadow">
           <img
-            :src="room.room_image ? 'http://157.66.101.165:8080' + room.room_image : 'http://157.66.101.165:8080/api/v1/images/view/b3a94d55-e4a4-42cf-8e9d-9e785d4488a7_room-9.jpg'"
+            :src="room.room_image ? 'http://localhost:8080' + room.room_image : 'http://localhost:8080/api/v1/images/view/b3a94d55-e4a4-42cf-8e9d-9e785d4488a7_room-9.jpg'"
             alt="Hotel Image" class="w-full h-[220px] object-cover rounded-t-2xl" />
 
           <div class="p-4 flex flex-col justify-between h-full">
@@ -221,10 +221,10 @@
         <div class="flex flex-col md:flex-row gap-8 border border-gray-300 p-6 rounded-xl shadow-lg">
           <!-- Cột trái - Hình ảnh và mô tả khách sạn -->
           <div class="md:w-1/3 bg-white rounded-xl shadow-md p-4">
-            <img :src="`http://157.66.101.165:8080${hotel.image}`" alt="Main room image" class="rounded-lg w-full" />
+            <img :src="`localhost:8080${hotel.image}`" alt="Main room image" class="rounded-lg w-full" />
             <div class="flex gap-2 mt-3">
               <img v-for="(roomType, i) in hotel.roomTypes.slice(0, 2)" :key="i"
-                :src="`http://157.66.101.165:8080${roomType.room_image}`" class="rounded-md w-1/2" />
+                :src="`http://localhost:8080${roomType.room_image}`" class="rounded-md w-1/2" />
             </div>
             <a href="#" class="text-blue-600 text-sm mt-2 inline-block">📷 Xem ảnh và chi tiết</a>
 
@@ -256,7 +256,7 @@
 
                 <!-- Thông tin loại phòng -->
                 <div class="sm:w-1/3 p-4 border-b sm:border-b-0 sm:border-r border-gray-300">
-                  <img :src="`http://157.66.101.165:8080${roomType.room_image}`" alt="room"
+                  <img :src="`http://localhost:8080${roomType.room_image}`" alt="room"
                     class="w-full h-40 object-cover rounded mb-2" />
                   <strong class="block text-lg mb-2">{{ roomType.type_name }}</strong>
 
@@ -426,8 +426,10 @@ const selectedRoom = ref(null)
 const openBooking = (room, roomType) => {
   selectedRoom.value = room
   selectedRoomType.value = roomType // nếu bạn muốn lưu thêm loại phòng
-
+ console.log('Room day du:', selectedRoom.value)
   console.log('Room:', selectedRoom.value.id_room)
+   console.log('RoomType ID:', roomType.room_type_id)
+    console.log('RoomType day du:', roomType)
   console.log('RoomType ID:', roomType.room_type_id)
 
   showBooking.value = true

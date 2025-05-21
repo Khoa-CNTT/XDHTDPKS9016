@@ -34,7 +34,7 @@
             <td class="px-4 py-2">{{ row.description }}</td>
             <td class="px-4 py-2">
               <img
-                :src="row.room_image ? `http://157.66.101.165:8080${row.room_image.startsWith('/') ? row.room_image : '/' + row.room_image}` : ''"
+                :src="row.room_image ? `http://localhost:8080${row.room_image.startsWith('/') ? row.room_image : '/' + row.room_image}` : ''"
                 alt="Ảnh khách sạn" class="w-20 h-14 object-cover rounded" />
             </td>
             <td class="px-4 py-2 text-center">

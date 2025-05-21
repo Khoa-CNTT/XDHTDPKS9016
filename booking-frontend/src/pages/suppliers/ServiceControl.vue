@@ -3,24 +3,14 @@
     <!-- Header -->
     <div class="border rounded-lg p-6 bg-white shadow flex justify-between items-center">
       <h3 class="text-lg font-semibold text-blue-700 flex">
-        <Icon
-          icon="mdi:tools"
-          class="mr-2 text-xl"
-          width="24"
-          height="24"
-        />
+        <Icon icon="mdi:tools" class="mr-2 text-xl" width="24" height="24" />
         Quản lý dịch vụ
       </h3>
       <button
         @click="showAddModal = true"
         class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition flex items-center"
       >
-        <Icon
-          icon="mdi:plus-box"
-          class="text-xl pr-2"
-          width="24"
-          height="24"
-        />
+        <Icon icon="mdi:plus-box" class="text-xl pr-2" width="24" height="24" />
         Thêm dịch vụ mới
       </button>
     </div>
@@ -38,12 +28,8 @@
           </tr>
         </thead>
         <tbody>
-          <tr
-            v-for="(row, index) in services"
-            :key="row.id"
-            class="border-t hover:bg-gray-50"
-          >
-            <td class="px-4 py-2">{{ index + 1 }}</td>
+          <tr v-for="(row, index) in services" :key="row.id" class="border-t hover:bg-gray-50">
+           <td class="px-4 py-2">{{ currentPage * size + index + 1 }}</td>
             <td class="px-4 py-2">{{ row.name }}</td>
             <td class="px-4 py-2">{{ row.price }} đ</td>
             <td class="px-4 py-2 max-w-xs truncate">{{ row.description }}</td>
@@ -54,47 +40,42 @@
                   class="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded transition"
                   title="Xem chi tiết"
                 >
-                  <Icon
-                    icon="mdi:eye"
-                    width="20"
-                    height="20"
-                  />
+                  <Icon icon="mdi:eye" width="20" height="20" />
                 </button>
                 <button
                   @click="handleEdit(row)"
                   class="p-2 bg-green-500 hover:bg-green-600 text-white rounded transition"
                   title="Chỉnh sửa"
                 >
-                  <Icon
-                    icon="mdi:pencil"
-                    width="20"
-                    height="20"
-                  />
+                  <Icon icon="mdi:pencil" width="20" height="20" />
                 </button>
                 <button
                   @click="handleDelete(row)"
                   class="p-2 bg-red-500 hover:bg-red-600 text-white rounded transition"
                   title="Xóa"
                 >
-                  <Icon
-                    icon="mdi:trash-can"
-                    width="20"
-                    height="20"
-                  />
+                  <Icon icon="mdi:trash-can" width="20" height="20" />
                 </button>
               </div>
             </td>
           </tr>
           <tr v-if="services.length === 0">
-            <td
-              colspan="5"
-              class="text-center py-4 text-gray-500"
-            >
+            <td colspan="5" class="text-center py-4 text-gray-500">
               Không có dữ liệu
             </td>
           </tr>
         </tbody>
       </table>
+        <!-- Pagination -->
+      <div class="mt-5 flex justify-center">
+        <Pagination
+          :total="totalElements"
+          :items-per-page="size"
+          :default-page="currentPage + 1"
+          :sibling-count="1"
+          @page-change="handlePageChange"
+        />
+      </div>
     </div>
 
     <!-- Modal thêm dịch vụ -->
@@ -160,12 +141,7 @@ import { getServiceListApi, deleteServiceApi } from '@/services/supplier'
 import { GetService } from '@/types/supplier'
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
-
-// Giả định kiểu trả về của API
-interface ApiResponse {
-  data: GetService[]
-}
-
+import Pagination from '@/components/base/Pagination.vue'
 // State
 const services = ref<GetService[]>([])
 const showAddModal = ref(false)
@@ -176,21 +152,30 @@ const showDeleteModal = ref(false)
 const editingService = ref<GetService | null>(null)
 const viewingService = ref<GetService | null>(null)
 const deletingService = ref<GetService | null>(null)
-
-// Fetch dịch vụ
+const currentPage = ref(0) // lưu ý: server thường tính page từ 0
+const size = ref(5) // số item mỗi trang
+const totalElements = ref(0) // tổng số dịch vụ (để tính tổng số trang)
+// Fetch danh sách dịch vụ
 const fetchServices = async () => {
   try {
-    const res = (await getServiceListApi()) as GetService[] | ApiResponse
-    services.value = Array.isArray(res) ? res : (res.data ?? [])
+    const response = await getServiceListApi(currentPage.value, size.value)
+    services.value = response.content
+    totalElements.value = response.page.totalElements
+    console.log('Danh sách dịch vụ:', services.value)
   } catch (error) {
+    console.error('Lỗi khi tải danh sách dịch vụ:', error)
     toast.error('Lỗi tải danh sách dịch vụ')
   }
 }
-
-// Sự kiện khi thêm
+onMounted(fetchServices)
+const handlePageChange = async (page: number) => {
+  currentPage.value = page - 1 
+  await fetchServices()
+}
+// Thêm dịch vụ
 const handleServiceAdded = async () => {
   await fetchServices()
-  toast.success('Thêm dịch vụ thành công!')
+  toast.success('Thêm dịch vụ thành công!', { autoClose: 5000, position: 'top-right' })
   showAddModal.value = false
 }
 
@@ -206,35 +191,31 @@ const handleEdit = (service: GetService) => {
   showEditModal.value = true
 }
 
-// Sự kiện sau khi cập nhật
+// Sau khi cập nhật dịch vụ
 const handleServiceUpdated = async () => {
   await fetchServices()
-  toast.success('Cập nhật dịch vụ thành công!')
+  toast.success('Cập nhật dịch vụ thành công!', { autoClose: 5000, position: 'top-right' })
+  
   showEditModal.value = false
 }
 
-// Mở modal xóa
+// Xóa dịch vụ
 const handleDelete = (service: GetService) => {
   deletingService.value = service
   showDeleteModal.value = true
 }
 
-// Xác nhận xóa
 const confirmDelete = async () => {
   if (!deletingService.value) return
   try {
     await deleteServiceApi(deletingService.value.id)
-    toast.success('Xóa dịch vụ thành công!')
+    toast.success('Xóa dịch vụ thành công!', { autoClose: 5000, position: 'top-right' })
     await fetchServices()
   } catch (error) {
-    toast.error('Lỗi khi xóa dịch vụ')
+    toast.error('Lỗi khi xóa dịch vụ', { autoClose: 5000, position: 'top-right' })
   } finally {
     showDeleteModal.value = false
     deletingService.value = null
   }
 }
-
-onMounted(() => {
-  fetchServices()
-})
 </script>

@@ -2,7 +2,7 @@
   <div class="space-y-6 px-4 py-6 relative">
     <!-- Bộ lọc -->
     <div class="border rounded-lg p-4 bg-white shadow flex flex-wrap justify-between items-center gap-2">
-      <h3 class="text-lg font-semibold text-blue-700 flex items-center"></h3>
+      <h3 class="text-lg font-semibold text-blue-700 flex items-center">Quản lý đặt phòng</h3>
 
       <div class="relative">
         <button
@@ -58,7 +58,7 @@
             <th class="px-3 py-2 text-left max-w-[140px] truncate">Loại phòng</th>
             <th class="px-3 py-2 text-left whitespace-nowrap">Số phòng</th>
             <th class="px-3 py-2 text-left whitespace-nowrap">Trạng thái</th>
-            <th class="px-3 py-2 text-left whitespace-nowrap">Hành động</th>
+            <!-- <th class="px-3 py-2 text-left whitespace-nowrap">Hành động</th> -->
           </tr>
         </thead>
         <tbody>
@@ -87,27 +87,13 @@
               <span
                 class="inline-block px-2 py-1 rounded font-medium text-xs border whitespace-nowrap"
                 :class="{
-                  'bg-yellow-100 text-yellow-700 border-yellow-300': booking.status === 'CONFIRMED',
                   'bg-green-100 text-green-700 border-green-300': booking.status === 'PAID',
                 }"
               >
                 {{ booking.statusDisplay }}
               </span>
             </td>
-            <td class="px-3 py-2">
-              <button
-                v-if="booking.status === 'CONFIRMED'"
-                @click="confirmBooking(booking.bookingId)"
-                class="p-2 bg-green-500 hover:bg-green-600 text-white rounded transition"
-                title="Xác nhận đặt phòng"
-              >
-                <Icon icon="mdi:check" width="20" height="20" />
-              </button>
-              <!-- Nếu là PAID thì không hiển thị gì -->
-              <template v-else-if="booking.status === 'PAID'"></template>
-              <!-- Nếu là trạng thái khác thì hiển thị gạch ngang -->
-              <template v-else><span class="text-gray-400">—</span></template>
-            </td>
+          
           </tr>
 
           <tr v-if="filteredBookings.length === 0">
@@ -130,13 +116,15 @@ const currentStatus = ref('ALL')
 
 const states = [
   { value: 'ALL', label: 'Tất cả' },
-  { value: 'PAID', label: 'Đã thanh toán' },
-  { value: 'CONFIRMED', label: 'Đang xác nhận' },
+  { value: 'COMPLETED', label: 'Đã thanh toán' },
+  { value: 'PAID', label: 'Chờ xác nhận' },
 ]
 
 onMounted(async () => {
   try {
     const res = await getBookingsManager()
+    console.log('data dat phong',res);
+    
     bookings.value = res.map((booking: any) => ({
       ...booking,
       statusDisplay: getStatusLabel(booking.status)

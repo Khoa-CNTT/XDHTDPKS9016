@@ -70,7 +70,7 @@ const handleFileUpload = async (event: Event) => {
   if (file) {
     try {
       const uploadedFilename = await uploadImageApi(file)
-      const baseUrl = 'http://157.66.101.165:8080'
+      const baseUrl = 'http://localhost:8080'
       previewImage.value = baseUrl + uploadedFilename
       form.value.room_image = uploadedFilename
       console.log('URL hiển thị ảnh:', previewImage.value)

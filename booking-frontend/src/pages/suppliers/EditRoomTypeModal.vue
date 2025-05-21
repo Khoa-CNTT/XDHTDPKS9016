@@ -17,13 +17,19 @@
         </div>
 
         <!-- Ảnh -->
-        <div class="mb-4">
-          <label class="block font-medium mb-1">Hình ảnh</label>
-          <input type="file" accept="image/*" class="w-full" @change="onFileChange" />
-          <div class="mt-2" v-if="room_image">
-            <img :src="fullImageUrl" alt="Preview" class="h-32 rounded object-cover" />
-          </div>
-        </div>
+       <div class="mb-4">
+  <label class="block font-medium mb-1">Hình ảnh</label>
+  <input 
+    key="image-input"
+    type="file"
+    accept="image/*"
+    class="w-full"
+    @change="onFileChange"
+  />
+  <div class="mt-2" v-if="previewImageUrl">
+    <img :src="previewImageUrl" alt="Preview" class="h-32 rounded object-cover" />
+  </div>
+</div>
 
         <!-- Mô tả -->
         <div class="mb-4">
@@ -78,6 +84,7 @@ watch(
   },
   { immediate: true }
 )
+const previewImageUrl = ref<string>('')
 
 const onFileChange = async (e: Event) => {
   const target = e.target as HTMLInputElement
@@ -85,10 +92,13 @@ const onFileChange = async (e: Event) => {
   if (!file) return
 
   try {
+    // ✅ Preview ngay ảnh vừa chọn bằng URL.createObjectURL
+    previewImageUrl.value = URL.createObjectURL(file)
+
+    // ✅ Upload file lên server
     const res = await uploadImageApi(file) // API trả về đường dẫn tương đối
-    console.log('==>ảnh', res)
-    
-    room_image.value = res // chỉ lưu đường dẫn tương đối
+
+    room_image.value = res // lưu đường dẫn tương đối vào server
     toast.success('Tải ảnh lên thành công!')
   } catch (err) {
     console.error(err)
@@ -96,6 +106,20 @@ const onFileChange = async (e: Event) => {
   }
 }
 
+// Khi load dữ liệu ban đầu thì hiển thị ảnh gốc từ server
+watch(
+  () => props.roomType,
+  (newVal) => {
+    if (newVal) {
+      type_name.value = newVal.type_name
+      number_room.value = newVal.number_room
+      description.value = newVal.description
+      room_image.value = newVal.room_image
+      previewImageUrl.value = newVal.room_image ? `${baseUrl}${newVal.room_image}` : ''
+    }
+  },
+  { immediate: true }
+)
 const submitForm = async () => {
   if (!props.roomType) return
   try {
