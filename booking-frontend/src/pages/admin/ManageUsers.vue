@@ -156,12 +156,7 @@
                     class="p-2 bg-red-500 hover:bg-red-600 text-white rounded transition"
                     title="Xóa"
                   >
-                    <Icon
-                      icon="mdi:cancel"
-                      width="20"
-                      height="20"
-                      class="mr-1"
-                    />
+                    <Icon icon="mdi:trash-can" width="20" height="20"/>
                   </button>
                 </div>
               </td>
