@@ -42,6 +42,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.Collections;
 
 @Controller
 @RequestMapping("${api.prefix}/payment")
@@ -184,7 +185,13 @@ public class PaymentController {
 
                     // Get services before finalizing
                     Set<Services> services = bookingService.getServicesByBookingId(bookingId);
-                    logger.info("Retrieved {} services for booking {}", services.size(), bookingId);
+                    // Handle null or empty services set
+                    if (services != null) {
+                        logger.info("Retrieved {} services for booking {}", services.size(), bookingId);
+                    } else {
+                        logger.info("No services for booking {}", bookingId);
+                        services = Collections.emptySet(); // Initialize as empty set to avoid null pointer
+                    }
 
                     // 2. Create a mock Principal with userId
                     Principal mockPrincipal = createMockPrincipal(userId);
