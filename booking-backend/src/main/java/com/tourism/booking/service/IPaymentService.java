@@ -9,7 +9,7 @@ import java.security.Principal;
 import java.util.List;
 
 public interface IPaymentService {
-    Page<PaymentResponseDTO> getAllPayments(Pageable pageable);
+    Page<PaymentResponseDTO> getAllPayments(Long accountId , Pageable pageable);
 
     PaymentResponseDTO updatePaymentStatus(Long paymentId, String status);
 

@@ -3,6 +3,8 @@ package com.tourism.booking.controller;
 import com.tourism.booking.dto.booking.PaymentRequestDTO;
 import com.tourism.booking.dto.booking.PaymentResponseDTO;
 import com.tourism.booking.dto.page.PageReponse;
+import com.tourism.booking.model.Account;
+import com.tourism.booking.service.IAccountService;
 import com.tourism.booking.service.IPaymentService;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -18,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 import java.util.Arrays;
@@ -29,11 +32,14 @@ import java.util.Arrays;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PaymentBookingController {
     IPaymentService paymentService;
+    IAccountService accountService;
     private static final Logger logger = LoggerFactory.getLogger(PaymentBookingController.class);
 
     @GetMapping("/history")
-    public ResponseEntity<?> getAllPayments(@PageableDefault(size = 5) Pageable pageable) {
-        Page<PaymentResponseDTO> payments = paymentService.getAllPayments(pageable);
+    public ResponseEntity<?> getAllPayments(@PageableDefault(size = 5) Pageable pageable, Principal principal) {
+        Account acc = accountService.getAccountByUsername(principal.getName());
+
+        Page<PaymentResponseDTO> payments = paymentService.getAllPayments(acc.getAccount_id() ,pageable);
         return ResponseEntity.ok(new PageReponse<>(payments));
     }
 
