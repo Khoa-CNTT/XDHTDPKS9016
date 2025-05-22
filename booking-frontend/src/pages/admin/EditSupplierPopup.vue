@@ -128,10 +128,10 @@ const handleFileChange = async (e: Event) => {
     imagePath.value = res
     console.log('anh', res)
 
-    toast.success('Tải ảnh lên thành công!')
+    toast.success('Tải ảnh lên thành công!', { autoClose: 5000, position: 'top-right' })
   } catch (err) {
     console.error(err)
-    toast.error('Lỗi khi tải ảnh!')
+    toast.error('Lỗi khi tải ảnh!', { autoClose: 5000, position: 'top-right' })
   }
 }
 
@@ -142,13 +142,13 @@ const emit = defineEmits(['close', 'save'])
 const submitForm = async () => {
   try {
     if (props.hotelId === undefined) {
-      toast.error('Hotel ID không hợp lệ');
+      toast.error('Hotel ID không hợp lệ', { autoClose: 5000, position: 'top-right' });
       return;
     }
 
     const hotelIdNumber = Number(props.hotelId);
     if (isNaN(hotelIdNumber)) {
-      toast.error('Hotel ID không hợp lệ');
+      toast.error('Hotel ID không hợp lệ', { autoClose: 5000, position: 'top-right' });
       return;
     }
 
@@ -164,7 +164,7 @@ const submitForm = async () => {
     const res = await updateSupplierApi(hotelIdNumber, payload);
     console.log('Response từ API:', res);
     
-    toast.success('Cập nhật khách sạn thành công!');
+    toast.success('Cập nhật khách sạn thành công!', { autoClose: 5000, position: 'top-right' });
     
     // Emit event 'save' kèm dữ liệu khách sạn mới (giả sử res chứa dữ liệu updated)
     emit('save', res);
@@ -173,7 +173,7 @@ const submitForm = async () => {
     emit('close');
   } catch (error) {
     console.error(error);
-    toast.error('Cập nhật thất bại!');
+    toast.error('Cập nhật thất bại!', { autoClose: 5000, position: 'top-right' });
   }
 };
 

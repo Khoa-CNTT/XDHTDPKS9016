@@ -66,7 +66,7 @@
             <td class="px-4 py-2">{{ hotel.name }}</td>
             <td class="px-4 py-2">
               <img
-                :src="`http://157.66.101.165:8080${hotel.image}`"
+                :src="`http://localhost:8080${hotel.image}`"
                 alt="Ảnh khách sạn"
                 class="w-20 h-14 object-cover rounded"
               />
@@ -174,13 +174,13 @@
       @close="showDetailPopup = false"
     />
 
-   <EditSupplierPopup
-  v-if="showEditModal"
-  :supplier="selectedHotelToEdit"
-  :hotel-id="selectedHotelIdToEdit"
-  @close="showEditModal = false"
-  @save="handleHotelSave"
-/>
+    <EditSupplierPopup
+      v-if="showEditModal && selectedHotelToEdit !== null && selectedHotelIdToEdit !== null"
+      :supplier="selectedHotelToEdit"
+      :hotel-id="selectedHotelIdToEdit"
+      @close="showEditModal = false"
+      @save="handleHotelSave"
+    />
   </div>
 </template>
 
@@ -245,7 +245,7 @@ const handlePageChange = (newPage: number) => {
 }
 const handleHotelSave = async () => {
   showEditModal.value = false
-  await fetchInfoHotel()  // gọi API lấy danh sách mới nhất
+  await fetchInfoHotel() // gọi API lấy danh sách mới nhất
 }
 
 const confirmDelete = (id: number) => {
