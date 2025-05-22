@@ -25,6 +25,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,14 +47,18 @@ public class HotelService implements IHotelService {
     IRoleRepository roleRepository;
     IUserProfileRepository userProfileRepository;
     EmailService emailService;
+    PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
     public HotelResponse createHotel(CreateHotelRequest request) {
 
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
+
         Account account = new Account();
         account.setUsername(request.getUsername());
-        account.setPassword(request.getPassword());
+        account.setPassword(encodedPassword);
         account.setEmail(request.getEmail());
         account.setCreated_at(LocalDateTime.now());
 
@@ -83,7 +89,7 @@ public class HotelService implements IHotelService {
         userProfileRepository.save(userProfile);
 
         if (request.isSendEmail()) {
-            sendAccountCreationEmail(savedAccount.getEmail(), savedAccount.getUsername(), savedAccount.getPassword());
+            sendAccountCreationEmail(savedAccount.getEmail(), savedAccount.getUsername(), request.getPassword());
         }
 
         return hotelMapper.toResponse(savedHotel);
