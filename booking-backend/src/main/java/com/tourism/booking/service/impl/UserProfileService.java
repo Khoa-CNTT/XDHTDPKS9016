@@ -1,5 +1,7 @@
 package com.tourism.booking.service.impl;
 
+import com.tourism.booking.dto.user.UserProfileDTO;
+import com.tourism.booking.dto.user.UserProfileProjection;
 import com.tourism.booking.dto.user.UserProfileResponse;
 import com.tourism.booking.model.UserProfile;
 import com.tourism.booking.repository.IUserProfileRepository;
@@ -25,9 +27,21 @@ public class UserProfileService implements IUserProfileService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<UserProfileResponse> findAll(Pageable pageable) {
-        Page<UserProfile> userProfiles = userProfileRepository.findAll(pageable);
-        return userProfiles.map(userProfileMapper::UserProfileToUserProfileResponse);
+    public Page<UserProfileDTO> findAll(Pageable pageable) {
+        Page<UserProfileProjection> projectionPage = userProfileRepository.getUserProfileDTOs(pageable);
+
+        return projectionPage.map(p -> new UserProfileDTO(
+                p.getUser_id(),
+                p.getFull_name(),
+                p.getGender(),
+                p.getAddress(),
+                p.getEmail(),
+                p.getPhone(),
+                p.getBirth_date(),
+                p.getStatus(),
+                p.getUsername(),
+                p.getRole_id()
+        ));
     }
 
     @Override
