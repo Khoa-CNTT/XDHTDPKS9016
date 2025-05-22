@@ -69,18 +69,18 @@
             <span>Tổng tiền dịch vụ:</span>
             <span>{{ formatCurrency(booking.bill?.serviceTotal ?? 0) }}</span>
           </div>
-          <div class="flex justify-between">
+          <!-- <div class="flex justify-between">
             <span>Tiền đặt cọc:</span>
             <span>{{ formatCurrency(booking.bill?.deposit ?? 0) }}</span>
-          </div>
+          </div> -->
           <div class="flex justify-between text-blue-700 text-lg font-semibold">
             <span>Tổng tiền:</span>
             <span>{{ formatCurrency(booking.bill?.total ?? 0) }}</span>
           </div>
-          <div class="flex justify-between">
+          <!-- <div class="flex justify-between">
             <span>Trạng thái:</span>
             <span>{{ booking.statusDisplay ?? 'N/A' }}</span>
-          </div>
+          </div> -->
         </div>
 
         <div class="mt-6 text-gray-600 italic">

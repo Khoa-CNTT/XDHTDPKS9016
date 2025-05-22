@@ -353,7 +353,10 @@ export interface BookingUser {
   status: string;
   username: string;
 }
-export type BookingList = Booking[];
+export interface BookingListResponse {
+  content: Booking[]; // hoặc BookingList
+  page: PageInfo;
+}
 
 export type RoomStatus = 'AVAILABLE' | 'UNAVAILABLE'
 
