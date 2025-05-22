@@ -3,17 +3,37 @@
   <div class="space-y-6 px-4 py-6">
     <div class="border rounded-lg p-6 bg-white shadow flex justify-between items-center">
       <h3 class="text-lg font-semibold text-blue-700 flex">
-        <Icon icon="mdi:tools" class="mr-2 text-xl" width="24" height="24" /> Quản lý khách sạn
+        <Icon
+          icon="mdi:tools"
+          class="mr-2 text-xl"
+          width="24"
+          height="24"
+        />
+        Quản lý khách sạn
       </h3>
-      <button @click="showCreateHotel = true"
-        class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition flex items-center">
-        <Icon icon="mdi:plus-box" class="text-xl pr-2" width="24" height="24" /> Thêm mới khách sạn
+      <button
+        @click="showCreateHotel = true"
+        class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition flex items-center"
+      >
+        <Icon
+          icon="mdi:plus-box"
+          class="text-xl pr-2"
+          width="24"
+          height="24"
+        />
+        Thêm mới khách sạn
       </button>
     </div>
 
     <div class="border rounded-lg p-6 bg-white shadow">
       <h3 class="text-lg font-semibold mb-4 text-blue-700 flex">
-        <Icon icon="mdi:clipboard-list" width="24" height="24" class="mr-2" /> Danh sách khách sạn
+        <Icon
+          icon="mdi:clipboard-list"
+          width="24"
+          height="24"
+          class="mr-2"
+        />
+        Danh sách khách sạn
       </h3>
       <table class="min-w-full divide-y divide-gray-200 border">
         <thead class="bg-gray-100">
@@ -29,44 +49,95 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(hotel, index) in hotels" :key="hotel.idHotel" class="border-t align-top">
+          <tr v-if="hotels.length === 0">
+            <td
+              colspan="8"
+              class="px-4 py-4 text-center italic text-gray-500"
+            >
+              Không có dữ liệu
+            </td>
+          </tr>
+          <tr
+            v-for="(hotel, index) in hotels"
+            :key="hotel.idHotel"
+            class="border-t align-top"
+          >
             <td class="px-4 py-2">{{ index + 1 }}</td>
             <td class="px-4 py-2">{{ hotel.name }}</td>
             <td class="px-4 py-2">
-              <img :src="`http://157.66.101.165:8080${hotel.image}`" alt="Ảnh khách sạn"
-                class="w-20 h-14 object-cover rounded" />
+              <img
+                :src="`http://157.66.101.165:8080${hotel.image}`"
+                alt="Ảnh khách sạn"
+                class="w-20 h-14 object-cover rounded"
+              />
             </td>
             <td class="px-4 py-2 whitespace-pre-line">{{ hotel.address }}</td>
             <td class="px-4 py-2">{{ hotel.hotline }}</td>
             <td class="px-4 py-2">
               <div v-if="hotel.services.length">
-                <div v-for="svc in hotel.services" :key="svc.serviceId" class="truncate">
+                <div
+                  v-for="svc in hotel.services"
+                  :key="svc.serviceId"
+                  class="truncate"
+                >
                   {{ svc.serviceName }}
                 </div>
               </div>
-              <div v-else class="italic text-gray-500">Không có</div>
+              <div
+                v-else
+                class="italic text-gray-500"
+              >
+                Không có
+              </div>
             </td>
             <td class="px-4 py-2">
               <div v-if="hotel.roomTypes.length">
-                <div v-for="rt in hotel.roomTypes" :key="rt.roomTypeId" class="truncate">
+                <div
+                  v-for="rt in hotel.roomTypes"
+                  :key="rt.roomTypeId"
+                  class="truncate"
+                >
                   {{ rt.typeName }}
                 </div>
               </div>
-              <div v-else class="italic text-gray-500">Không có</div>
+              <div
+                v-else
+                class="italic text-gray-500"
+              >
+                Không có
+              </div>
             </td>
             <td class="px-4 py-2 text-center">
               <div class="flex justify-center gap-2">
-                <button @click="openEditModal(hotel)"
-                  class="p-2 bg-green-500 hover:bg-green-600 text-white rounded transition">
-                  <Icon icon="mdi:pencil" width="20" height="20" />
+                <button
+                  @click="openEditModal(hotel)"
+                  class="p-2 bg-green-500 hover:bg-green-600 text-white rounded transition"
+                >
+                  <Icon
+                    icon="mdi:pencil"
+                    width="20"
+                    height="20"
+                  />
                 </button>
-                <button @click="confirmDelete(hotel.idHotel)"
-                  class="p-2 bg-red-500 hover:bg-red-600 text-white rounded transition">
-                   <Icon icon="mdi:trash-can" width="20" height="20"/>
+                <button
+                  @click="confirmDelete(hotel.idHotel)"
+                  class="p-2 bg-red-500 hover:bg-red-600 text-white rounded transition"
+                >
+                  <Icon
+                    icon="mdi:trash-can"
+                    width="20"
+                    height="20"
+                  />
                 </button>
-                <button @click="handleView(hotel.idHotel)"
-                  class="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded transition">
-                  <Icon icon="mdi:eye" width="20" height="20" />
+                <button
+                  @click="handleView(hotel.idHotel)"
+                  class="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded transition"
+                >
+                  <Icon
+                    icon="mdi:eye"
+                    width="20"
+                    height="20"
+                  />
                 </button>
               </div>
             </td>
@@ -118,11 +189,7 @@ import SupplierDetailPopup from './SupplierDetailPopup.vue'
 import CreateHotel from './CreateHotel.vue'
 import DeleteConfirmModal from './DeleteConfirmModal.vue'
 import EditSupplierPopup from './EditSupplierPopup.vue'
-import {
-  getManagementSupplier,
-  getSupplierByIdApi,
-  deleteSupplierApi
-} from '@/services/admin'
+import { getManagementSupplier, getSupplierByIdApi, deleteSupplierApi } from '@/services/admin'
 
 interface Hotel {
   idHotel: number
@@ -168,7 +235,7 @@ const openEditModal = (hotel: Hotel) => {
 
 const handleHotelSave = (updated: Hotel) => {
   // tìm index và thay thế bằng object mới
-  const idx = hotels.value.findIndex(h => h.idHotel === updated.idHotel)
+  const idx = hotels.value.findIndex((h) => h.idHotel === updated.idHotel)
   if (idx !== -1) {
     hotels.value.splice(idx, 1, updated)
   }
