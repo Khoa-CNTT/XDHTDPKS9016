@@ -41,7 +41,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                  FROM booking_management.account a
                  JOIN booking_management.role_account rl
                    ON a.account_id = rl.account_id
-                WHERE rl.role_id   = 2 OR rl.role_id   = 3
+                WHERE (rl.role_id   = 2 OR rl.role_id   = 3)
                     AND YEAR(a.created_at) = :year
                   AND QUARTER(a.created_at) = :quarter
               ) AS accountCount,
