@@ -257,8 +257,8 @@ const loading = ref(false)
 const body = ref({
   checkInDate: '',
   checkOutDate: '',
-  checkInTime: '',
-  checkOutTime: '',
+  checkInTime: '12:00:00',
+  checkOutTime: '12:00:00',
   numberOfPeople: 1,
   roomSelections: [
     {
