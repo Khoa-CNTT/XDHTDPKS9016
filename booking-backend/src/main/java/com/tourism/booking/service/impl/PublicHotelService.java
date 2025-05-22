@@ -57,6 +57,7 @@ public class PublicHotelService implements IPublicHotelService {
                                                         .map(r -> RoomPublicDTO.builder()
                                                                         .id_room(r.getId_room())
                                                                         .number_bed(r.getNumber_bed())
+                                                                        .number_rooms(r.getNumber_rooms())
                                                                         .price(r.getPrice())
                                                                         .build())
                                                         .collect(Collectors.toList());

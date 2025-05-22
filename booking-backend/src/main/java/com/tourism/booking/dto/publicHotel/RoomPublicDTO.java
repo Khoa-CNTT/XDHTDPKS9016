@@ -14,5 +14,6 @@ import java.math.BigDecimal;
 public class RoomPublicDTO {
     Long id_room;
     Integer number_bed;
+    Integer number_rooms;
     BigDecimal price;
 }

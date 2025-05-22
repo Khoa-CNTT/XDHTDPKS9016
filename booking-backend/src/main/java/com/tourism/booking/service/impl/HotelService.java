@@ -25,9 +25,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -44,15 +47,20 @@ public class HotelService implements IHotelService {
     IRoleRepository roleRepository;
     IUserProfileRepository userProfileRepository;
     EmailService emailService;
+    PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
     public HotelResponse createHotel(CreateHotelRequest request) {
 
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
+
         Account account = new Account();
         account.setUsername(request.getUsername());
-        account.setPassword(request.getPassword());
+        account.setPassword(encodedPassword);
         account.setEmail(request.getEmail());
+        account.setCreated_at(LocalDateTime.now());
 
         Set<Role> roles = new HashSet<>();
         // Lấy role có ID là 3 từ database
@@ -81,7 +89,7 @@ public class HotelService implements IHotelService {
         userProfileRepository.save(userProfile);
 
         if (request.isSendEmail()) {
-            sendAccountCreationEmail(savedAccount.getEmail(), savedAccount.getUsername(), savedAccount.getPassword());
+            sendAccountCreationEmail(savedAccount.getEmail(), savedAccount.getUsername(), request.getPassword());
         }
 
         return hotelMapper.toResponse(savedHotel);
