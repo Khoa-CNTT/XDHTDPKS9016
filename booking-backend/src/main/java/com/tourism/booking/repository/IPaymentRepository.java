@@ -24,14 +24,27 @@ public interface IPaymentRepository extends JpaRepository<Payment, Long> {
     @Query("SELECT p FROM Payment p WHERE p.booking.id_booking = :bookingId")
     List<Payment> findByBookingId(@Param("bookingId") Long bookingId);
 
-    @Query(value = """
-        select p.* from payment p
-        join booking_management.booking_room br on p.booking_id = br.booking_id
-        join booking_management.room_type rt on br.room_type_id = rt.room_type_id
-        join booking_management.hotel h on rt.hotel_id = h.hotel_id
-        join booking_management.account a on h.account_id = a.account_id
-        where a.account_id = :accountId
-        """, nativeQuery = true)
+    @Query(
+            value = """
+                    SELECT p.* 
+                    FROM payment p
+                      JOIN booking_management.booking_room br ON p.booking_id   = br.booking_id
+                      JOIN booking_management.room_type   rt ON br.room_type_id = rt.room_type_id
+                      JOIN booking_management.hotel       h  ON rt.hotel_id      = h.hotel_id
+                      JOIN booking_management.account     a  ON h.account_id     = a.account_id
+                    WHERE a.account_id = :accountId
+                    """,
+            countQuery = """
+                    SELECT COUNT(*) 
+                    FROM payment p
+                      JOIN booking_management.booking_room br ON p.booking_id   = br.booking_id
+                      JOIN booking_management.room_type   rt ON br.room_type_id = rt.room_type_id
+                      JOIN booking_management.hotel       h  ON rt.hotel_id      = h.hotel_id
+                      JOIN booking_management.account     a  ON h.account_id     = a.account_id
+                    WHERE a.account_id = :accountId
+                    """,
+            nativeQuery = true
+    )
     Page<Payment> getHistoryPayment(@Param("accountId") Long accountId, Pageable pageable);
 
 }
