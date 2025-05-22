@@ -1,6 +1,7 @@
 package com.tourism.booking.controller;
 
 import com.tourism.booking.dto.page.PageReponse;
+import com.tourism.booking.dto.user.UserProfileDTO;
 import com.tourism.booking.dto.user.UserProfileRequest;
 import com.tourism.booking.dto.user.UserProfileResponse;
 import com.tourism.booking.dto.user.UserSearchRequest;
@@ -31,7 +32,7 @@ public class ManagementUserController {
     public ResponseEntity<?> getUserProfile(@RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<UserProfileResponse> userProfiles = userProfileService.findAll(pageable);
+        Page<UserProfileDTO> userProfiles = userProfileService.findAll(pageable);
         return ResponseEntity.ok(new PageReponse<>(userProfiles));
     }
 
