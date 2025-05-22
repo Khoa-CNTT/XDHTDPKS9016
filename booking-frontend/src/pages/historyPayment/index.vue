@@ -59,6 +59,16 @@
             </tr>
           </tbody>
         </table>
+          <!-- Pagination -->
+      <div class="mt-5 flex justify-center">
+        <Pagination
+          :total="totalElements"
+          :items-per-page="size"
+          :default-page="currentPage + 1"
+          :sibling-count="1"
+          @page-change="handlePageChange"
+        />
+      </div>
       </div>
 
       <div v-else class="text-center py-6 text-gray-500">
@@ -89,28 +99,37 @@ import { getBookingListApi } from '@/services/booking'
 import type { BookingListItem } from '@/types/booking'
 import ReviewModal from './ReviewModal.vue'
 import UpdateInfo from './UpdateInfo.vue'
-
+import Pagination from '@/components/base/Pagination.vue'
 const bookings = ref<BookingListItem[]>([])
 
-// Modal review
+// Modal reviewl
 const showReviewModal = ref(false)
 const bookingToReview = ref<BookingListItem | null>(null)
 
 // Modal update info
 const showUpdateInfoModal = ref(false)
 const bookingToUpdate = ref<BookingListItem | null>(null)
-
-onMounted(async () => {
+const totalElements = ref(0)
+const currentPage = ref(0) // bắt đầu từ 0
+const size = ref(5) 
+const fetchBookings = async () => {
   try {
-    const data = await getBookingListApi()
-    bookings.value = data.content
-    console.log('data:', bookings.value);
-    
+    const response = await getBookingListApi(currentPage.value, size.value)
+
+    bookings.value = response.content
+    totalElements.value = response.page.totalElements
+    currentPage.value = response.page.number
   } catch (error) {
     console.error('Lỗi khi lấy danh sách đặt phòng:', error)
   }
-})
-
+}
+onMounted(() => {
+  fetchBookings();
+});
+const handlePageChange = (page: number) => {
+  currentPage.value = page - 1;
+  fetchBookings();
+};
 // Mở modal ReviewModal
 function openReviewModal(booking: BookingListItem) {
   bookingToReview.value = booking
