@@ -197,8 +197,8 @@ public class PaymentService implements IPaymentService {
      * Nghiệp vụ: Hiển thị danh sách thanh toán cho quản lý
      */
     @Override
-    public Page<PaymentResponseDTO> getAllPayments(Pageable pageable) {
-        Page<Payment> payments = paymentRepository.findAll(pageable);
+    public Page<PaymentResponseDTO> getAllPayments(Long accountId, Pageable pageable) {
+        Page<Payment> payments = paymentRepository.getHistoryPayment(accountId, pageable);
         return payments.map(this::convertToDetailedDTO);
     }
 
