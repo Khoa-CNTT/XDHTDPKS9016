@@ -5,4 +5,6 @@ public interface StatisticalDTO {
     Long getAccountCount();
     Long getTotalPayment();
     Long getAccountHotel();
+    Long getAccountUser();
+
 }
