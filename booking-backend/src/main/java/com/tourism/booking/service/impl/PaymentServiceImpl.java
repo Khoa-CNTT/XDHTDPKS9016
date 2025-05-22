@@ -43,8 +43,8 @@ public class PaymentServiceImpl implements IPaymentService {
     private IBookingService bookingService;
 
     @Override
-    public Page<PaymentResponseDTO> getAllPayments(Pageable pageable) {
-        Page<Payment> payments = paymentRepository.findAll(pageable);
+    public Page<PaymentResponseDTO> getAllPayments(Long accountId, Pageable pageable) {
+        Page<Payment> payments = paymentRepository.getHistoryPayment(accountId, pageable);
         return payments.map(this::convertToDTO);
     }
 
@@ -68,7 +68,7 @@ public class PaymentServiceImpl implements IPaymentService {
     @Override
     @Transactional
     public PaymentResponseDTO processPaymentWithBookingFinalization(PaymentRequestDTO request, Long bookingId,
-            Principal principal) {
+                                                                    Principal principal) {
         // Finalize booking first
         bookingService.finalizeBooking(bookingId, principal);
 
