@@ -106,7 +106,6 @@ const fetchBookings = async () => {
     console.error('Lỗi khi lấy danh sách đặt phòng:', error);
   }
 };
-
 onMounted(() => {
   fetchBookings();
 });
