@@ -113,16 +113,17 @@ const selectedQuarter = ref(2)
 const dataStats = ref<DashboardStats | null>(null)
 
 // Các key trong dữ liệu để hiển thị nút chọn
-const statKeys = ['accountHotel', 'accountCount', 'bookingCount', 'totalPayment'] as const
+const statKeys = ['accountUser','accountHotel', 'accountCount', 'bookingCount', 'totalPayment'] as const
 type StatKey = (typeof statKeys)[number]
 const selectedStat = ref<StatKey>('accountHotel')
 
 // Định nghĩa tên hiển thị cho các key
 const statLabels: Record<StatKey, string> = {
-  accountHotel: 'Tài khoản khách sạn',
-  accountCount: 'Tổng số tài khoản đăng ký',
-  bookingCount: 'Tài khoản người dùng',
+  accountUser: 'Tài khoản người dùng',
   totalPayment: 'Tổng số tiền thanh toán',
+  bookingCount: 'Số lượng đặt phòng',
+  accountCount: 'Tổng tài khoản đăng ký',
+  accountHotel: 'Tài khoản khách sạn',
 }
 
 // Hàm fetch data theo năm & quý

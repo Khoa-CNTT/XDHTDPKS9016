@@ -1,64 +1,65 @@
 <template>
-  <div class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4"
-    @click.self="$emit('close')">
-    <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl p-8 flex flex-col gap-6" style="max-height: 90vh;">
-      <h3 class="text-2xl font-semibold text-center text-blue-800">
-        Chỉnh sửa thông tin khách sạn
-      </h3>
-
-      <form @submit.prevent="submitEdit" class="flex flex-col gap-6 flex-grow overflow-visible">
-        <!-- 3 ô input ngang -->
-        <div class="flex flex-col sm:flex-row gap-6">
-          <div class="flex-1">
-            <label class="block mb-2 font-semibold text-gray-700">Tên nhà cung cấp</label>
-            <input v-model="form.name" type="text" placeholder="Nhập tên nhà cung cấp"
-              class="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required />
-          </div>
-
-          <div class="flex-1">
-            <label class="block mb-2 font-semibold text-gray-700">Địa chỉ</label>
-            <input v-model="form.address" type="text" placeholder="Nhập địa chỉ"
-              class="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required />
-          </div>
-
-          <div class="flex-1">
-            <label class="block mb-2 font-semibold text-gray-700">Hotline</label>
-            <input v-model="form.hotline" type="tel" pattern="[0-9]+" placeholder="Chỉ nhập số"
-              class="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required />
-          </div>
+  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded p-6 w-96 max-w-full">
+      <h3 class="text-lg font-semibold mb-4">Sửa khách sạn</h3>
+      <form @submit.prevent="submitForm">
+        <div class="mb-3">
+          <label class="block mb-1 font-medium">Tên khách sạn</label>
+          <input
+            v-model="name"
+            type="text"
+            class="w-full border rounded px-2 py-1"
+          />
         </div>
+        <div class="mb-3">
+          <label class="block mb-1 font-medium">Địa chỉ</label>
+          <input
+            v-model="address"
+            type="text"
+            class="w-full border rounded px-2 py-1"
+          />
+        </div>
+        <div class="mb-3">
+          <label class="block mb-1 font-medium">Hotline</label>
+          <input
+            v-model="hotline"
+            type="text"
+            class="w-full border rounded px-2 py-1"
+          />
+        </div>
+        <div class="mb-3">
+          <label class="block mb-1 font-medium">Ảnh khách sạn</label>
 
-        <!-- Upload ảnh -->
-        <div>
-          <label class="block mb-2 font-semibold text-gray-700">Chọn ảnh</label>
-          <input type="file" accept="image/*" @change="handleFileUpload" class="block w-full text-gray-700" />
-          <div v-if="form.image" class="mt-4 flex justify-center">
-            <img
-              :src="`http://157.66.101.165:8080${form.image}`"
-              alt="Ảnh preview"
-              class="max-w-full max-h-40 object-contain rounded-lg shadow-md mx-auto"
+          <div class="mt-2">
+            <input
+              type="file"
+              accept="image/*"
+              @change="handleFileChange"
             />
           </div>
         </div>
 
-        <!-- Mô tả -->
-        <div>
-          <label class="block mb-2 font-semibold text-gray-700">Mô tả</label>
-          <textarea v-model="form.description" placeholder="Nhập mô tả"
-            class="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-            rows="3"></textarea>
+        <!-- Mô tả khách sạn -->
+        <div class="mb-3">
+          <label class="block mb-1 font-medium">Mô tả khách sạn</label>
+          <textarea
+            v-model="description"
+            rows="4"
+            class="w-full border rounded px-2 py-1"
+          ></textarea>
         </div>
 
-        <!-- Nút hành động -->
-        <div class="flex justify-end gap-4">
-          <button type="button" @click="$emit('close')"
-            class="px-6 py-3 bg-gray-300 rounded-lg hover:bg-gray-400 transition">Hủy</button>
+        <div class="flex justify-end gap-2">
+          <button
+            type="button"
+            @click="$emit('close')"
+            class="px-4 py-2 border rounded"
+          >
+            Hủy
+          </button>
           <button
             type="submit"
-            class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+            class="px-4 py-2 bg-green-600 text-white rounded"
           >
             Lưu
           </button>
@@ -69,81 +70,111 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, watch, defineProps, defineEmits } from 'vue'
+import { ref, watch } from 'vue'
 import { uploadImageApi } from '@/services/supplier'
 import { updateSupplierApi } from '@/services/admin'
-
+import { toast } from 'vue3-toastify'
 const props = defineProps({
-  supplier: Object
+  supplier: {
+    type: Object,
+    required: true,
+  },
+  hotelId: {
+    // thêm prop này để nhận id
+    type: [String, Number],
+    required: false,
+  },
 })
-const emit = defineEmits(['close', 'save'])
+watch(
+  () => props.hotelId,
+  (newVal) => {
+    console.log('hotelId thay đổi:', newVal)
+  },
+  { immediate: true },
+)
+// Tạo biến để binding với form
+const name = ref('')
+const address = ref('')
+const previewImage = ref('')
+const hotline = ref('')
+const description = ref('')
 
-const form = reactive({
-  name: '',
-  image: '',
-  address: '',
-  hotline: '',
-  description: ''
-})
+const imagePath = ref('')
 
-// Đổ dữ liệu khi mở popup
 watch(
   () => props.supplier,
   (newVal) => {
     if (newVal) {
-      form.name = newVal.name || ''
-      form.address = newVal.address || ''
-      form.hotline = newVal.hotline || ''
-      form.description = newVal.description || ''
-      form.image = newVal.image || ''
+      name.value = newVal.name || ''
+      address.value = newVal.address || ''
+      hotline.value = newVal.hotline || ''
+      description.value = newVal.description || ''
+      previewImage.value = newVal.image ? `http://localhost:8080${newVal.image}` : ''
     }
   },
-  { immediate: true }
+  { immediate: true },
 )
-
-// Upload ảnh khi người dùng chọn
-const handleFileUpload = async (event: Event) => {
-  const target = event.target as HTMLInputElement
+const handleFileChange = async (e: Event) => {
+  const target = e.target as HTMLInputElement
   const file = target.files?.[0]
-  if (file) {
-    try {
-      const uploadedUrl = await uploadImageApi(file)
-      form.image = uploadedUrl
-      console.log('Uploaded image URL:', uploadedUrl)
-    } catch (error) {
-      console.error('Lỗi upload ảnh:', error)
-    }
+  if (!file) return
+
+  try {
+    // Preview ngay ảnh vừa chọn
+    previewImage.value = URL.createObjectURL(file)
+
+    // Upload file lên server
+    const res = await uploadImageApi(file) // trả về đường dẫn tương đối
+    imagePath.value = res
+    console.log('anh', res)
+
+    toast.success('Tải ảnh lên thành công!')
+  } catch (err) {
+    console.error(err)
+    toast.error('Lỗi khi tải ảnh!')
   }
 }
 
-// Submit form
-const submitEdit = async () => {
+const emit = defineEmits(['close', 'save'])
+// Thêm 'save' vào defineEmits
+
+
+const submitForm = async () => {
   try {
-    const supplierId = props.supplier?.hotel_id || props.supplier?.id // tùy API trả về id
-    if (!supplierId) {
-      console.error('Không tìm thấy ID khách sạn')
-      return
+    if (props.hotelId === undefined) {
+      toast.error('Hotel ID không hợp lệ');
+      return;
+    }
+
+    const hotelIdNumber = Number(props.hotelId);
+    if (isNaN(hotelIdNumber)) {
+      toast.error('Hotel ID không hợp lệ');
+      return;
     }
 
     const payload = {
-      name: form.name,
-      address: form.address,
-      hotline: form.hotline,
-      description: form.description,
-      image: form.image
-    }
+      name: name.value,
+      image: imagePath.value || props.supplier.image, 
+      address: address.value,
+      hotline: hotline.value,
+      description: description.value,
+    };
 
-    const response = await updateSupplierApi(supplierId, payload)
-    console.log('API Response:', response)
+    console.log('Payload gửi lên:', payload);
+    const res = await updateSupplierApi(hotelIdNumber, payload);
+    console.log('Response từ API:', res);
+    
+    toast.success('Cập nhật khách sạn thành công!');
+    
+    // Emit event 'save' kèm dữ liệu khách sạn mới (giả sử res chứa dữ liệu updated)
+    emit('save', res);
 
-    emit('save', response)
-    emit('close')
+    // Emit event đóng popup
+    emit('close');
   } catch (error) {
-    console.error('Lỗi cập nhật nhà cung cấp:', error)
+    console.error(error);
+    toast.error('Cập nhật thất bại!');
   }
-}
-</script>
+};
 
-<style scoped>
-/* Nếu cần thêm style riêng */
-</style>
+</script>

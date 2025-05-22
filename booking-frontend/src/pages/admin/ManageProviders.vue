@@ -62,10 +62,7 @@
             :key="hotel.idHotel"
             class="border-t align-top"
           >
-            <td class="px-4 py-2">
-             {{ (currentPage - 1) * pageSize + index + 1 }}
-            </td>
-
+            <td class="px-4 py-2">{{ (currentPage - 1) * pageSize + index + 1 }}</td>
             <td class="px-4 py-2">{{ hotel.name }}</td>
             <td class="px-4 py-2">
               <img
@@ -177,12 +174,13 @@
       @close="showDetailPopup = false"
     />
 
-    <!-- <EditSupplierPopup
-      v-if="showEditModal"
-      :supplier="selectedHotelToEdit"
-      @close="showEditModal = false"
-      @save="handleHotelSave"
-    /> -->
+   <EditSupplierPopup
+  v-if="showEditModal"
+  :supplier="selectedHotelToEdit"
+  :hotel-id="selectedHotelIdToEdit"
+  @close="showEditModal = false"
+  @save="handleHotelSave"
+/>
   </div>
 </template>
 
@@ -205,11 +203,12 @@ interface Hotel {
   services: { serviceId: number; serviceName: string }[]
   roomTypes: { roomTypeId: number; typeName: string }[]
 }
+
+const hotels = ref<Hotel[]>([])
 const currentPage = ref(1)
 const pageSize = ref(5)
-const hotels = ref<Hotel[]>([])
 const totalElements = ref(0)
-
+const selectedHotelIdToEdit = ref<number | null>(null)
 const showCreateHotel = ref(false)
 const showEditModal = ref(false)
 const showDeleteModal = ref(false)
@@ -230,25 +229,23 @@ const fetchInfoHotel = async (page = 1) => {
     console.error('Lỗi khi gọi API nhà cung cấp:', error)
   }
 }
-const handlePageChange = (newPage: number) => {
-  currentPage.value = newPage
-  fetchInfoHotel(newPage)
-}
 watch(pageSize, (newSize) => {
   fetchInfoHotel(1)
 })
 const openEditModal = (hotel: Hotel) => {
   selectedHotelToEdit.value = hotel
+  selectedHotelIdToEdit.value = hotel.idHotel
+  console.log('id', selectedHotelIdToEdit.value)
+
   showEditModal.value = true
 }
-
-const handleHotelSave = (updated: Hotel) => {
-  // tìm index và thay thế bằng object mới
-  const idx = hotels.value.findIndex((h) => h.idHotel === updated.idHotel)
-  if (idx !== -1) {
-    hotels.value.splice(idx, 1, updated)
-  }
+const handlePageChange = (newPage: number) => {
+  currentPage.value = newPage
+  fetchInfoHotel(newPage)
+}
+const handleHotelSave = async () => {
   showEditModal.value = false
+  await fetchInfoHotel()  // gọi API lấy danh sách mới nhất
 }
 
 const confirmDelete = (id: number) => {
