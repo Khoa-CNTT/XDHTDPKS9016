@@ -52,6 +52,7 @@
                   type="time"
                   v-model="body.checkInTime"
                   class="w-full border rounded px-3 py-2"
+                  readonly
                 />
               </div>
               <div>
@@ -75,6 +76,7 @@
                   type="time"
                   v-model="body.checkOutTime"
                   class="w-full border rounded px-3 py-2"
+                  readonly
                 />
               </div>
             </div>
@@ -101,7 +103,7 @@
                   <div class="flex-1">
                     <div class="text-sm text-gray-500 mb-1">Số phòng</div>
                     <div class="border rounded px-3 py-2 bg-gray-100 text-sm">
-                      {{ room.id_room }}
+                    {{ room.number_rooms }}
                     </div>
                   </div>
                 </div>
@@ -229,6 +231,12 @@
 import { ref, watch, onMounted } from 'vue'
 import { initializeBookingApi, contactInfoPaymentApi } from '@/services/booking'
 import { toast } from 'vue3-toastify'
+// const props = defineProps({
+//   show: Boolean,
+//   room: Object,
+//   hotel: Object,
+//   roomType: Object,
+// })
 const props = defineProps({
   show: Boolean,
   room: Object,
@@ -236,6 +244,14 @@ const props = defineProps({
   roomType: Object,
 })
 
+console.log(props.room)
+watch(
+  () => props.room,
+  (newRoom) => {
+    console.log('room.number_rooms (watch):', newRoom?.number_rooms)
+  },
+  { immediate: true }
+)
 const emit = defineEmits(['close'])
 
 const step = ref(1)
@@ -257,8 +273,8 @@ const loading = ref(false)
 const body = ref({
   checkInDate: '',
   checkOutDate: '',
-  checkInTime: '',
-  checkOutTime: '',
+  checkInTime: '14:00:00',
+  checkOutTime: '12:00:00',
   numberOfPeople: 1,
   roomSelections: [
     {

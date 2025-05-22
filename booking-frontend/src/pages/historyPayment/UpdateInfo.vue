@@ -33,7 +33,7 @@
       <div class="space-y-4 text-gray-700 text-base">
         <div class="flex justify-between border-b border-gray-200 pb-2">
           <span class="font-semibold">Người đặt:</span>
-          <span>{{ booking.user?.full_name ?? 'N/A' }}</span>
+          <span>{{ booking.contactName ?? 'N/A' }}</span>
         </div>
         <div class="flex justify-between border-b border-gray-200 pb-2">
           <span class="font-semibold">Khách sạn:</span>

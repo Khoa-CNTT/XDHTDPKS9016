@@ -2,12 +2,7 @@
   <div class="space-y-6 px-4 py-6">
     <div class="border rounded-lg p-6 bg-white shadow">
       <h3 class="text-lg font-semibold mb-4 text-blue-700 flex">
-        <Icon
-          icon="mdi:clipboard-list-outline"
-          class="mr-2"
-          width="24"
-          height="24"
-        />
+        <Icon icon="mdi:clipboard-list-outline" class="mr-2" width="24" height="24" />
         LỊCH SỬ GIAO DỊCH
       </h3>
 
@@ -17,6 +12,7 @@
             <tr>
               <th class="px-4 py-2 text-left">STT</th>
               <th class="px-4 py-2 text-left">Tên người đặt</th>
+              <th class="px-4 py-2 text-left">Khách sạn</th>
               <th class="px-4 py-2 text-left">Ngày nhận phòng</th>
               <th class="px-4 py-2 text-left">Ngày trả phòng</th>
               <th class="px-4 py-2 text-left">Tổng tiền</th>
@@ -25,44 +21,39 @@
             </tr>
           </thead>
           <tbody>
-            <tr
-              v-for="(booking, index) in bookings"
-              :key="booking.bookingId"
-            >
+            <tr v-for="(booking, index) in bookings" :key="booking.bookingId">
               <td class="px-4 py-2">{{ index + 1 }}</td>
-              <td class="px-4 py-2">{{ booking.user?.full_name || 'N/A' }}</td>
+              <td class="px-4 py-2">{{ booking.contactName || 'N/A' }}</td>
+              <td class="px-4 py-2">{{ booking.hotel?.name || 'N/A' }}</td>
               <td class="px-4 py-2">{{ formatDate(booking.checkInDate) }}</td>
               <td class="px-4 py-2">{{ formatDate(booking.checkOutDate) }}</td>
               <td class="px-4 py-2">{{ formatCurrency(booking.bill?.total || 0) }}</td>
               <td class="px-4 py-2">
                 <span
                   :class="statusClass(booking.statusDisplay)"
-                  class="px-2 py-1 rounded-full text-sm font-medium inline-block"
+                  class="px-2 py-1 rounded text-sm font-medium inline-block"
                 >
                   {{ booking.statusDisplay }}
                 </span>
               </td>
               <td class="px-4 py-2 text-center space-x-2">
+                <!-- Nút xem thông tin cập nhật - mở modal UpdateInfo -->
                 <button
-                  @click="viewBooking(booking)"
+                  @click="openUpdateInfoModal(booking)"
                   class="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded"
+                  title="Xem thông tin cập nhật"
                 >
-                  <Icon
-                    icon="mdi:eye"
-                    width="20"
-                    height="20"
-                  />
+                  <Icon icon="mdi:eye" width="20" height="20" />
                 </button>
+
+                <!-- Nút đánh giá - mở modal ReviewModal -->
                 <button
                   v-if="canReview(booking.checkOutDate)"
                   @click="openReviewModal(booking)"
                   class="p-2 bg-green-500 hover:bg-green-600 text-white rounded"
+                  title="Đánh giá"
                 >
-                  <Icon
-                    icon="mdi:star"
-                    width="20"
-                    height="20"
-                  />
+                  <Icon icon="mdi:star" width="20" height="20" />
                 </button>
               </td>
             </tr>
@@ -70,18 +61,23 @@
         </table>
       </div>
 
-      <div
-        v-else
-        class="text-center py-6 text-gray-500"
-      >
+      <div v-else class="text-center py-6 text-gray-500">
         Không có dữ liệu đặt phòng...
       </div>
     </div>
 
+    <!-- Modal Review -->
     <ReviewModal
-      v-if="showReviewModal"
+      v-if="showReviewModal && bookingToReview"
       :booking="bookingToReview"
       @close="showReviewModal = false"
+    />
+
+    <!-- Modal UpdateInfo -->
+    <UpdateInfo
+      v-if="showUpdateInfoModal && bookingToUpdate"
+      :booking="bookingToUpdate"
+      @close="showUpdateInfoModal = false"
     />
   </div>
 </template>
@@ -92,31 +88,51 @@ import { Icon } from '@iconify/vue'
 import { getBookingListApi } from '@/services/booking'
 import type { BookingListItem } from '@/types/booking'
 import ReviewModal from './ReviewModal.vue'
+import UpdateInfo from './UpdateInfo.vue'
 
 const bookings = ref<BookingListItem[]>([])
+
+// Modal review
 const showReviewModal = ref(false)
 const bookingToReview = ref<BookingListItem | null>(null)
+
+// Modal update info
+const showUpdateInfoModal = ref(false)
+const bookingToUpdate = ref<BookingListItem | null>(null)
 
 onMounted(async () => {
   try {
     const data = await getBookingListApi()
-    bookings.value = data
+    bookings.value = data.content
+    console.log('data:', bookings.value);
+    
   } catch (error) {
     console.error('Lỗi khi lấy danh sách đặt phòng:', error)
   }
 })
 
+// Mở modal ReviewModal
 function openReviewModal(booking: BookingListItem) {
   bookingToReview.value = booking
   showReviewModal.value = true
 }
 
+// Mở modal UpdateInfo
+function openUpdateInfoModal(booking: BookingListItem) {
+  bookingToUpdate.value = booking
+  showUpdateInfoModal.value = true
+}
+
+// Các hàm format, xử lý UI
 function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString('vi-VN')
 }
 
 function formatCurrency(amount: number) {
-  return amount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
+  return amount.toLocaleString('vi-VN', {
+    style: 'currency',
+    currency: 'VND'
+  })
 }
 
 function statusClass(status: string) {

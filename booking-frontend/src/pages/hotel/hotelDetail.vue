@@ -434,15 +434,21 @@
         </div>
       </div>
     </div>
-    <BookingModal
+    <!-- <BookingModal
       :show="showBooking"
       :room="selectedRoom"
       :hotel="hotel"
       @close="showBooking = false"
       :roomType="selectedRoomType"
+    /> -->
+    <BookingModal
+      :show="showBooking"
+      :room="selectedRoom"
+      :hotel="hotel"
+      :roomType="selectedRoomType"
+      @close="showBooking = false"
     />
-    <!-- <ListRoom /> -->
-    <!-- <BookingModal v-if="showBookingModal" :show="showBookingModal" @close="showBookingModal = false" /> -->
+
     <router-link
       :to="{ name: 'HotelReview', params: { id: hotelId } }"
       class="inline-block"
@@ -464,7 +470,7 @@ import { getHotelByIdApi } from '@/services/home'
 import { getHotelListApi, getCommentPublicApi } from '@/services/home'
 import { useRouter } from 'vue-router'
 import BookingModal from '@/pages/hotel/BookingModal.vue'
-  import {BASE_URL} from '@/utils/imageHelper'
+import { BASE_URL } from '@/utils/imageHelper'
 const route = useRoute()
 const hotel = ref(null)
 const hotelList = ref([])
@@ -552,6 +558,8 @@ const selectedRoom = ref(null)
 
 const openBooking = (room, roomType) => {
   selectedRoom.value = room
+  console.log('Room:', room)
+  console.log('Số hiệu phòng (number_rooms):', room.number_rooms)
   selectedRoomType.value = roomType // nếu bạn muốn lưu thêm loại phòng
   console.log('Room day du:', selectedRoom.value)
   console.log('Room:', selectedRoom.value.id_room)

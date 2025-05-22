@@ -76,9 +76,9 @@ export const getUserDetailsApi = async (userId: number): Promise<User> => {
   )
 }
 // Supplier
-export const getManagementSupplier = async (page = 0): Promise<ApiResponse> => {
+export const getManagementSupplier = async (page = 0, size = 5): Promise<ApiResponse> => {
   return $api(
-    `/management-supplier?page=${page}`,
+    `/management-supplier?page=${page}&size=${size}`,
     {
       method: 'GET',
     },

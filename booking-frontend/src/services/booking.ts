@@ -4,7 +4,7 @@ import {
   BookingResponse,
   BookingContact,
   BookingResponsePayment,
-  BookingListItem,
+  BookingListResponse,
 } from '@/types/booking'
 export const initializeBookingApi = async (
   bookingRequest: BookingRequest,
@@ -32,7 +32,7 @@ export const contactInfoPaymentApi = async (
   )
 }
 
-export const getBookingListApi = async (): Promise<BookingListItem[]> => {
+export const getBookingListApi = async (): Promise<BookingListResponse> => {
   return $api(
     '/bookings/user',
     {

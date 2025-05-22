@@ -62,7 +62,10 @@
             :key="hotel.idHotel"
             class="border-t align-top"
           >
-            <td class="px-4 py-2">{{ index + 1 }}</td>
+            <td class="px-4 py-2">
+             {{ (currentPage - 1) * pageSize + index + 1 }}
+            </td>
+
             <td class="px-4 py-2">{{ hotel.name }}</td>
             <td class="px-4 py-2">
               <img
@@ -145,12 +148,13 @@
         </tbody>
       </table>
 
-      <div class="pt-6 flex justify-center">
+      <div class="mt-5 flex justify-center">
         <Pagination
           :total="totalElements"
           :items-per-page="pageSize"
           :default-page="currentPage"
-          @page-change="fetchInfoHotel"
+          :sibling-count="1"
+          @page-change="handlePageChange"
         />
       </div>
     </div>
@@ -173,24 +177,24 @@
       @close="showDetailPopup = false"
     />
 
-    <EditSupplierPopup
+    <!-- <EditSupplierPopup
       v-if="showEditModal"
       :supplier="selectedHotelToEdit"
       @close="showEditModal = false"
       @save="handleHotelSave"
-    />
+    /> -->
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import Pagination from '@/components/base/Pagination.vue'
 import SupplierDetailPopup from './SupplierDetailPopup.vue'
 import CreateHotel from './CreateHotel.vue'
 import DeleteConfirmModal from './DeleteConfirmModal.vue'
 import EditSupplierPopup from './EditSupplierPopup.vue'
 import { getManagementSupplier, getSupplierByIdApi, deleteSupplierApi } from '@/services/admin'
-
+const emit = defineEmits(['close', 'refresh'])
 interface Hotel {
   idHotel: number
   name: string
@@ -201,10 +205,9 @@ interface Hotel {
   services: { serviceId: number; serviceName: string }[]
   roomTypes: { roomTypeId: number; typeName: string }[]
 }
-
-const hotels = ref<Hotel[]>([])
 const currentPage = ref(1)
-const pageSize = ref(10)
+const pageSize = ref(5)
+const hotels = ref<Hotel[]>([])
 const totalElements = ref(0)
 
 const showCreateHotel = ref(false)
@@ -218,7 +221,7 @@ const deleteId = ref<number | null>(null)
 
 const fetchInfoHotel = async (page = 1) => {
   try {
-    const res = await getManagementSupplier(page - 1)
+    const res = await getManagementSupplier(page - 1, pageSize.value)
     hotels.value = res.content
     totalElements.value = res.page.totalElements
     pageSize.value = res.page.size
@@ -227,7 +230,13 @@ const fetchInfoHotel = async (page = 1) => {
     console.error('Lỗi khi gọi API nhà cung cấp:', error)
   }
 }
-
+const handlePageChange = (newPage: number) => {
+  currentPage.value = newPage
+  fetchInfoHotel(newPage)
+}
+watch(pageSize, (newSize) => {
+  fetchInfoHotel(1)
+})
 const openEditModal = (hotel: Hotel) => {
   selectedHotelToEdit.value = hotel
   showEditModal.value = true
