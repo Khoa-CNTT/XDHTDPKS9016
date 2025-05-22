@@ -1,16 +1,15 @@
+
+
 import { $api } from '@/api/ofetch'
-import { GetServiceResponse , AddService, Service,NewService,AddServiceResponse, Room } from "@/types/supplier"
+import { GetService , AddService, Service,NewService,AddServiceResponse, Room } from "@/types/supplier"
 import { RoomTypeResponse,RoomTypeSummary,RoomType,RoomTypeDetail,UpdateRoomTypeBody} from "@/types/supplier"
 import { HotelInfo,InfoHotel,HotelProfile, HotelDetail} from "@/types/supplier"
 import { IBookingList,BookingList,DashboardStatsPartial} from "@/types/supplier"
-import { PaymentHistoryResponse,PaymentHistory} from "@/types/supplier"
+import { PaymentHistory} from "@/types/supplier"
 //service
-export const getServiceListApi = async (
-  page: number,
-  size: number
-): Promise<GetServiceResponse> => {
-  return $api(`/management-service?page=${page}&size=${size}`, { method: 'GET' }, true);
-}
+export const getServiceListApi = async (): Promise<GetService[]> => {
+  return $api('/management-service', { method: 'GET' }, true);
+};
 
 export const getServiceByIdApi = async (serviceId: number): Promise<Service> => {
   return $api(`/management-service/${serviceId}`, { method: 'GET' }, true);
@@ -155,30 +154,8 @@ export const createRoomApi = async (roomData: Partial<Room>): Promise<Room> => {
   }, true);
 }
 //history payment
-export const getPaymentHistory = async (
-  page: number = 0,
-  size: number = 5
-): Promise<PaymentHistoryResponse> => {
-  return $api(
-    `/payments/history?page=${page}&size=${size}`,
-    { method: 'GET' },
-    true
-  );
-};
-
-//update status history payment
-export const updatePaymentStatus = async (
-  paymentId: number,
-  status: string
-): Promise<PaymentHistory> => {
-  const url = `/payments/${paymentId}/status?status=${encodeURIComponent(status)}`;
-
-  return $api(url, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  }, true);
+export const getPaymentHistory = async (): Promise<PaymentHistory[]> => {
+  return $api('/payments/history', { method: 'GET' }, true);
 };
 
 //thong ke

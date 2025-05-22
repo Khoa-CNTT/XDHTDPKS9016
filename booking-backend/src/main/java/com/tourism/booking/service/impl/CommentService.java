@@ -2,6 +2,7 @@ package com.tourism.booking.service.impl;
 
 import com.tourism.booking.dto.comment.CommentRequest;
 import com.tourism.booking.dto.comment.CommentResponse;
+import com.tourism.booking.dto.comment.RoomCommentDTO;
 import com.tourism.booking.model.*;
 import com.tourism.booking.repository.ICommentRepository;
 import com.tourism.booking.repository.IRoomRepository;
@@ -117,5 +118,10 @@ public class CommentService implements ICommentService {
         }
 
         commentRepository.delete(comment);
+    }
+
+    @Override
+    public RoomCommentDTO getRoomComment(Long bookingId) {
+        return commentRepository.getRoomComment(bookingId);
     }
 }

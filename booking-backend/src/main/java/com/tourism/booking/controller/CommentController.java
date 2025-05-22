@@ -89,4 +89,9 @@ public class CommentController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    @GetMapping("/room-comment/{bookingId}")
+    public ResponseEntity<?> getRoomComment(@PathVariable Long bookingId) {
+        return ResponseEntity.ok(commentService.getRoomComment(bookingId));
+    }
 }

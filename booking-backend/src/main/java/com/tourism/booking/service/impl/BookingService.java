@@ -31,6 +31,7 @@ import com.tourism.booking.service.IBookingService;
 import com.tourism.booking.service.IUserProfileService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -209,15 +210,17 @@ public class BookingService implements IBookingService {
     }
 
     @Override
-    public List<BookingResponseDTO> getBookingsByUserId(Long userId) {
-        List<Booking> bookings = bookingRepository.findByUserProfileUserId(userId);
-        return convertToResponseDTOList(bookings);
+    public Page<BookingResponseDTO> getBookingsByUserId(Pageable pageable, Long userId) {
+        Page<Booking> bookings = bookingRepository.findByUserProfileUserId(pageable, userId);
+        Page<BookingResponseDTO> dtoPage = bookings.map(booking -> convertToResponseDTO(booking));
+        return dtoPage;
     }
 
     @Override
-    public List<BookingResponseDTO> getBookingsByHotelId(Long hotelId) {
-        List<Booking> bookings = bookingRepository.findByRoomRoomTypeHotelHotelId(hotelId);
-        return convertToResponseDTOList(bookings);
+    public Page<BookingResponseDTO> getBookingsByHotelId(Pageable pageable, Long hotelId) {
+        Page<Booking> bookings = bookingRepository.findByRoomRoomTypeHotelHotelId(pageable, hotelId);
+        Page<BookingResponseDTO> dtoPage = bookings.map(booking -> convertToResponseDTO(booking));
+        return dtoPage;
     }
 
     @Override

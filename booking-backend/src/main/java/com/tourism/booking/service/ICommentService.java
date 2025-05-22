@@ -2,6 +2,7 @@ package com.tourism.booking.service;
 
 import com.tourism.booking.dto.comment.CommentRequest;
 import com.tourism.booking.dto.comment.CommentResponse;
+import com.tourism.booking.dto.comment.RoomCommentDTO;
 
 import java.security.Principal;
 import java.util.List;
@@ -17,4 +18,6 @@ public interface ICommentService {
     CommentResponse updateComment(Long id, CommentRequest commentRequest, Principal principal);
 
     void deleteComment(Long id, Principal principal);
+
+    RoomCommentDTO getRoomComment(Long bookingId);
 }

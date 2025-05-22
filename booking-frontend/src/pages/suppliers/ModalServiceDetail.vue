@@ -28,7 +28,7 @@
   import {computed} from 'vue';
   import { defineProps, defineEmits } from 'vue';
   import { Service } from '@/types/supplier';
-  
+  import {BASE_URL} from '@/utils/imageHelper'
   const props = defineProps({
     service: {
       type: Object as () => Service | null,
@@ -44,7 +44,7 @@
   const fullImageUrl = computed(() => {
   if (!props.service?.service_image) return '';
   const imageUrl = props.service.service_image;
-  return imageUrl.startsWith('http') ? imageUrl : `http://157.66.101.165:8080${imageUrl}`;
+  return imageUrl.startsWith('http') ? imageUrl : `${BASE_URL}${imageUrl}`;
 });
   </script>
   

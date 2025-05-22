@@ -16,6 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Service
@@ -44,7 +45,7 @@ public class AccountService implements IAccountService {
         account.setUsername(accountRequest.getUsername());
         account.setPassword(encodedPassword);
         account.setEmail(accountRequest.getEmail());
-
+        account.setCreated_at(LocalDateTime.now());
         // Set vai trò mặc định USER
         Role userRole = roleRepository.findByRoleName("USER")
                 .orElseThrow(() -> new RuntimeException("Role USER not found"));

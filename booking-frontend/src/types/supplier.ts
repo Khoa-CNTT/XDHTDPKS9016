@@ -1,5 +1,5 @@
 // --- Đặt Booking nếu cần, tạm thời để trống ---
-export interface Booking {}
+export interface Booking { }
 
 // --- Service & Response ---
 export interface Service {
@@ -17,17 +17,26 @@ export interface AddService {
   service_image: string | null
   description: string
 }
-
-export interface ServiceResponse {
-  content: Service[]
-  page: Page
-}
 export interface GetService {
   id: number
   name: string
   description: string
   price: number
 }
+export interface GetServiceResponse {
+  content: GetService[]
+  page: {
+    totalElements: number
+    totalPages: number
+    number: number
+    size: number
+  }
+}
+export interface ServiceResponse {
+  content: Service[]
+  page: Page
+}
+
 export interface NewService {
   service_name: string
   service_price: number
@@ -244,8 +253,8 @@ export interface Comment {
   content: string;
   comment_id: number;
   comment_author: string | null;
-  comment_date: string; 
-  comment_time: string; 
+  comment_date: string;
+  comment_time: string;
 }
 //info hotel
 export interface HotelProfile {
@@ -254,7 +263,7 @@ export interface HotelProfile {
   image: string | null;
   address: string;
   hotline: string;
-  description: string;
+  description: string | null;
   username: string;
   password: string;
   sendEmail: boolean;
@@ -304,7 +313,7 @@ export interface HotelBooking {
   address: string;
   email: string;
   phone: string;
-  description: string;
+  description: string | null;
 }
 
 export interface BookingRoom {
@@ -320,7 +329,7 @@ export interface BookingRoom {
 export interface BookingService {
   id: number;
   name: string;
-  description: string;
+description: string | null;
   price: number;
 }
 
@@ -340,7 +349,7 @@ export interface BookingUser {
   address: string;
   email: string;
   phone: string;
-  birth_date: string;  
+  birth_date: string;
   status: string;
   username: string;
 }
@@ -367,11 +376,16 @@ export interface PaymentHistory {
   paymentMethod: string;
   transactionId: string;
   status: string;
-  paymentDate: string; 
-  paymentTime: string; 
+  paymentDate: string;
+  paymentTime: string;
   customerName: string;
   accountNumber: string;
-  statusDisplay: string | null;
+  statusDisplay?: string | null;
+}
+
+export interface PaymentHistoryResponse {
+  content: PaymentHistory[];
+  page: PageInfo;
 }
 
 //thong ke

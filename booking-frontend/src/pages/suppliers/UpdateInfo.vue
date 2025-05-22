@@ -45,12 +45,12 @@ import { ref } from 'vue'
 import { updateHotelInfoApi, uploadImageApi } from '@/services/supplier'
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
-
+  import {BASE_URL} from '@/utils/imageHelper'
 const emit = defineEmits(['close', 'updated'])
 const props = defineProps<{ hotel: any }>()
 
 // Base URL để nối trước đường dẫn tương đối
-const baseUrl = 'http://157.66.101.165:8080'
+const baseUrl = 'http://localhost:8080'
 
 const form = ref({ ...props.hotel })
 const previewImage = ref(form.value.image
