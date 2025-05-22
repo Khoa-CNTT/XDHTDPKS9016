@@ -410,11 +410,11 @@ async function submitBooking() {
         emit('close') // đóng modal
       }, 1500)
     } else {
-      toast.error('Không nhận được link thanh toán từ hệ thống.')
+      toast.error('Không nhận được link thanh toán từ hệ thống.', { autoClose: 5000, position: 'top-right' })
     }
   } catch (err) {
     console.error('Lỗi khi gọi contactInfoPaymentApi:', err)
-    toast.error('❌ Đặt phòng thất bại. Vui lòng thử lại sau.')
+    toast.error('❌ Đặt phòng thất bại. Vui lòng thử lại sau.', { autoClose: 5000, position: 'top-right' })
   } finally {
     loading.value = false
   }

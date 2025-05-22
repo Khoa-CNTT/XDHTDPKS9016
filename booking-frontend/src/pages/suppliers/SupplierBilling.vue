@@ -153,7 +153,7 @@ const loadPaymentHistory = async (page = 0) => {
     currentPage.value = res.page.number;
   } catch (error) {
     console.error('Lỗi khi lấy lịch sử thanh toán:', error);
-    toast.error('Lấy lịch sử thanh toán thất bại');
+    toast.error('Lấy lịch sử thanh toán thất bại', { autoClose: 5000, position: 'top-right' });
   } finally {
     isLoading.value = false;
   }

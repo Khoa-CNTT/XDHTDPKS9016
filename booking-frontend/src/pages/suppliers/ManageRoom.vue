@@ -177,7 +177,7 @@ const fetchRooms = async () => {
     rooms.value = data
   } catch (error) {
     console.error('Lỗi tải phòng:', error)
-    toast.error('Lỗi tải phòng')
+    toast.error('Lỗi tải phòng', { autoClose: 5000, position: 'top-right' })
   }
 }
 onMounted(fetchRooms)
@@ -211,12 +211,12 @@ const deleteRoom = async () => {
   try {
     await deleteRoomApi(selectedRoomForDelete.value.id_room)
     rooms.value = rooms.value.filter((r) => r.id_room !== selectedRoomForDelete.value.id_room)
-    toast.success('Xóa phòng thành công!')
+    toast.success('Xóa phòng thành công!', { autoClose: 5000, position: 'top-right' })
     if (selectedRoom.value?.id_room === selectedRoomForDelete.value.id_room) {
       selectedRoom.value = null
     }
   } catch (err) {
-    toast.error('Lỗi khi xóa phòng')
+    toast.error('Lỗi khi xóa phòng', { autoClose: 5000, position: 'top-right' })
   } finally {
     cancelDelete()
   }

@@ -257,6 +257,7 @@
           <input
             type="date"
             id="checkIn"
+            :min="today"
             v-model="checkInDate"
             class="border rounded px-3 py-2"
           />
@@ -273,6 +274,7 @@
             type="date"
             id="checkOut"
             v-model="checkOutDate"
+            :min="checkInDate || today"
             class="border rounded px-3 py-2"
           />
         </div>
@@ -489,6 +491,7 @@ const checkLogin = (room, roomType) => {
   }
   openBooking(room, roomType) // Gọi hàm openBooking nếu đã đăng nhập
 }
+const today = new Date().toISOString().split('T')[0]
 
 const fetchComments = async () => {
   try {

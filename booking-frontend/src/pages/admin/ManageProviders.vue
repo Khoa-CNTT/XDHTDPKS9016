@@ -248,23 +248,35 @@ const handleHotelSave = async () => {
   await fetchInfoHotel() // gọi API lấy danh sách mới nhất
 }
 
-const confirmDelete = (id: number) => {
-  deleteId.value = id
-  showDeleteModal.value = true
-}
 
+// const handleDelete = async () => {
+//   if (deleteId.value == null) return
+//   try {
+//     await deleteSupplierApi(deleteId.value)
+//     await fetchInfoHotel(currentPage.value)
+//     showDeleteModal.value = false
+//     deleteId.value = null
+//   } catch (error) {
+//     console.error('Lỗi khi xóa nhà cung cấp:', error)
+//   }
+// }
 const handleDelete = async () => {
   if (deleteId.value == null) return
   try {
+    console.log('ID cần xóa:', deleteId.value)
     await deleteSupplierApi(deleteId.value)
     await fetchInfoHotel(currentPage.value)
     showDeleteModal.value = false
     deleteId.value = null
+    
   } catch (error) {
     console.error('Lỗi khi xóa nhà cung cấp:', error)
   }
 }
-
+const confirmDelete = (id: number) => {
+  deleteId.value = id
+  showDeleteModal.value = true
+}
 const handleView = async (id: number) => {
   try {
     const res = await getSupplierByIdApi(id)

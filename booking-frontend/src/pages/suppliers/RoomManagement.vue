@@ -79,16 +79,7 @@
           </tr>
         </tbody>
       </table>
-      <!-- Pagination -->
-      <!-- <div class="mt-5 flex justify-center">
-        <Pagination
-          :total="totalElements"
-          :items-per-page="size"
-          :default-page="currentPage + 1"
-          :sibling-count="1"
-          @page-change="handlePageChange"
-        />
-      </div> -->
+
     </div>
   </div>
 </template>
@@ -97,7 +88,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { Icon } from '@iconify/vue'
 import { getBookingsManager } from '@/services/supplier'
-import Pagination from '@/components/base/Pagination.vue'
+// import Pagination from '@/components/base/Pagination.vue'
 const bookings = ref<any[]>([])
 const isDropdownOpen = ref(false)
 const currentStatus = ref('ALL')

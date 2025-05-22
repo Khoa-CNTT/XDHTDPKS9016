@@ -74,13 +74,13 @@ const submitReview = async () => {
     await postCommentApi(room.roomId, comment.value)
     await postRatingApi(room.roomId, score.value)
 
-    toast.success('Đánh giá thành công!')
+    toast.success('Đánh giá thành công!', { autoClose: 5000, position: 'top-right' })
     comment.value = ''
     score.value = 5
     emit('close')
   } catch (error: any) {
     console.error('Lỗi khi gửi đánh giá:', error)
-    toast.error(error.message || 'Gửi đánh giá thất bại')
+    toast.error(error.message || 'Gửi đánh giá thất bại', { autoClose: 5000, position: 'top-right' })
   }
 }
 </script>

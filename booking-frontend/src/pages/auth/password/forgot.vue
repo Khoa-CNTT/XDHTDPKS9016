@@ -77,7 +77,7 @@ async function submitEmail() {
   } catch (err) {
     console.error('🚫 Lỗi gửi yêu cầu:', err)
     emailError.value = 'Không thể gửi yêu cầu. Vui lòng thử lại sau.'
-    toast.error('Lỗi gửi email. Vui lòng thử lại.')
+    toast.error('Lỗi gửi email. Vui lòng thử lại.', { autoClose: 5000, position: 'top-right' })
   } finally {
     loading.value = false
   }

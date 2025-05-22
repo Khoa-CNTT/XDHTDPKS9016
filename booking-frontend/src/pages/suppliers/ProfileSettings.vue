@@ -64,15 +64,15 @@ const onSubmit = async () => {
   console.log('Form Data:', form); // 👉 Log dữ liệu ra
 
   if (form.newPassword !== form.confirmPassword) {
-    toast.error('Mật khẩu xác nhận không khớp!');
+    toast.error('Mật khẩu xác nhận không khớp!', { autoClose: 5000, position: 'top-right' });
     return;
   }
 
   try {
     await updateUserApi(form);
-    toast.success('Đổi mật khẩu thành công!');
+    toast.success('Đổi mật khẩu thành công!', { autoClose: 5000, position: 'top-right' });
   } catch (err) {
-    toast.error('Đổi mật khẩu thất bại!');
+    toast.error('Đổi mật khẩu thất bại!', { autoClose: 5000, position: 'top-right' });
     console.error('API Error:', err);
   }
 };

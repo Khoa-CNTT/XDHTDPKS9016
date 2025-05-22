@@ -16,7 +16,7 @@
               <th class="px-4 py-2 text-left">Ngày nhận phòng</th>
               <th class="px-4 py-2 text-left">Ngày trả phòng</th>
               <th class="px-4 py-2 text-left">Tổng tiền</th>
-              <th class="px-4 py-2 text-left">Trạng thái</th>
+              <!-- <th class="px-4 py-2 text-left">Trạng thái</th> -->
               <th class="px-4 py-2 text-center">Hành động</th>
             </tr>
           </thead>
@@ -28,14 +28,14 @@
               <td class="px-4 py-2">{{ formatDate(booking.checkInDate) }}</td>
               <td class="px-4 py-2">{{ formatDate(booking.checkOutDate) }}</td>
               <td class="px-4 py-2">{{ formatCurrency(booking.bill?.total || 0) }}</td>
-              <td class="px-4 py-2">
+              <!-- <td class="px-4 py-2">
                 <span
                   :class="statusClass(booking.statusDisplay)"
                   class="px-2 py-1 rounded text-sm font-medium inline-block"
                 >
                   {{ booking.statusDisplay }}
                 </span>
-              </td>
+              </td> -->
               <td class="px-4 py-2 text-center space-x-2">
                 <!-- Nút xem thông tin cập nhật - mở modal UpdateInfo -->
                 <button

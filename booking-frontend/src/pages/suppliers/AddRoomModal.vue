@@ -128,7 +128,7 @@ onMounted(async () => {
     const res: RoomTypeResponse = await getRoomTypesApi()
     roomTypes.value = res.content
   } catch (error) {
-    toast.error('Lấy danh sách loại phòng thất bại')
+    toast.error('Lấy danh sách loại phòng thất bại', { autoClose: 5000, position: 'top-right' })
   }
 })
 
@@ -141,7 +141,7 @@ const closeModal = () => {
 
 const createRoom = async () => {
   if (!form.room_type_id) {
-    toast.error('Vui lòng chọn loại phòng')
+    toast.error('Vui lòng chọn loại phòng', { autoClose: 5000, position: 'top-right' })
     return
   }
 
@@ -159,11 +159,11 @@ const createRoom = async () => {
 
     const created = await createRoomApi({ ...newRoom, room_type_id: form.room_type_id } as any)
 
-    toast.success('Tạo phòng thành công!')
+    toast.success('Tạo phòng thành công!', { autoClose: 5000, position: 'top-right' })
     emit('created', created)
     closeModal()
   } catch (error: any) {
-    toast.error('Lỗi khi tạo phòng')
+    toast.error('Lỗi khi tạo phòng', { autoClose: 5000, position: 'top-right' })
   } finally {
     loading.value = false
   }

@@ -99,10 +99,10 @@ const onFileChange = async (e: Event) => {
     const res = await uploadImageApi(file) // API trả về đường dẫn tương đối
 
     room_image.value = res // lưu đường dẫn tương đối vào server
-    toast.success('Tải ảnh lên thành công!')
+    toast.success('Tải ảnh lên thành công!', { autoClose: 5000, position: 'top-right' })
   } catch (err) {
     console.error(err)
-    toast.error('Lỗi khi tải ảnh!')
+    toast.error('Lỗi khi tải ảnh!', { autoClose: 5000, position: 'top-right' })
   }
 }
 
@@ -133,12 +133,12 @@ const submitForm = async () => {
     const res = await updateRoomTypeApi(props.roomType.room_type_id, updatedData)
     console.log('==>ảnh cập nhật', res)
     
-    toast.success('Cập nhật loại phòng thành công!')
+    toast.success('Cập nhật loại phòng thành công!', { autoClose: 5000, position: 'top-right' })
     emit('updated')
     emit('close')
   } catch (err) {
     console.error(err)
-    toast.error('Cập nhật thất bại!')
+    toast.error('Cập nhật thất bại!', { autoClose: 5000, position: 'top-right' })
   }
 }
 </script>
