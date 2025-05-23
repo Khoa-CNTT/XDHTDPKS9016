@@ -455,11 +455,11 @@
       :to="{ name: 'HotelReview', params: { id: hotelId } }"
       class="inline-block"
     >
-      <button
+      <!-- <button
         class="px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold rounded-lg shadow hover:scale-105 hover:shadow-lg transition-transform duration-200"
       >
         Đánh Giá
-      </button>
+      </button> -->
     </router-link>
     <router-view />
   </div>
