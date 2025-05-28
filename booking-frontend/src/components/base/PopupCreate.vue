@@ -13,7 +13,7 @@ const { errors, handleSubmit, defineField } = useForm({
 const [name, nameAttrs] = defineField('name')
 
 const onSubmit = handleSubmit((values) => {
-  console.log('value', values)
+
   emit('update:modelValue', values.name)
   emit('submit')
 })

@@ -198,3 +198,13 @@ export interface BookingListItem {
   contactAddress: string
   specialRequests: string
 }
+
+export interface BookingListResponse {
+  content: BookingListItem[]
+  page: {
+    totalElements: number
+    totalPages: number
+    number: number
+    size: number
+  }
+}

@@ -4,7 +4,7 @@ import {
   BookingResponse,
   BookingContact,
   BookingResponsePayment,
-  BookingListItem,
+  BookingListResponse,
 } from '@/types/booking'
 export const initializeBookingApi = async (
   bookingRequest: BookingRequest,
@@ -32,15 +32,18 @@ export const contactInfoPaymentApi = async (
   )
 }
 
-export const getBookingListApi = async (): Promise<BookingListItem[]> => {
+export const getBookingListApi = async (
+  page: number = 0,
+  size: number = 5
+): Promise<BookingListResponse> => {
   return $api(
-    '/bookings/user',
+    `/bookings/user?page=${page}&size=${size}`,
     {
       method: 'GET',
     },
-    true,
-  )
-}
+    true
+  );
+};
 
 export const postCommentApi = async (roomId: number, comment: string): Promise<void> => {
   return $api(

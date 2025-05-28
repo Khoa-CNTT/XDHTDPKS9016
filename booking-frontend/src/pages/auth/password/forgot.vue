@@ -45,9 +45,7 @@ const emailError = ref('')
 const loading = ref(false)
 
 async function submitEmail() {
-  console.log('===> Giá trị email khi Submit:', email.value)
-
-  await new Promise(resolve => setTimeout(resolve, 1000)) // 🐢 Delay 1 giây
+  await new Promise(resolve => setTimeout(resolve, 1000)) 
 
   const emailValidation = validEmail(email.value)
 
@@ -62,8 +60,6 @@ async function submitEmail() {
 
   try {
     const res = await forgotPasswordApi(encodeURIComponent(email.value))
-    console.log('📩 Phản hồi API:', res)
-
     toast.success('Gửi email thành công! Vui lòng kiểm tra hộp thư.', {
       autoClose: 3000
     })
@@ -75,9 +71,8 @@ async function submitEmail() {
       })
     }, 1000)
   } catch (err) {
-    console.error('🚫 Lỗi gửi yêu cầu:', err)
     emailError.value = 'Không thể gửi yêu cầu. Vui lòng thử lại sau.'
-    toast.error('Lỗi gửi email. Vui lòng thử lại.')
+    toast.error('Lỗi gửi email. Vui lòng thử lại.', { autoClose: 5000, position: 'top-right' })
   } finally {
     loading.value = false
   }

@@ -79,16 +79,7 @@
           </tr>
         </tbody>
       </table>
-      <!-- Pagination -->
-      <!-- <div class="mt-5 flex justify-center">
-        <Pagination
-          :total="totalElements"
-          :items-per-page="size"
-          :default-page="currentPage + 1"
-          :sibling-count="1"
-          @page-change="handlePageChange"
-        />
-      </div> -->
+
     </div>
   </div>
 </template>
@@ -97,27 +88,25 @@
 import { ref, computed, onMounted } from 'vue'
 import { Icon } from '@iconify/vue'
 import { getBookingsManager } from '@/services/supplier'
-import Pagination from '@/components/base/Pagination.vue'
-const bookings = ref<any[]>([])
+import {Booking,PageInfo} from '@/types/supplier'
+// import Pagination from '@/components/base/Pagination.vue'
 const isDropdownOpen = ref(false)
 const currentStatus = ref('ALL')
-
+const bookings = ref<Booking[]>([]);
+const pageInfo = ref<PageInfo | null>(null);
 const states = [{ value: 'PAID', label: 'Chờ xác nhận' }]
 
-onMounted(async () => {
+const fetchBookings = async () => {
   try {
-    const res = await getBookingsManager()
-    console.log('data dat phong', res)
-
-    bookings.value = res.map((booking: any) => ({
-      ...booking,
-      statusDisplay: getStatusLabel(booking.status),
-    }))
+    const res = await getBookingsManager();
+    bookings.value = res.content;
   } catch (error) {
-    console.error('Lỗi khi lấy danh sách đặt phòng:', error)
+    void error
   }
-})
-
+};
+onMounted(() => {
+  fetchBookings();
+});
 function getStatusLabel(status: string) {
   const match = states.find((s) => s.value === status)
   return match ? match.label : status

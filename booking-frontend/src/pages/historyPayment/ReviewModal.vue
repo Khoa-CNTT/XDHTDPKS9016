@@ -46,7 +46,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch, toRef } from 'vue'
 import type { BookingListItem } from '@/types/booking'
 import { toast } from 'vue3-toastify'
 import { postCommentApi, postRatingApi } from '@/services/booking'
@@ -55,8 +55,16 @@ const props = defineProps<{
   booking: BookingListItem
 }>()
 
+const emit = defineEmits(['close'])
+
 const comment = ref('')
 const score = ref(5)
+
+// Khi prop booking thay đổi, bạn có thể reset form nếu muốn
+watch(() => props.booking, () => {
+  comment.value = ''
+  score.value = 5
+})
 
 const submitReview = async () => {
   try {
@@ -66,15 +74,14 @@ const submitReview = async () => {
     await postCommentApi(room.roomId, comment.value)
     await postRatingApi(room.roomId, score.value)
 
-    toast.success('Đánh giá thành công!')
+    toast.success('Đánh giá thành công!', { autoClose: 5000, position: 'top-right' })
     comment.value = ''
     score.value = 5
     emit('close')
   } catch (error: any) {
     console.error('Lỗi khi gửi đánh giá:', error)
-    toast.error(error.message || 'Gửi đánh giá thất bại')
+    toast.error(error.message || 'Gửi đánh giá thất bại', { autoClose: 5000, position: 'top-right' })
   }
 }
-
-const emit = defineEmits(['close'])
 </script>
+

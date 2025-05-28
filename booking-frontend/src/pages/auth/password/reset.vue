@@ -83,7 +83,7 @@ async function resetPassword() {
   }
 
   if (!email) {
-    toast.error('Không tìm thấy email để đặt lại mật khẩu.')
+    toast.error('Không tìm thấy email để đặt lại mật khẩu.', { autoClose: 5000, position: 'top-right' })
     return
   }
 
@@ -93,11 +93,11 @@ async function resetPassword() {
       repeatPassword: confirmPassword.value
     })
 
-    toast.success('Đặt lại mật khẩu thành công! Hãy đăng nhập lại.')
+    toast.success('Đặt lại mật khẩu thành công! Hãy đăng nhập lại.', { autoClose: 5000, position: 'top-right' })
     router.push({ name: 'login' })
   } catch (err) {
     console.error('Lỗi khi đặt lại mật khẩu:', err)
-    toast.error('Có lỗi xảy ra, vui lòng thử lại sau.')
+    toast.error('Có lỗi xảy ra, vui lòng thử lại sau.', { autoClose: 5000, position: 'top-right' })
   }
 }
 </script>

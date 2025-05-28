@@ -257,6 +257,7 @@
           <input
             type="date"
             id="checkIn"
+            :min="today"
             v-model="checkInDate"
             class="border rounded px-3 py-2"
           />
@@ -273,6 +274,7 @@
             type="date"
             id="checkOut"
             v-model="checkOutDate"
+            :min="checkInDate || today"
             class="border rounded px-3 py-2"
           />
         </div>
@@ -434,24 +436,30 @@
         </div>
       </div>
     </div>
-    <BookingModal
+    <!-- <BookingModal
       :show="showBooking"
       :room="selectedRoom"
       :hotel="hotel"
       @close="showBooking = false"
       :roomType="selectedRoomType"
+    /> -->
+    <BookingModal
+      :show="showBooking"
+      :room="selectedRoom"
+      :hotel="hotel"
+      :roomType="selectedRoomType"
+      @close="showBooking = false"
     />
-    <!-- <ListRoom /> -->
-    <!-- <BookingModal v-if="showBookingModal" :show="showBookingModal" @close="showBookingModal = false" /> -->
+
     <router-link
       :to="{ name: 'HotelReview', params: { id: hotelId } }"
       class="inline-block"
     >
-      <button
+      <!-- <button
         class="px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold rounded-lg shadow hover:scale-105 hover:shadow-lg transition-transform duration-200"
       >
         Đánh Giá
-      </button>
+      </button> -->
     </router-link>
     <router-view />
   </div>
@@ -464,7 +472,7 @@ import { getHotelByIdApi } from '@/services/home'
 import { getHotelListApi, getCommentPublicApi } from '@/services/home'
 import { useRouter } from 'vue-router'
 import BookingModal from '@/pages/hotel/BookingModal.vue'
-  import {BASE_URL} from '@/utils/imageHelper'
+import { BASE_URL } from '@/utils/imageHelper'
 const route = useRoute()
 const hotel = ref(null)
 const hotelList = ref([])
@@ -483,11 +491,11 @@ const checkLogin = (room, roomType) => {
   }
   openBooking(room, roomType) // Gọi hàm openBooking nếu đã đăng nhập
 }
+const today = new Date().toISOString().split('T')[0]
 
 const fetchComments = async () => {
   try {
     comments.value = await getCommentPublicApi(hotelId)
-    console.log('comment', comments)
   } catch (error) {
     console.error('Lỗi khi lấy comment:', error)
   }
@@ -498,15 +506,13 @@ onMounted(() => {
 })
 const checkInDate = ref('')
 const checkOutDate = ref('')
-console.log('Init dates:', checkInDate.value, checkOutDate.value)
 // 1. Load trước data hotel (không filter)
 onMounted(async () => {
   const hotelId = Number(route.params.id)
   try {
     hotel.value = await getHotelByIdApi(hotelId, '', '')
-    console.log('Đã load hotel:', hotel.value)
   } catch (e) {
-    console.error('Lỗi load hotel ban đầu:', e)
+   void e
   }
 })
 // 2. Hàm gọi lại API khi filter
@@ -526,7 +532,7 @@ const filterRooms = async () => {
   try {
     // Gọi API với 2 param ngày
     hotel.value = await getHotelByIdApi(id, checkInDate.value, checkOutDate.value)
-    console.log('Kết quả filter:', hotel.value)
+
   } catch (error) {
     console.error('Lỗi khi lọc phòng:', error)
   }
@@ -535,9 +541,7 @@ const fetchHotelList = async () => {
   try {
     const response = await getHotelListApi()
     hotelList.value = response.content
-    console.log('list', hotelList.value)
 
-    console.log('Hotel list response:', response.content)
   } catch (error) {
     console.error('Error fetching hotel list:', error)
   }
@@ -552,13 +556,7 @@ const selectedRoom = ref(null)
 
 const openBooking = (room, roomType) => {
   selectedRoom.value = room
-  selectedRoomType.value = roomType // nếu bạn muốn lưu thêm loại phòng
-  console.log('Room day du:', selectedRoom.value)
-  console.log('Room:', selectedRoom.value.id_room)
-  console.log('RoomType ID:', roomType.room_type_id)
-  console.log('RoomType day du:', roomType)
-  console.log('RoomType ID:', roomType.room_type_id)
-
+  selectedRoomType.value = roomType 
   showBooking.value = true
 }
 onMounted(() => {

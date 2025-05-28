@@ -64,15 +64,10 @@ const submitReply = (index: number) => {
     commentData.value[index].reply = replyContent.value.trim()
     showReplyForm.value = null
     replyContent.value = ''
-
-    console.log('Câu trả lời đã được gửi:', commentData.value[index].reply)
-  } else {
-    console.log('Câu trả lời không được để trống')
-  }
+  } 
 }
 
 const hideComment = (index: number) => {
   commentData.value.splice(index, 1)
-  console.log('Đã ẩn bình luận tại index:', index)
 }
 </script>

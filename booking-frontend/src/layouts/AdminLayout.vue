@@ -2,11 +2,6 @@
   <div class="flex h-screen overflow-hidden">
     <!-- Sidebar -->
     <aside class="bg-gray-800 text-white w-1/5 flex flex-col">
-      <!-- <RouterLink to="/" class="flex items-center gap-2 px-4 py-6 text-xl font-bold uppercase">
-        <Icon icon="si:home-line" width="30" height="30" />
-        Admin
-      </RouterLink> -->
-
       <nav class="flex-1 px-2 space-y-1 mt-6">
         <router-link to="/admin/manage-providers"
           class="flex items-center gap-2 px-4 py-3 rounded-lg transition-colors duration-300 hover:bg-blue-600"

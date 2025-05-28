@@ -97,11 +97,10 @@ const selectedRoomTypeId = ref<number | null>(null)
 const fetchRoomTypes = async () => {
   try {
     const res = await getRoomTypesApi(currentPage.value, size.value)
-    console.log('===>ne', res)
     roomTypes.value = res.content
     totalElements.value = res.page.totalElements
   } catch (err) {
-    toast.error('Lỗi tải dữ liệu loại phòng')
+    toast.error('Lỗi tải dữ liệu loại phòng', { autoClose: 5000, position: 'top-right' })
   }
 }
 
@@ -138,10 +137,10 @@ const confirmDelete = async () => {
   if (selectedRoomTypeId.value !== null) {
     try {
       await deleteRoomTypeApi(selectedRoomTypeId.value)
-      toast.success('Xóa loại phòng thành công!')
+      toast.success('Xóa loại phòng thành công!', { autoClose: 5000, position: 'top-right' })
       fetchRoomTypes()
     } catch (err) {
-      toast.error('Xóa thất bại!')
+      toast.error('Xóa thất bại!', { autoClose: 5000, position: 'top-right' })
     } finally {
       showDeleteConfirm.value = false
     }

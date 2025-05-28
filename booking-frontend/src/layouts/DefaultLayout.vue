@@ -14,8 +14,6 @@ function toggleChat() {
 
 const sendChat = async () => {
   if (!chatMessage.value.trim()) return
-
-  // Thêm tin nhắn người dùng vào lịch sử
   chatHistory.value.push({ from: 'user', message: chatMessage.value })
 
   const currentMessage = chatMessage.value
@@ -36,6 +34,7 @@ const sendChat = async () => {
     <Header class="header" />
     <div class="content">
       <slot />
+
       <!-- Nút bật chat -->
       <div class="fixed bottom-6 right-6 z-50">
         <button @click="toggleChat"
@@ -59,9 +58,9 @@ const sendChat = async () => {
           <div class="flex-1 overflow-y-auto space-y-3 px-4 py-3 text-sm bg-gray-50 scroll-smooth max-h-[400px]">
             <div v-for="(msg, index) in chatHistory" :key="index"
               :class="msg.from === 'user' ? 'flex justify-end' : 'flex justify-start'">
-              <div :class="msg.from === 'user' ? 'bg-blue-100 text-blue-800' : 'bg-gray-200 text-gray-800'"
+              <div v-html="msg.message.replace(/\n/g, '<br>')"
+                :class="msg.from === 'user' ? 'bg-blue-100 text-blue-800' : 'bg-gray-200 text-gray-800'"
                 class="px-4 py-2 rounded-2xl max-w-[75%] leading-relaxed break-words shadow-sm text-sm">
-                {{ msg.message }}
               </div>
             </div>
           </div>
@@ -78,8 +77,6 @@ const sendChat = async () => {
           </div>
         </div>
       </transition>
-
-
     </div>
     <Footer class="footer" />
   </div>

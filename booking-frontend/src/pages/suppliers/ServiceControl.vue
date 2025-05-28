@@ -190,7 +190,6 @@ const fetchServices = async () => {
     const response = await getServiceListApi(currentPage.value, size.value)
     services.value = response.content
     totalElements.value = response.page.totalElements
-    console.log('Danh sách dịch vụ:', services.value)
   } catch (error) {
     console.error('Lỗi khi tải danh sách dịch vụ:', error)
     toast.error('Lỗi tải danh sách dịch vụ')

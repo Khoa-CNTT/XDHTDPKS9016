@@ -81,7 +81,7 @@ const fetchHotelInfo = async () => {
     }
   } catch (error) {
     console.error('Lỗi khi lấy thông tin khách sạn:', error)
-    toast.error('Lỗi khi tải thông tin khách sạn')
+    toast.error('Lỗi khi tải thông tin khách sạn', { autoClose: 5000, position: 'top-right' })
   }
 }
 
