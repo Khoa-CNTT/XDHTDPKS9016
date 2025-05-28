@@ -29,9 +29,6 @@ public class RoomManagementController {
     @Autowired
     private IRoomManagementService roomManagementService;
 
-    /**
-     * Lấy thông tin quản lý phòng theo khách sạn
-     */
     @GetMapping("/hotel/{hotelId}")
     public ResponseEntity<?> getRoomManagementByHotel(@PathVariable Long hotelId) {
         logger.info("Request to get room management for hotel ID: {}", hotelId);
@@ -47,9 +44,6 @@ public class RoomManagementController {
         }
     }
 
-    /**
-     * Lấy thông tin quản lý phòng theo khách sạn và khoảng thời gian
-     */
     @GetMapping("/hotel/{hotelId}/availability")
     public ResponseEntity<?> getRoomManagementWithDateRange(
             @PathVariable Long hotelId,
@@ -71,9 +65,6 @@ public class RoomManagementController {
         }
     }
 
-    /**
-     * Tạo loại phòng mới
-     */
     @PostMapping("/room-type")
     public ResponseEntity<?> createRoomType(@Valid @RequestBody CreateRoomTypeRequest request) {
         logger.info("Request to create new room type for hotel ID: {}", request.getHotelId());
@@ -94,9 +85,6 @@ public class RoomManagementController {
         }
     }
 
-    /**
-     * Tạo phòng mới cho một loại phòng
-     */
     @PostMapping("/room")
     public ResponseEntity<?> createRoom(@Valid @RequestBody CreateRoomRequest request) {
         logger.info("Request to create new room for room type ID: {}", request.getRoomTypeId());
@@ -119,15 +107,11 @@ public class RoomManagementController {
         }
     }
 
-    /**
-     * Tạo loại phòng mới cho khách sạn với ID cụ thể (đơn giản hóa quy trình API)
-     */
     @PostMapping("/hotel/{hotelId}/room-type")
     public ResponseEntity<?> createRoomTypeForHotel(
             @PathVariable Long hotelId,
             @Valid @RequestBody CreateRoomTypeRequest request) {
 
-        // Đảm bảo hotelId trong path và request trùng khớp
         request.setHotelId(hotelId);
         logger.info("Request to create new room type for hotel ID (path): {}", hotelId);
 

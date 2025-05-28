@@ -45,13 +45,13 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-                .cors(Customizer.withDefaults()) // Cần có dòng này
+                .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> {
                     request
                             .requestMatchers(apiPrefix + "/**").permitAll()
                             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                            .anyRequest().authenticated(); // các request còn lại phải xác thực
+                            .anyRequest().authenticated();
                 });
 
         httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> jwtConfigurer
@@ -75,31 +75,22 @@ public class SecurityConfig {
 
     @Bean
     public JwtDecoder jwtDecoder() {
-        // Tạo khóa bí mật với thuật toán HS512
         SecretKeySpec secretKeySpec = new SecretKeySpec(SIGNER_KEY.getBytes(), "HS512");
 
-        // Cấu hình và tạo JwtDecoder với khóa bí mật và thuật toán mã hóa
         return NimbusJwtDecoder
-                .withSecretKey(secretKeySpec) // Đặt khóa bí mật
-                .macAlgorithm(MacAlgorithm.HS512) // Chọn thuật toán HS512
-                .build(); // Xây dựng JwtDecoder
+                .withSecretKey(secretKeySpec)
+                .macAlgorithm(MacAlgorithm.HS512)
+                .build();
     }
-
-    // 401: chưa login
-    // 403: không có quyền truy cập
 
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
-        // Tạo JwtGrantedAuthoritiesConverter và đặt tiền tố quyền hạn
         JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
         jwtGrantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
         jwtGrantedAuthoritiesConverter.setAuthoritiesClaimName("sub");
-        // Tạo JwtAuthenticationConverter và thiết lập JwtGrantedAuthoritiesConverter
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
-        // jwtAuthenticationConverter.setPrincipalClaimName("accountId");
 
-        // Trả về JwtAuthenticationConverter cấu hình sẵn
         return jwtAuthenticationConverter;
     }
 

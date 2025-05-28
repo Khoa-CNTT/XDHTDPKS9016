@@ -15,13 +15,6 @@ import java.util.Optional;
 public interface IAccountRepository extends JpaRepository<Account, Integer> {
     Account findByUsername(String username);
 
-    // @Query(value = """
-    // SELECT r.role_name FROM role r JOIN role_account ra ON r.role_id = ra.role_id
-    // JOIN Account a ON ra.account_id = a.account_id
-    // WHERE a.username = :username
-    // """, nativeQuery = true)
-    // List<String> findRolesByUsername(@Param("username") String username);
-
     boolean existsByUsername(String username);
 
     Optional<Account> findByEmail(String email);

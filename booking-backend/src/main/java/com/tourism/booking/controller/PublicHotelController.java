@@ -42,7 +42,7 @@ public class PublicHotelController {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkOut
     ) {
         LocalDate ci = (checkIn != null) ? checkIn : LocalDate.now();
-        LocalDate co = (checkOut != null) ? checkOut : ci.plusDays(1); // mặc định ở lại 1 đêm
+        LocalDate co = (checkOut != null) ? checkOut : ci.plusDays(1);
 
         if (!ci.isBefore(co)) {
             throw new ApiException(ErrorCode.INVALID_DATE_RANGE);

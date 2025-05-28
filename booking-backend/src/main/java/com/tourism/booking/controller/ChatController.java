@@ -24,7 +24,7 @@ public class ChatController {
     public ResponseEntity<Map<String, Object>> chat(@RequestBody Map<String, String> request) {
         String userMessage = request.get("prompt");
         if (userMessage == null) {
-            userMessage = request.get("message"); // Fallback nếu client gửi key "message"
+            userMessage = request.get("message");
         }
 
         String response = geminiService.generateResponse(userMessage);

@@ -92,32 +92,27 @@ public class AuthenticationService implements IAuthenticationService {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                .subject(acc.getUsername()) // Đặt chủ thể (subject) của JWT là tên đăng nhập của người dùng
-                .issuer("sqc.com") // Đặt người phát hành JWT là "sqc.com"
-                .issueTime(new Date()) // Đặt thời gian phát hành JWT là thời điểm hiện tại
-                .expirationTime(new Date( // Đặt thời gian hết hạn cho JWT là 1 giờ kể từ lúc phát hành
+                .subject(acc.getUsername())
+                .issuer("sqc.com")
+                .issueTime(new Date())
+                .expirationTime(new Date(
                         Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()
                 ))
-                // Thêm một custom claim (thông tin tùy chỉnh) vào JWT, chứa thông tin về đối tượng Student
+
                 .claim("scope", getRoles(acc))
                 .claim("accountId", acc.getAccount_id())
                 .jwtID(UUID.randomUUID().toString())
-                .build(); // Xây dựng đối tượng JWTClaimsSet
+                .build();
 
-        // Tạo payload từ claims đã tạo, chuyển đối tượng claims thành định dạng JSON
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
 
-        // Tạo JWSObject từ header và payload, kết hợp chúng lại thành đối tượng JWS
         JWSObject jwsObject = new JWSObject(header, payload);
 
         try {
-            // Ký JWT bằng thuật toán HMAC SHA-512, sử dụng khóa bí mật (SIGNER_KEY)
             jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));
 
-            // Chuyển đối tượng JWS thành chuỗi JWT hoàn chỉnh (header.payload.signature) và trả về
             return jwsObject.serialize();
         } catch (JOSEException e) {
-            // Nếu có lỗi xảy ra trong quá trình ký JWT, ném ra ngoại lệ RuntimeException
             throw new RuntimeException(e);
         }
     }
@@ -130,19 +125,14 @@ public class AuthenticationService implements IAuthenticationService {
     }
 
     private SignedJWT verifyToken(String token) {
-        // Tạo một đối tượng JWSVerifier với thuật toán HMAC SHA-512 để xác minh chữ ký của JWT
         try {
-            // Tạo một đối tượng JWSVerifier với thuật toán HMAC SHA-512 để xác minh chữ ký của JWT
             JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
 
-            // Phân tích cú pháp (parse) chuỗi JWT thành đối tượng SignedJWT
             SignedJWT signedJWT = SignedJWT.parse(token);
 
-            // Lấy thời gian hết hạn của JWT từ phần claims (payload)
             Date expiryTime = signedJWT.getJWTClaimsSet().getExpirationTime();
             var verified = signedJWT.verify(verifier);
 
-            // Xác minh chữ ký của JWT, kiểm tra xem chữ ký có hợp lệ không
             if (!verified && expiryTime.after(new Date())) {
                 throw new JwtException("Invalid token");
             }

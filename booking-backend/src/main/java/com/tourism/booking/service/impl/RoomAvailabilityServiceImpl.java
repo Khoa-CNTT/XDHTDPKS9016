@@ -26,7 +26,6 @@ public class RoomAvailabilityServiceImpl implements IRoomAvailabilityService {
         public List<RoomAvailabilityResponseDTO> checkAvailability(RoomAvailabilityRequestDTO request) {
                 List<RoomAvailabilityResponseDTO> availabilityList = new ArrayList<>();
 
-                // If roomTypeId is provided, check only that room type
                 if (request.getRoomTypeId() != null) {
                         RoomType roomType = roomTypeRepository.findById(request.getRoomTypeId())
                                         .orElseThrow(() -> new RuntimeException(
@@ -44,7 +43,6 @@ public class RoomAvailabilityServiceImpl implements IRoomAvailabilityService {
                                 availabilityList.add(availability);
                         }
                 } else {
-                        // Check all room types
                         List<RoomType> allRoomTypes = roomTypeRepository.findAll();
 
                         for (RoomType roomType : allRoomTypes) {
@@ -80,7 +78,6 @@ public class RoomAvailabilityServiceImpl implements IRoomAvailabilityService {
                 dto.setAvailableRooms(availableCount);
                 dto.setCheckInDate(checkInDate);
                 dto.setCheckOutDate(checkOutDate);
-                // Add more fields as needed from roomType
                 return dto;
         }
 }

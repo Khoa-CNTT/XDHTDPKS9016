@@ -45,15 +45,9 @@ public class PaymentService implements IPaymentService {
 
     private static final Logger logger = LoggerFactory.getLogger(PaymentService.class);
 
-    /**
-     * Xử lý thanh toán
-     * Nghiệp vụ: Tạo bản ghi thanh toán khi người dùng thanh toán
-     */
     @Override
     public PaymentResponseDTO processPayment(PaymentRequestDTO request) {
         logger.info("Processing payment request: {}", request);
-
-        // Check existing payment
         if (request.getTransactionId() != null) {
             Payment existingPayment = paymentRepository.findByTransactionId(request.getTransactionId());
             if (existingPayment != null) {
@@ -61,7 +55,6 @@ public class PaymentService implements IPaymentService {
             }
         }
 
-        // Get bill
         Bill bill = null;
         if (request.getBillId() != null) {
             bill = billRepository.findById(request.getBillId()).get();
@@ -69,7 +62,6 @@ public class PaymentService implements IPaymentService {
             bill = billRepository.findByBookingId(request.getBookingId());
         }
 
-        // Create and save payment
         Payment payment = new Payment();
         payment.setAmount(request.getAmount());
         payment.setPayment_date(LocalDate.now());
@@ -80,8 +72,6 @@ public class PaymentService implements IPaymentService {
         payment.setBill(bill);
         payment.setBookingId(request.getBookingId());
         payment = paymentRepository.save(payment);
-
-        // Update booking status
         if (bill != null && bill.getBooking() != null) {
             bookingService.updateBookingStatus(bill.getBooking().getId_booking(), "PAID");
         }
@@ -96,7 +86,6 @@ public class PaymentService implements IPaymentService {
         bill.setPrint_time(LocalTime.now());
         bill.setVersion(0L);
 
-        // Calculate total amount from all booked rooms
         BigDecimal totalAmount = BigDecimal.ZERO;
         if (booking.getBookingRooms() != null && !booking.getBookingRooms().isEmpty()) {
             for (BookingRoom bookingRoom : booking.getBookingRooms()) {
@@ -119,13 +108,8 @@ public class PaymentService implements IPaymentService {
         return billRepository.saveAndFlush(bill);
     }
 
-    /**
-     * Xử lý thanh toán độc lập không liên kết với bill
-     * Được thiết kế để chạy trong một transaction riêng biệt
-     */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     protected PaymentResponseDTO processStandalonePayment(PaymentRequestDTO request) {
-        // Kiểm tra nếu payment đã tồn tại với transaction ID này
         if (request.getTransactionId() != null) {
             try {
                 Payment existingPayment = paymentRepository.findByTransactionId(request.getTransactionId());
@@ -136,11 +120,9 @@ public class PaymentService implements IPaymentService {
                 }
             } catch (Exception e) {
                 System.err.println("Error checking existing payment: " + e.getMessage());
-                // Tiếp tục tạo payment mới
             }
         }
 
-        // Tạo một payment độc lập
         Payment payment = new Payment();
         payment.setAmount(request.getAmount());
         payment.setPayment_date(LocalDate.now());
@@ -148,24 +130,16 @@ public class PaymentService implements IPaymentService {
         payment.setPayment_method(request.getPaymentMethod());
         payment.setTransaction_id(request.getTransactionId());
         payment.setStatus("PROCESSED");
-        // Không liên kết với bill
-
-        // Lưu payment
         try {
             payment = paymentRepository.saveAndFlush(payment);
             System.out.println("Standalone payment saved successfully with ID: " + payment.getPayment_id());
         } catch (Exception e) {
             System.err.println("Error saving standalone payment: " + e.getMessage());
-            // Trả về DTO tạm thời
             return createTempPaymentResponseDTO(request);
         }
 
         return convertToDTO(payment);
     }
-
-    /**
-     * Tạo một DTO tạm thời khi không lưu được payment
-     */
     private PaymentResponseDTO createTempPaymentResponseDTO(PaymentRequestDTO request) {
         PaymentResponseDTO tempDTO = new PaymentResponseDTO();
         tempDTO.setTransactionId(request.getTransactionId());
@@ -177,35 +151,21 @@ public class PaymentService implements IPaymentService {
         tempDTO.setAccountNumber(request.getTransactionId());
         return tempDTO;
     }
-
-    /**
-     * Xử lý thanh toán cho booking nằm trong luồng 3 bước
-     * Nghiệp vụ: Tạo bản ghi thanh toán và hoàn tất booking
-     */
     @Override
     @Transactional
     public PaymentResponseDTO processPaymentWithBookingFinalization(PaymentRequestDTO request, Long bookingId,
             Principal principal) {
         bookingService.finalizeBooking(bookingId, principal);
-
-        // Sau đó xử lý thanh toán như bình thường
         return processPayment(request);
     }
 
-    /**
-     * Lấy danh sách tất cả thanh toán cho UI quản lý
-     * Nghiệp vụ: Hiển thị danh sách thanh toán cho quản lý
-     */
+
     @Override
     public Page<PaymentResponseDTO> getAllPayments(Long accountId, Pageable pageable) {
         Page<Payment> payments = paymentRepository.getHistoryPayment(accountId, pageable);
         return payments.map(this::convertToDetailedDTO);
     }
 
-    /**
-     * Lấy lịch sử thanh toán của một hóa đơn
-     * Nghiệp vụ: Hiển thị lịch sử thanh toán cho người dùng hoặc khách sạn
-     */
     @Override
     public List<PaymentResponseDTO> getPaymentsByBillId(Long billId) {
         List<Payment> payments = paymentRepository.findByBillId(billId);
@@ -213,23 +173,13 @@ public class PaymentService implements IPaymentService {
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
-
-    /**
-     * Cập nhật trạng thái thanh toán
-     * Nghiệp vụ: Xác nhận hoặc huỷ thanh toán
-     */
     @Override
     @Transactional
     public PaymentResponseDTO updatePaymentStatus(Long paymentId, String status) {
         Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy thanh toán với ID: " + paymentId));
-
-        // Cập nhật trạng thái
         payment.setStatus(status);
-        // Lưu lại payment
         payment = paymentRepository.save(payment);
-
-        // Nếu xác nhận thanh toán, kiểm tra và cập nhật trạng thái booking nếu cần
         if ("COMPLETED".equals(status)) {
             Bill bill = payment.getBill();
             if (isFullyPaid(bill.getBooking().getId_booking())) {
@@ -239,14 +189,8 @@ public class PaymentService implements IPaymentService {
 
         return convertToDetailedDTO(payment);
     }
-
-    /**
-     * Kiểm tra xem booking đã thanh toán đủ chưa
-     * Nghiệp vụ: Kiểm tra tình trạng thanh toán của booking
-     */
     @Override
     public boolean isFullyPaid(Long bookingId) {
-        // Lấy tổng số tiền cần thanh toán
         Bill bill = billRepository.findByBookingId(bookingId);
         if (bill == null) {
             return false;
@@ -254,19 +198,13 @@ public class PaymentService implements IPaymentService {
 
         BigDecimal totalAmount = bill.getTotal_amount();
 
-        // Lấy tổng số tiền đã thanh toán
         BigDecimal paidAmount = paymentRepository.getTotalPaidAmountByBillId(bill.getBill_id());
         if (paidAmount == null) {
             paidAmount = BigDecimal.ZERO;
         }
-
-        // So sánh
         return paidAmount.compareTo(totalAmount) >= 0;
     }
 
-    /**
-     * Chuyển đổi từ Entity sang DTO
-     */
     private PaymentResponseDTO convertToDTO(Payment payment) {
         PaymentResponseDTO dto = new PaymentResponseDTO();
         dto.setPaymentId(payment.getPayment_id());
@@ -277,11 +215,10 @@ public class PaymentService implements IPaymentService {
         dto.setPaymentMethod(payment.getPayment_method());
         dto.setTransactionId(payment.getTransaction_id());
 
-        // Kiểm tra null trước khi truy cập
         if (payment.getBill() != null) {
             dto.setBillId(payment.getBill().getBill_id());
         } else {
-            // Nếu không có bill, đặt billId thành null
+
             dto.setBillId(null);
         }
 
@@ -289,17 +226,13 @@ public class PaymentService implements IPaymentService {
         return dto;
     }
 
-    /**
-     * Chuyển đổi từ Entity sang DTO chi tiết cho UI quản lý
-     */
+
     private PaymentResponseDTO convertToDetailedDTO(Payment payment) {
         PaymentResponseDTO dto = convertToDTO(payment);
 
-        // Thêm thông tin chi tiết cho UI nếu có bill
         if (payment.getBill() != null && payment.getBill().getBooking() != null) {
             Booking booking = payment.getBill().getBooking();
 
-            // Xác định tên khách hàng từ booking hoặc user profile
             String customerName = null;
             if (booking.getContact_name() != null && !booking.getContact_name().isEmpty()) {
                 customerName = booking.getContact_name();
@@ -314,7 +247,6 @@ public class PaymentService implements IPaymentService {
             dto.setCustomerName("Unknown Customer");
         }
 
-        // Sử dụng transaction ID thay cho số tài khoản
         dto.setAccountNumber(payment.getTransaction_id());
 
         return dto;

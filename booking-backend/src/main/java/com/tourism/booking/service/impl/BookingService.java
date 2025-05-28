@@ -91,12 +91,9 @@ public class BookingService implements IBookingService {
 
     @Override
     public BookingResponseDTO getBookingById(Long id) {
-        // First check in temporary storage
         if (temporaryBookings.containsKey(id)) {
             return temporaryBookings.get(id);
         }
-
-        // If not found in temporary storage, check database
         Booking booking = getBookingEntityById(id);
         return convertToResponseDTO(booking);
     }
@@ -119,7 +116,6 @@ public class BookingService implements IBookingService {
             String status) {
         List<Booking> bookings;
 
-        // Filter logic based on provided parameters
         if (status != null && !status.isEmpty()) {
             if (checkInFrom != null && checkInTo != null && checkOutFrom != null && checkOutTo != null) {
                 bookings = bookingRepository.findByStatusAndDateRange(
@@ -164,7 +160,6 @@ public class BookingService implements IBookingService {
 
             setUserInformation(bookingResponse, user.getUser_id());
 
-            // Calculate prices and set room/service information
             calculatePricesAndSetInfo(bookingResponse, request);
 
             temporaryBookings.put(bookingResponse.getBookingId(), bookingResponse);
@@ -190,7 +185,6 @@ public class BookingService implements IBookingService {
         }
 
         try {
-            // Update contact information
             booking.setContactName(contactInfo.getContactName());
             booking.setContactEmail(contactInfo.getContactEmail());
             booking.setContactPhone(contactInfo.getContactPhone());
@@ -198,7 +192,6 @@ public class BookingService implements IBookingService {
             booking.setSpecialRequests(contactInfo.getSpecialRequests());
             booking.setStatus("PAID");
 
-            // Update in temporary storage
             temporaryBookings.put(contactInfo.getBookingId(), booking);
 
             logger.info("Contact info updated for booking: {}", contactInfo.getBookingId());
@@ -258,14 +251,11 @@ public class BookingService implements IBookingService {
             if (tempBooking == null || originalRequest == null) {
                 throw new EntityNotFoundException("Booking not found in temporary storage with id: " + bookingId);
             }
-
-            // 1. Create and save booking entity first
             Booking booking = createBookingEntity(tempBooking, originalRequest, principal);
-            booking.setVersion(0L); // Initialize version for optimistic locking
+            booking.setVersion(0L);
             booking = bookingRepository.saveAndFlush(booking);
             logger.info("Booking entity saved with ID: {}", booking.getId_booking());
 
-            // 2. Create bill with the correct booking reference
             Bill bill = new Bill();
             bill.setBooking(booking);
             bill.setTotal_amount(tempBooking.getBill().getTotal());
@@ -274,13 +264,11 @@ public class BookingService implements IBookingService {
             bill.setPrint_time(LocalTime.now());
             bill.setVersion(0L);
 
-            // Save bill and handle potential optimistic locking exceptions
             try {
                 bill = billRepository.saveAndFlush(bill);
                 logger.info("Bill created successfully with ID: {}", bill.getBill_id());
             } catch (Exception e) {
                 logger.error("Error saving bill: {}", e.getMessage());
-                // If bill already exists, try to get and update it
                 Bill existingBill = billRepository.findByBookingId(booking.getId_booking());
                 if (existingBill != null) {
                     existingBill.setTotal_amount(bill.getTotal_amount());
@@ -294,12 +282,10 @@ public class BookingService implements IBookingService {
                 }
             }
 
-            // 3. Clean up temporary storage
             temporaryBookings.remove(bookingId);
             temporaryRequests.remove(bookingId);
             logger.info("Temporary storage cleaned up for booking: {}", bookingId);
 
-            // 4. Return response with complete booking information
             BookingResponseDTO response = convertToResponseDTO(booking);
             logger.info("Booking finalized successfully: {}", bookingId);
             return response;
@@ -337,7 +323,6 @@ public class BookingService implements IBookingService {
 
         booking = bookingRepository.save(booking);
 
-        // Process room selections - FIXED to use correct numberOfRooms
         for (RoomSelectionDTO roomSelection : bookingRequest.getRoomSelections()) {
             RoomType roomType = roomTypeRepository.findById(roomSelection.getRoomTypeId())
                     .orElseThrow(
@@ -347,16 +332,15 @@ public class BookingService implements IBookingService {
                     roomType.getRoom_type_id(),
                     bookingRequest.getCheckInDate(),
                     bookingRequest.getCheckOutDate(),
-                    1); // Just need one room of this type
+                    1);
 
             if (availableRooms.isEmpty()) {
                 throw new RuntimeException("Not enough rooms available");
             }
 
-            // Create a single booking_room entry with the correct numberOfRooms
             BookingRoom bookingRoom = new BookingRoom();
             bookingRoom.setBooking(booking);
-            bookingRoom.setRoom(availableRooms.get(0)); // Use the first available room
+            bookingRoom.setRoom(availableRooms.get(0));
             bookingRoom.setRoomTypeId(roomType.getRoom_type_id());
             bookingRoom.setNumberOfRooms(availableRooms.get(0).getNumber_rooms());
 
@@ -381,16 +365,13 @@ public class BookingService implements IBookingService {
         int numberOfDays = calculateNumberOfDays(request.getCheckInDate(), request.getCheckOutDate());
         List<BookedRoomDTO> bookedRooms = new ArrayList<>();
 
-        // Process room selections
         if (request.getRoomSelections() != null && !request.getRoomSelections().isEmpty()) {
             for (RoomSelectionDTO roomSelection : request.getRoomSelections()) {
                 try {
-                    // Get room information
                     Room room = roomRepository.findById(roomSelection.getRoomId())
                             .orElseThrow(() -> new EntityNotFoundException(
                                     "Room not found: " + roomSelection.getRoomId()));
 
-                    // Verify room type matches
                     if (!room.getRoom_type().getRoom_type_id().equals(roomSelection.getRoomTypeId())) {
                         throw new EntityNotFoundException(
                                 "Room " + roomSelection.getRoomId() + " does not belong to room type "
@@ -407,33 +388,27 @@ public class BookingService implements IBookingService {
                                 "Room " + roomSelection.getRoomId() + " is not available for the selected dates");
                     }
 
-                    // Calculate room price
                     BigDecimal roomPrice = room.getPrice();
                     totalRoomPrice = totalRoomPrice.add(roomPrice);
 
-                    // Create room DTO for response
                     BookedRoomDTO bookedRoomDTO = new BookedRoomDTO();
                     bookedRoomDTO.setRoomId(room.getId_room());
                     bookedRoomDTO.setRoomTypeId(room.getRoom_type().getRoom_type_id());
                     bookedRoomDTO.setRoomTypeName(room.getRoom_type().getType_name());
-                    bookedRoomDTO.setNumberOfRooms(room.getNumber_rooms()); // Set default to 1 since we're booking
-                                                                            // specific rooms
+                    bookedRoomDTO.setNumberOfRooms(room.getNumber_rooms());
                     bookedRoomDTO.setNumberBeds(room.getNumber_bed());
                     bookedRoomDTO.setPricePerRoom(roomPrice);
                     bookedRoomDTO.setTotalPrice(roomPrice);
 
                     bookedRooms.add(bookedRoomDTO);
 
-                    // Log details for debugging
                     logger.info("Room calculation for type {}: roomId={}, price={}, totalPrice={}, numberOfRooms={}",
                             room.getRoom_type().getType_name(), room.getId_room(), roomPrice, roomPrice, 1);
 
-                    // Set room type for the booking (using the first room type if multiple)
                     if (booking.getRoomType() == null) {
                         RoomTypeDTO roomTypeDTO = convertToRoomTypeDTO(room.getRoom_type());
                         booking.setRoomType(roomTypeDTO);
 
-                        // Set hotel information
                         if (room.getRoom_type().getHotel() != null) {
                             HotelDTO hotelDTO = convertToHotelDTO(room.getRoom_type().getHotel());
                             booking.setHotel(hotelDTO);
@@ -446,20 +421,16 @@ public class BookingService implements IBookingService {
             }
         }
 
-        // Set the booked rooms
         booking.setRooms(bookedRooms);
 
-        // Process services
         BigDecimal serviceTotal = BigDecimal.ZERO;
         if (request.getServiceIds() != null && !request.getServiceIds().isEmpty()) {
             Set<Long> serviceSet = new HashSet<>(request.getServiceIds());
             serviceTotal = calculateServicesTotal(booking, serviceSet);
         }
 
-        // Set bill information with totalRoomPrice
         setBillInformation(booking, totalRoomPrice, serviceTotal, numberOfDays);
 
-        // Log summary
         logger.info("Final calculation summary:");
         logger.info("- Total room price per day: {}", totalRoomPrice);
         logger.info("- Number of days: {}", numberOfDays);
@@ -489,12 +460,10 @@ public class BookingService implements IBookingService {
         }
     }
 
-    // Helper method to generate temporary booking ID
     private Long generateTemporaryBookingId() {
         return tempBookingIdCounter++;
     }
 
-    // Helper method to convert Booking entity to BookingResponseDTO
     private BookingResponseDTO convertToResponseDTO(Booking booking) {
         if (booking == null)
             return null;
@@ -513,7 +482,6 @@ public class BookingService implements IBookingService {
         dto.setContactAddress(booking.getContact_address());
         dto.setSpecialRequests(booking.getSpecial_requests());
 
-        // Create list of booked rooms from BookingRoom entities
         List<BookedRoomDTO> bookedRooms = new ArrayList<>();
         BigDecimal totalAmount = BigDecimal.ZERO;
 
@@ -523,7 +491,6 @@ public class BookingService implements IBookingService {
                 if (room != null && room.getRoom_type() != null) {
                     RoomType roomType = room.getRoom_type();
 
-                    // Create BookedRoomDTO
                     BookedRoomDTO bookedRoomDTO = new BookedRoomDTO();
                     bookedRoomDTO.setRoomId(room.getId_room());
                     bookedRoomDTO.setRoomTypeId(roomType.getRoom_type_id());
@@ -532,18 +499,14 @@ public class BookingService implements IBookingService {
                     bookedRoomDTO.setNumberBeds(room.getNumber_bed());
                     bookedRoomDTO.setPricePerRoom(room.getPrice());
 
-                    // Calculate total price for this room
                     BigDecimal roomTotal = room.getPrice()
                             .multiply(BigDecimal.valueOf(bookingRoom.getNumberOfRooms()));
                     bookedRoomDTO.setTotalPrice(roomTotal);
 
-                    // Add to total amount
                     totalAmount = totalAmount.add(roomTotal);
 
-                    // Add to rooms list
                     bookedRooms.add(bookedRoomDTO);
 
-                    // Set room type and hotel info from first room
                     if (dto.getRoomType() == null) {
                         RoomTypeDTO roomTypeDTO = convertToRoomTypeDTO(roomType);
                         dto.setRoomType(roomTypeDTO);
@@ -556,12 +519,9 @@ public class BookingService implements IBookingService {
                 }
             }
         }
-
-        // Set the rooms list in the DTO
         dto.setRooms(bookedRooms);
         dto.setTotalAmount(totalAmount);
 
-        // Add services information
         Set<Services> bookingServices = getServicesByBookingId(booking.getId_booking());
         if (bookingServices != null && !bookingServices.isEmpty()) {
             Set<ServiceDTO> serviceDTOs = bookingServices.stream()
@@ -570,7 +530,6 @@ public class BookingService implements IBookingService {
             dto.setServices(serviceDTOs);
         }
 
-        // Add bill information
         Bill bill = billRepository.findByBookingId(booking.getId_booking());
         if (bill != null) {
             BillDTO billDTO = new BillDTO();
@@ -578,7 +537,6 @@ public class BookingService implements IBookingService {
             billDTO.setTotal(bill.getTotal_amount());
             billDTO.setDeposit(bill.getDeposit());
 
-            // Calculate service total from actual services
             BigDecimal serviceTotal = BigDecimal.ZERO;
             if (bookingServices != null) {
                 serviceTotal = bookingServices.stream()
@@ -587,12 +545,10 @@ public class BookingService implements IBookingService {
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
             }
             billDTO.setServiceTotal(serviceTotal);
-
-            // Room total is the difference between total and service total
             BigDecimal roomTotal = bill.getTotal_amount().subtract(serviceTotal);
             billDTO.setRoomTotal(roomTotal);
 
-            // Calculate number of days
+
             if (booking.getCheck_in_date() != null && booking.getCheck_out_date() != null) {
                 int days = (int) java.time.temporal.ChronoUnit.DAYS.between(
                         booking.getCheck_in_date(), booking.getCheck_out_date());
@@ -603,22 +559,20 @@ public class BookingService implements IBookingService {
 
             dto.setBill(billDTO);
         } else {
-            // Create a minimal bill with booking ID
+
             BillDTO billDTO = new BillDTO();
             billDTO.setBillId(booking.getId_booking());
             dto.setBill(billDTO);
         }
 
-        // Add user profile information if available
         if (booking.getUser_profile() != null) {
             try {
-                // Try to get UserProfileResponse from the service
                 Optional<UserProfileResponse> userProfileResponse = userProfileService
                         .findById(booking.getUser_profile().getUser_id());
                 if (userProfileResponse.isPresent()) {
                     dto.setUser(userProfileResponse.get());
                 } else {
-                    // If response not available, create a simple one from entity
+
                     UserProfileResponse userResponse = new UserProfileResponse();
                     userResponse.setUser_id(booking.getUser_profile().getUser_id());
                     userResponse.setFull_name(booking.getUser_profile().getFull_name());
@@ -627,12 +581,10 @@ public class BookingService implements IBookingService {
                     dto.setUser(userResponse);
                 }
             } catch (Exception e) {
-                // Log error but continue without user information
                 System.err.println("Error adding user information: " + e.getMessage());
             }
         }
 
-        // Set statusDisplay for UI
         switch (booking.getStatus()) {
             case "CONFIRMED":
                 dto.setStatusDisplay("Đã xác nhận");
@@ -653,8 +605,6 @@ public class BookingService implements IBookingService {
         return dto;
     }
 
-    // Helper method to convert List of Booking entities to List of
-    // BookingResponseDTOs
     private List<BookingResponseDTO> convertToResponseDTOList(List<Booking> bookings) {
         List<BookingResponseDTO> dtoList = new ArrayList<>();
         for (Booking booking : bookings) {
@@ -663,17 +613,14 @@ public class BookingService implements IBookingService {
         return dtoList;
     }
 
-    // Helper methods to convert entities to DTOs
     private RoomTypeDTO convertToRoomTypeDTO(RoomType roomType) {
         RoomTypeDTO dto = new RoomTypeDTO();
         dto.setId(roomType.getRoom_type_id());
         dto.setName(roomType.getType_name());
         dto.setDescription(roomType.getDescription());
 
-        // Get room price from associated room
         List<Room> rooms = roomRepository.findByRoomType(roomType);
         if (!rooms.isEmpty()) {
-            // Get min and max price
             BigDecimal minPrice = rooms.stream()
                     .map(Room::getPrice)
                     .filter(Objects::nonNull)
@@ -688,9 +635,8 @@ public class BookingService implements IBookingService {
 
             dto.setMinPrice(minPrice);
             dto.setMaxPrice(maxPrice);
-            dto.setPrice(minPrice); // Set default price as min price
+            dto.setPrice(minPrice);
 
-            // Set occupancy and room counts
             dto.setMaxOccupancy(rooms.stream()
                     .mapToInt(Room::getNumber_bed)
                     .max()
@@ -700,8 +646,6 @@ public class BookingService implements IBookingService {
             dto.setAvailableRoomCount((int) rooms.stream()
                     .filter(r -> "AVAILABLE".equals(r.getStatus()))
                     .count());
-
-            // Convert available rooms to RoomDTO objects
             List<RoomTypeDTO.RoomDTO> availableRooms = rooms.stream()
                     .filter(r -> "AVAILABLE".equals(r.getStatus()))
                     .map(room -> {
@@ -716,9 +660,7 @@ public class BookingService implements IBookingService {
             dto.setAvailableRooms(availableRooms);
         }
 
-        // Set average rating if available
-        // You may need to implement this based on your rating system
-        dto.setAverageRating(4.5); // Example value, implement actual rating calculation
+        dto.setAverageRating(4.5);
 
         return dto;
     }
@@ -731,7 +673,6 @@ public class BookingService implements IBookingService {
         dto.setPhone(hotel.getHotline());
         dto.setDescription(hotel.getDescription());
 
-        // Set email from account if available
         if (hotel.getAccount() != null) {
             dto.setEmail(hotel.getAccount().getEmail());
         }
@@ -777,7 +718,6 @@ public class BookingService implements IBookingService {
 
                 booking.setUser(userResponse);
             } else {
-                // Fallback to minimal user info
                 UserProfileResponse minimalUser = new UserProfileResponse();
                 minimalUser.setUser_id(userId);
                 minimalUser.setFull_name("User #" + userId);
@@ -793,7 +733,6 @@ public class BookingService implements IBookingService {
             Principal principal) {
         Booking booking = new Booking();
 
-        // Set basic booking info
         booking.setCheck_in_date(request.getCheckInDate());
         booking.setCheck_out_date(request.getCheckOutDate());
         booking.setCheck_in_time(request.getCheckInTime());
@@ -806,7 +745,6 @@ public class BookingService implements IBookingService {
         booking.setContact_address(tempBooking.getContactAddress());
         booking.setSpecial_requests(tempBooking.getSpecialRequests());
 
-        // Set user
         if (principal != null) {
             Account acc = accountService.getAccountByUsername(principal.getName());
             UserProfile user = userProfileService.findUserProfileByAccoutId(acc.getAccount_id())
@@ -816,30 +754,24 @@ public class BookingService implements IBookingService {
 
         booking = bookingRepository.save(booking);
 
-        // Handle rooms
         if (request.getRoomSelections() != null) {
             for (RoomSelectionDTO roomSelection : request.getRoomSelections()) {
                 try {
-                    // Get room and verify it exists
                     Room room = roomRepository.findById(roomSelection.getRoomId())
                             .orElseThrow(() -> new EntityNotFoundException(
                                     "Room not found: " + roomSelection.getRoomId()));
 
-                    // Verify room type matches
                     if (!room.getRoom_type().getRoom_type_id().equals(roomSelection.getRoomTypeId())) {
                         throw new EntityNotFoundException(
                                 "Room " + roomSelection.getRoomId() + " does not belong to room type "
                                         + roomSelection.getRoomTypeId());
                     }
 
-                    // Create BookingRoom
                     BookingRoom bookingRoom = new BookingRoom();
                     bookingRoom.setBooking(booking);
                     bookingRoom.setRoom(room);
                     bookingRoom.setRoomTypeId(room.getRoom_type().getRoom_type_id());
-                    bookingRoom.setNumberOfRooms(room.getNumber_rooms()); // Set default to 1 since we're booking
-                                                                          // specific rooms
-
+                    bookingRoom.setNumberOfRooms(room.getNumber_rooms());
                     booking.getBookingRooms().add(bookingRoom);
 
                     logger.info("Added room to booking: roomId={}, roomType={}, numberOfRooms={}",
@@ -850,7 +782,6 @@ public class BookingService implements IBookingService {
                 }
             }
         } else if (tempBooking.getRooms() != null && !tempBooking.getRooms().isEmpty()) {
-            // Fallback: Use room information from tempBooking if not in request
             for (BookedRoomDTO bookedRoom : tempBooking.getRooms()) {
                 try {
                     Room room = roomRepository.findById(bookedRoom.getRoomId())
@@ -861,8 +792,7 @@ public class BookingService implements IBookingService {
                     bookingRoom.setBooking(booking);
                     bookingRoom.setRoom(room);
                     bookingRoom.setRoomTypeId(bookedRoom.getRoomTypeId());
-                    bookingRoom.setNumberOfRooms(room.getNumber_rooms()); // Set default to 1 since we're booking
-                                                                          // specific rooms
+                    bookingRoom.setNumberOfRooms(room.getNumber_rooms());
 
                     booking.getBookingRooms().add(bookingRoom);
 
@@ -901,31 +831,23 @@ public class BookingService implements IBookingService {
             int numberOfDays) {
         BillDTO bill = new BillDTO();
 
-        // 1. Tính tổng tiền phòng = totalPrice (đã bao gồm số lượng phòng) * số ngày
         BigDecimal roomTotal = roomPrice.multiply(BigDecimal.valueOf(Math.max(1, numberOfDays)));
         bill.setRoomTotal(roomTotal);
 
-        // 2. Set tổng tiền dịch vụ
         bill.setServiceTotal(serviceTotal);
 
-        // 3. Tính tổng tiền = tổng tiền phòng + tổng tiền dịch vụ
         BigDecimal total = roomTotal.add(serviceTotal);
         bill.setTotal(total);
 
-        // 4. Set số ngày
         bill.setNumberOfDays(numberOfDays);
 
-        // 5. Tính tiền đặt cọc (30% tổng tiền)
         BigDecimal deposit = total.multiply(new BigDecimal("0.3"));
         bill.setDeposit(deposit);
 
-        // 6. Set ID cho bill
         bill.setBillId(generateTemporaryBookingId());
 
-        // 7. Set bill vào booking
         booking.setBill(bill);
 
-        // Log chi tiết để debug
         logger.info("Bill calculation details:");
         logger.info("- Number of days: {}", numberOfDays);
         logger.info("- Room price (already includes number of rooms): {}", roomPrice);
@@ -944,10 +866,8 @@ public class BookingService implements IBookingService {
 
     @Override
     public Set<Services> getServicesByBookingId(Long bookingId) {
-        // First check in temporary storage
         if (temporaryBookings.containsKey(bookingId)) {
             BookingResponseDTO tempBooking = temporaryBookings.get(bookingId);
-            // Add null check before accessing services
             if (tempBooking.getServices() == null) {
                 logger.info("No services found for booking ID: {}", bookingId);
                 return Collections.emptySet();
@@ -958,9 +878,7 @@ public class BookingService implements IBookingService {
                             .collect(Collectors.toSet()));
         }
 
-        // If not in temporary storage, check database
         Booking booking = getBookingEntityById(bookingId);
-        // Add null check for database services as well
         return booking.getServices() != null ? booking.getServices() : Collections.emptySet();
     }
 }

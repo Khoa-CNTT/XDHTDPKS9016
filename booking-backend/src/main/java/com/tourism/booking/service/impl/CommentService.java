@@ -45,31 +45,22 @@ public class CommentService implements ICommentService {
     @Override
     @Transactional
     public CommentResponse createComment(Long roomId, CommentRequest commentRequest, Principal principal) {
-        // Kiểm tra room tồn tại
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new EntityNotFoundException("Room not found with id: " + roomId));
 
-        // Lấy thông tin user
         Account acc = accountService.getAccountByUsername(principal.getName());
         UserProfile user = userProfileService.findUserProfileByAccoutId(acc.getAccount_id())
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
-
-        // Tạo comment mới
         Comment comment = new Comment();
         comment.setContent(commentRequest.getComment());
         comment.setComment_date(LocalDate.now());
         comment.setComment_time(LocalTime.now());
         comment.setUser_profile(user);
-
-        // Lưu comment
         Comment savedComment = commentRepository.save(comment);
-
-        // Tạo liên kết room_comment
         RoomComment roomComment = new RoomComment();
         roomComment.setRoom(room);
         roomComment.setComment(savedComment);
 
-        // Thêm vào danh sách của room và comment
         room.getRoomComments().add(roomComment);
         savedComment.getRoomComments().add(roomComment);
 
@@ -79,11 +70,9 @@ public class CommentService implements ICommentService {
     @Override
     @Transactional
     public CommentResponse updateComment(Long id, CommentRequest commentRequest, Principal principal) {
-        // Kiểm tra comment tồn tại
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Comment not found with id: " + id));
 
-        // Kiểm tra quyền chỉnh sửa
         Account acc = accountService.getAccountByUsername(principal.getName());
         UserProfile user = userProfileService.findUserProfileByAccoutId(acc.getAccount_id())
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
@@ -91,8 +80,6 @@ public class CommentService implements ICommentService {
         if (!comment.getUser_profile().getUser_id().equals(user.getUser_id())) {
             throw new RuntimeException("You don't have permission to update this comment");
         }
-
-        // Cập nhật comment
         comment.setContent(commentRequest.getComment());
         comment.setComment_date(LocalDate.now());
         comment.setComment_time(LocalTime.now());
@@ -104,11 +91,8 @@ public class CommentService implements ICommentService {
     @Override
     @Transactional
     public void deleteComment(Long id, Principal principal) {
-        // Kiểm tra comment tồn tại
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Comment not found with id: " + id));
-
-        // Kiểm tra quyền xóa
         Account acc = accountService.getAccountByUsername(principal.getName());
         UserProfile user = userProfileService.findUserProfileByAccoutId(acc.getAccount_id())
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));

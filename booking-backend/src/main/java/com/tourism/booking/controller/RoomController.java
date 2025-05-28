@@ -24,40 +24,24 @@ import java.util.Map;
 public class RoomController {
     IRoomService roomService;
 
-    /**
-     * API lấy chi tiết phòng theo ID
-     * Nghiệp vụ: Hiển thị chi tiết phòng cho người dùng
-     */
     @GetMapping("/{id}")
     public ResponseEntity<RoomDTO> getRoomById(@PathVariable Long id) {
         RoomDTO room = roomService.getRoomById(id);
         return ResponseEntity.ok(room);
     }
 
-    /**
-     * API lấy danh sách phòng theo khách sạn
-     * Nghiệp vụ: Hiển thị danh sách phòng của khách sạn
-     */
     @GetMapping("/hotel/{hotelId}")
     public ResponseEntity<List<RoomDTO>> getRoomsByHotelId(@PathVariable Long hotelId) {
         List<RoomDTO> rooms = roomService.getRoomsByHotelId(hotelId);
         return ResponseEntity.ok(rooms);
     }
 
-    /**
-     * API lấy danh sách phòng theo loại phòng
-     * Nghiệp vụ: Hiển thị danh sách phòng của một loại phòng
-     */
     @GetMapping("/roomtype/{roomTypeId}")
     public ResponseEntity<List<RoomDTO>> getRoomsByRoomTypeId(@PathVariable Long roomTypeId) {
         List<RoomDTO> rooms = roomService.getRoomsByRoomTypeId(roomTypeId);
         return ResponseEntity.ok(rooms);
     }
 
-    /**
-     * API lấy danh sách phòng có sẵn theo loại phòng và thời gian
-     * Nghiệp vụ: Tìm phòng còn trống cho việc đặt phòng
-     */
     @GetMapping("/available")
     public ResponseEntity<List<RoomDTO>> getAvailableRooms(
             @RequestParam Long roomTypeId,
@@ -66,11 +50,6 @@ public class RoomController {
         List<RoomDTO> rooms = roomService.getAvailableRooms(roomTypeId, checkInDate, checkOutDate);
         return ResponseEntity.ok(rooms);
     }
-
-    /**
-     * API cập nhật trạng thái phòng
-     * Nghiệp vụ: Quản lý đánh dấu phòng đang bảo trì, đang dọn dẹp, sẵn sàng
-     */
     @PutMapping("/{id}/status")
     public ResponseEntity<?> updateRoomStatus(
             @PathVariable Long id,

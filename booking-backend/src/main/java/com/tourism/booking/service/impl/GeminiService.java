@@ -23,15 +23,16 @@ public class GeminiService {
     }
 
     public String generateResponse(String userMessage) {
-        // Tạo context để AI hiểu được nó đang tư vấn về khách sạn
-        String prompt = "Bạn là trợ lý AI tư vấn về khách sạn và du lịch tại Việt Nam. " +
-                "Hãy trả lời câu hỏi sau một cách chi tiết và hữu ích. " +
-                "Chỉ liệt kê một vài lựa chọn nổi tiếng và phù hợp nhất, mỗi lựa chọn viết trên một dòng riêng biệt:\n" +
+        String prompt = "Bạn là trợ lý AI chuyên tư vấn du lịch tại Việt Nam. " +
+                "Hãy trả lời câu hỏi của người dùng một cách ngắn gọn, rõ ràng và đúng trọng tâm. " +
+                "Nếu người dùng hỏi về lịch trình, hãy chia theo từng ngày (ví dụ: Ngày 1, Ngày 2...), mỗi hoạt động bắt đầu bằng dấu '-'. " +
+                "Nếu người dùng hỏi về khách sạn, điểm tham quan, nhà hàng hoặc món ăn, hãy liệt kê từ 3 đến 5 lựa chọn nổi bật và phù hợp nhất, mỗi dòng bắt đầu bằng dấu '-'. " +
+                "Khi gợi ý món ăn, hãy ghi rõ tên món và địa chỉ quán hoặc khu vực nên ăn. " +
+                "Không cần viết lời chào, không giải thích lan man. Trả lời theo định dạng dễ đọc:\n- Tên địa điểm/món ăn: mô tả ngắn\n\n" +
                 userMessage;
 
 
         try {
-            // URL của API đã được cập nhật theo định dạng mới nhất
             String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + geminiApiKey;
 
             HttpHeaders headers = new HttpHeaders();
@@ -39,7 +40,6 @@ public class GeminiService {
 
             Map<String, Object> requestBody = new HashMap<>();
 
-            // Cấu trúc yêu cầu đã được cập nhật theo tài liệu mới nhất của Google
             Map<String, Object> contents = new HashMap<>();
             contents.put("role", "user");
 
@@ -55,7 +55,6 @@ public class GeminiService {
 
             requestBody.put("contents", contentsList);
 
-            // Thêm các tham số tùy chọn để cải thiện kết quả
             Map<String, Object> generationConfig = new HashMap<>();
             generationConfig.put("temperature", 0.7);
             generationConfig.put("maxOutputTokens", 1024);
@@ -72,7 +71,6 @@ public class GeminiService {
                     Map.class
             );
 
-            // Parse phản hồi theo cấu trúc mới nhất của API
             Map responseBody = responseEntity.getBody();
             if (responseBody != null) {
                 try {
