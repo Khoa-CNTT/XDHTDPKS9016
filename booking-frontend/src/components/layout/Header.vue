@@ -14,7 +14,6 @@ const toggleDropdown = () => {
   showDropdown.value = !showDropdown.value
 }
 
-// Đóng dropdown khi click bên ngoài
 const handleClickOutside = (e: Event) => {
   const dropdown = document.querySelector('.relative')
   if (dropdown && !dropdown.contains(e.target as Node)) {
@@ -27,24 +26,21 @@ const router = useRouter()
 const handleLogout = async () => {
   try {
     const token = localStorage.getItem('access_token')
-    console.log('Token lấy ra từ localStorage---------------------:', token)
     if (!token) {
       throw new Error('Không tìm thấy token trong localStorage')
     }
 
     await logoutApi({ token: token })
 
-    // Xóa token sau khi logout thành công
     localStorage.removeItem('access_token')
     toast.success('Đăng xuất thành công!', {
       autoClose: 3000,
       position: 'top-right',
     })
-    console.log('Đang chuyển hướng tới /login')
     router.push('/login')
     window.location.reload()
   } catch (error) {
-    console.error('Lỗi khi logout:', error)
+    void error
   }
 }
 onMounted(() => {
@@ -97,23 +93,15 @@ onMounted(() => {
           </RouterLink>
         </nav>
 
-        <!-- Avatar và các chức năng khi click vào avatar -->
+  
         <div v-if="authStore.getIsLoggedIn" class="relative" @click="toggleDropdown">
-          <!-- <div class="flex items-center space-x-3 cursor-pointer">
-            <img
-              :src="authStore.getUser?.avatar || 'https://i.pravatar.cc/300'"
-              alt="Avatar"
-              class="w-10 h-10 rounded-full border"
-            />
-            <span class="text-gray-700 text-lg">{{ authStore.getUser?.username }}</span>
-          </div> -->
+
           <div class="flex items-center space-x-3 cursor-pointer">
             <img :src="authStore.getUser?.avatar || '/assets/images/avatar.jpg'" alt="Avatar"
               class="w-10 h-10 rounded-full border" />
 
             <span class="text-gray-700 text-lg">{{ authStore.getUser?.username }}</span>
           </div>
-
           <!-- Dropdown -->
           <div v-if="showDropdown"
             class="absolute right-0 mt-2 w-60 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
@@ -165,30 +153,30 @@ onMounted(() => {
   z-index: 1000;
 }
 
-/* Đảm bảo rằng font được áp dụng cho toàn bộ trang */
+
 body {
   font-family: 'Poppins', sans-serif;
 }
 
-/* Điều chỉnh các kiểu font chữ cụ thể cho các phần tử */
+
 header,
 .dropdown ul {
   font-family: 'Poppins', sans-serif;
 }
 
-/* Tăng kích thước chữ */
+
 .text-xl {
   font-size: 1.25rem;
-  /* Tăng cỡ chữ cho các phần tử */
+
 }
 
 .text-3xl {
   font-size: 1.875rem;
-  /* Tăng cỡ chữ cho tiêu đề */
+
 }
 
 .text-lg {
   font-size: 1.125rem;
-  /* Tăng cỡ chữ cho các phần tử text lớn */
+
 }
 </style>

@@ -152,9 +152,8 @@ const fetchHotelList = async () => {
   try {
     const response = await getHotelListApi()
     hotelList.value = response.content
-    console.log('Hotel list response:', response.content)
   } catch (error) {
-    console.error('Error fetching hotel list:', error)
+    void error
   }
 }
 
@@ -177,9 +176,7 @@ watch(location, (newVal) => {
   debounceTimer = setTimeout(async () => {
     try {
       const response = await searchHotelsApi(newVal.trim())
-      // Nếu API trả về response.content thì dùng response.content
       searchResults.value = response.content || response || []
-      console.log('Search API response:', searchResults.value)
     } catch (error) {
       console.error('Lỗi khi tìm kiếm khách sạn:', error)
     }
@@ -196,16 +193,13 @@ const handleSearch = async () => {
 
   try {
     const response = await searchHotelsApi(query)
-    console.log('Search API response:', response)
     searchResults.value = response.content || response || []
-    console.log('Search API response:', searchResults.value)
   } catch (error) {
     console.error('Lỗi khi tìm kiếm khách sạn:', error)
   }
 }
 
 const viewHotelDetail = (hotelId) => {
-  console.log('Hotel ID clicked:', hotelId)
   router.push({ name: 'HotelDetail', params: { id: hotelId } })
 }
 

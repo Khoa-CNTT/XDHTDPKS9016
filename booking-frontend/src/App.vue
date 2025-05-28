@@ -28,7 +28,6 @@ const openConfirm = async () => {
     title: 'Are you sure?',
     question: 'Do you really want to delete this item?',
   })
-  console.log('result', result)
 }
 </script>
 

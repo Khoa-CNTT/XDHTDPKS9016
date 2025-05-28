@@ -62,7 +62,6 @@ const form = ref<RoomTypeDetail>({
   available_room: 0
 })
 
-// ✅ Hàm upload ảnh và lưu URL
 const previewImage = ref<string | null>(null)
 
 const handleFileUpload = async (event: Event) => {
@@ -74,9 +73,8 @@ const handleFileUpload = async (event: Event) => {
       const baseUrl = 'http://localhost:8080'
       previewImage.value = baseUrl + uploadedFilename
       form.value.room_image = uploadedFilename
-      console.log('URL hiển thị ảnh:', previewImage.value)
     } catch (error) {
-      console.error('Lỗi upload ảnh:', error)
+      void error
     }
   }
 }
@@ -89,10 +87,7 @@ import { toast } from 'vue3-toastify'
 
 const submit = async () => {
   try {
-    console.log('Dữ liệu gửi lên:', form.value)
     const res = await createRoomTypeApi(form.value)
-    console.log('hihi', res)
-
     toast.success('Tạo loại phòng thành công!', {
       autoClose: 5000,
       position: 'top-right'

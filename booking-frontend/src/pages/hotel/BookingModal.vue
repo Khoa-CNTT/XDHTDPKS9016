@@ -231,12 +231,7 @@
 import { ref, watch, onMounted } from 'vue'
 import { initializeBookingApi, contactInfoPaymentApi } from '@/services/booking'
 import { toast } from 'vue3-toastify'
-// const props = defineProps({
-//   show: Boolean,
-//   room: Object,
-//   hotel: Object,
-//   roomType: Object,
-// })
+
 const props = defineProps({
   show: Boolean,
   room: Object,
@@ -244,7 +239,6 @@ const props = defineProps({
   roomType: Object,
 })
 
-console.log(props.room)
 watch(
   () => props.room,
   (newRoom) => {
@@ -326,7 +320,7 @@ watch(
     if (newRoomType?.room_type_id) {
       body.value.roomSelections[0].roomTypeId = newRoomType.room_type_id
     }
-    console.log('✅ roomSelections đã được cập nhật:', body.value.roomSelections)
+
   },
   { immediate: true },
 )
@@ -344,7 +338,6 @@ const stepClass = (s) => {
 }
 
 async function handleNextStep() {
-  console.log('handleNextStep được gọi')
   if (!body.value.checkInDate) errorCheckInDate.value = 'Ngày nhận phòng không được để trống.'
   else errorCheckInDate.value = ''
 
@@ -369,12 +362,9 @@ async function handleNextStep() {
       return
     }
 
-    console.log('Dữ liệu gửi initializeBookingApi:', JSON.stringify(body.value, null, 2))
-
     loading.value = true
     try {
       const res = await initializeBookingApi(body.value)
-      console.log('API trả về:', res)
 
       // Gán bookingId từ API cho biến contact
       if (res && res.bookingId) {
@@ -384,7 +374,7 @@ async function handleNextStep() {
         console.error('Không nhận được bookingId từ API')
       }
     } catch (error) {
-      console.error('Lỗi khi gọi initializeBookingApi:', error)
+      void error
     } finally {
       loading.value = false
     }
@@ -397,15 +387,13 @@ async function submitBooking() {
     const res = await contactInfoPaymentApi(contact.value)
 
     if (res && res.paymentUrl) {
-      // ✅ Hiển thị toast thành công
       toast.success('🎉 Đặt phòng thành công! Đang chuyển hướng đến trang thanh toán...', {
         autoClose: 1500, // thời gian hiển thị toast
         position: 'top-center',
       })
 
-      // ✅ Sau 1.5s thì mở paymentUrl và đóng modal
       setTimeout(() => {
-        window.open(res.paymentUrl, '_blank') // mở tab mới
+        window.open(res.paymentUrl, '_blank') 
         resetForm()
         emit('close') // đóng modal
       }, 1500)

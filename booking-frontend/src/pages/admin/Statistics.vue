@@ -130,14 +130,12 @@ const statLabels: Record<StatKey, string> = {
 const fetchStats = async () => {
   try {
     const data = await getAdminStatisticsApi(selectedYear.value, selectedQuarter.value)
-    console.log('bieu do',data)
     dataStats.value = data
   } catch (error) {
-    console.error('Lỗi khi fetch thống kê:', error)
+    void error
   }
 }
 
-// Gọi fetch lần đầu khi component mount
 fetchStats()
 
 const chartData = ref<any>({

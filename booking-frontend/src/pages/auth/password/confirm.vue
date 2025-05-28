@@ -95,7 +95,6 @@
   
     try {
       const res = await confirmOtpApi(otp.value, email)
-      console.log('Phản hồi xác minh:', res)
   
       toast.success('Xác minh thành công!', { autoClose: 5000, position: 'top-right' })
   
@@ -104,7 +103,6 @@
         query: { email }
       })
     } catch (err) {
-      console.error('Lỗi xác minh OTP:', err)
       toast.error('Mã OTP không chính xác hoặc đã hết hạn.', { autoClose: 5000, position: 'top-right' })
     }
   }

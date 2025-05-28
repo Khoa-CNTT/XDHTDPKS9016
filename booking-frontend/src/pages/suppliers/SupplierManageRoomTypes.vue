@@ -97,7 +97,6 @@ const selectedRoomTypeId = ref<number | null>(null)
 const fetchRoomTypes = async () => {
   try {
     const res = await getRoomTypesApi(currentPage.value, size.value)
-    console.log('===>ne', res)
     roomTypes.value = res.content
     totalElements.value = res.page.totalElements
   } catch (err) {

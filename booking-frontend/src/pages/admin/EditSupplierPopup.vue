@@ -80,7 +80,6 @@ const props = defineProps({
     required: true,
   },
   hotelId: {
-    // thêm prop này để nhận id
     type: [String, Number],
     required: false,
   },
@@ -88,11 +87,10 @@ const props = defineProps({
 watch(
   () => props.hotelId,
   (newVal) => {
-    console.log('hotelId thay đổi:', newVal)
+    // console.log('hotelId thay đổi:', newVal)
   },
   { immediate: true },
 )
-// Tạo biến để binding với form
 const name = ref('')
 const address = ref('')
 const previewImage = ref('')
@@ -120,61 +118,47 @@ const handleFileChange = async (e: Event) => {
   if (!file) return
 
   try {
-    // Preview ngay ảnh vừa chọn
     previewImage.value = URL.createObjectURL(file)
-
-    // Upload file lên server
-    const res = await uploadImageApi(file) // trả về đường dẫn tương đối
+    const res = await uploadImageApi(file)
     imagePath.value = res
-    console.log('anh', res)
 
     toast.success('Tải ảnh lên thành công!', { autoClose: 5000, position: 'top-right' })
   } catch (err) {
-    console.error(err)
     toast.error('Lỗi khi tải ảnh!', { autoClose: 5000, position: 'top-right' })
   }
 }
 
 const emit = defineEmits(['close', 'save'])
-// Thêm 'save' vào defineEmits
-
 
 const submitForm = async () => {
   try {
     if (props.hotelId === undefined) {
-      toast.error('Hotel ID không hợp lệ', { autoClose: 5000, position: 'top-right' });
-      return;
+      toast.error('Hotel ID không hợp lệ', { autoClose: 5000, position: 'top-right' })
+      return
     }
 
-    const hotelIdNumber = Number(props.hotelId);
+    const hotelIdNumber = Number(props.hotelId)
     if (isNaN(hotelIdNumber)) {
-      toast.error('Hotel ID không hợp lệ', { autoClose: 5000, position: 'top-right' });
-      return;
+      toast.error('Hotel ID không hợp lệ', { autoClose: 5000, position: 'top-right' })
+      return
     }
 
     const payload = {
       name: name.value,
-      image: imagePath.value || props.supplier.image, 
+      image: imagePath.value || props.supplier.image,
       address: address.value,
       hotline: hotline.value,
       description: description.value,
-    };
+    }
 
-    console.log('Payload gửi lên:', payload);
-    const res = await updateSupplierApi(hotelIdNumber, payload);
-    console.log('Response từ API:', res);
-    
-    toast.success('Cập nhật khách sạn thành công!', { autoClose: 5000, position: 'top-right' });
-    
-    // Emit event 'save' kèm dữ liệu khách sạn mới (giả sử res chứa dữ liệu updated)
-    emit('save', res);
+    const res = await updateSupplierApi(hotelIdNumber, payload)
 
-    // Emit event đóng popup
-    emit('close');
+    toast.success('Cập nhật khách sạn thành công!', { autoClose: 5000, position: 'top-right' })
+
+    emit('save', res)
+    emit('close')
   } catch (error) {
-    console.error(error);
-    toast.error('Cập nhật thất bại!', { autoClose: 5000, position: 'top-right' });
+    toast.error('Cập nhật thất bại!', { autoClose: 5000, position: 'top-right' })
   }
-};
-
+}
 </script>

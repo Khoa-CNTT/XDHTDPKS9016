@@ -226,7 +226,7 @@ const fetchInfoHotel = async (page = 1) => {
     pageSize.value = res.page.size
     currentPage.value = res.page.number + 1
   } catch (error) {
-    console.error('Lỗi khi gọi API nhà cung cấp:', error)
+    void error
   }
 }
 watch(pageSize, (newSize) => {
@@ -235,8 +235,6 @@ watch(pageSize, (newSize) => {
 const openEditModal = (hotel: Hotel) => {
   selectedHotelToEdit.value = hotel
   selectedHotelIdToEdit.value = hotel.idHotel
-  console.log('id', selectedHotelIdToEdit.value)
-
   showEditModal.value = true
 }
 const handlePageChange = (newPage: number) => {
@@ -245,32 +243,19 @@ const handlePageChange = (newPage: number) => {
 }
 const handleHotelSave = async () => {
   showEditModal.value = false
-  await fetchInfoHotel() // gọi API lấy danh sách mới nhất
+  await fetchInfoHotel() 
 }
 
-
-// const handleDelete = async () => {
-//   if (deleteId.value == null) return
-//   try {
-//     await deleteSupplierApi(deleteId.value)
-//     await fetchInfoHotel(currentPage.value)
-//     showDeleteModal.value = false
-//     deleteId.value = null
-//   } catch (error) {
-//     console.error('Lỗi khi xóa nhà cung cấp:', error)
-//   }
-// }
 const handleDelete = async () => {
   if (deleteId.value == null) return
   try {
-    console.log('ID cần xóa:', deleteId.value)
     await deleteSupplierApi(deleteId.value)
     await fetchInfoHotel(currentPage.value)
     showDeleteModal.value = false
     deleteId.value = null
     
   } catch (error) {
-    console.error('Lỗi khi xóa nhà cung cấp:', error)
+   void error
   }
 }
 const confirmDelete = (id: number) => {
@@ -283,7 +268,7 @@ const handleView = async (id: number) => {
     selectedSupplier.value = res
     showDetailPopup.value = true
   } catch (error) {
-    console.error('Lỗi khi lấy chi tiết nhà cung cấp:', error)
+   void error
   }
 }
 

@@ -61,8 +61,6 @@ const form = reactive<ChangePasswordPayload>({
 });
 
 const onSubmit = async () => {
-  console.log('Form Data:', form); // 👉 Log dữ liệu ra
-
   if (form.newPassword !== form.confirmPassword) {
     toast.error('Mật khẩu xác nhận không khớp!', { autoClose: 5000, position: 'top-right' });
     return;

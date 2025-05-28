@@ -163,7 +163,11 @@
                     class="p-2 bg-red-500 hover:bg-red-600 text-white rounded transition"
                     title="Xóa"
                   >
-                    <Icon icon="mdi:trash-can" width="20" height="20"/>
+                    <Icon
+                      icon="mdi:trash-can"
+                      width="20"
+                      height="20"
+                    />
                   </button>
                 </div>
               </td>
@@ -364,12 +368,9 @@ const formatDate = (dateString: string) => {
   return `${d}/${m}/${y}`
 }
 
-
-// Format số điện thoại
 const formatPhone = (phone: string): string => {
   if (!phone || phone === '—') return '—'
 
-  // Loại bỏ các ký tự không phải số
   phone = phone.replace(/\D/g, '')
 
   if (phone.length === 10) {
@@ -378,14 +379,12 @@ const formatPhone = (phone: string): string => {
   return phone
 }
 
-// Hiển thị tên người dùng
 const getUserDisplayName = (user: User): string => {
   if (user.full_name?.trim()) return user.full_name.trim()
   if (user.email) return user.email
   return 'Người dùng'
 }
 
-// Hiển thị vai trò người dùng
 const getUserRole = (role: string): string => {
   const roles: Record<string, string> = {
     admin: 'Quản trị viên',
@@ -395,7 +394,6 @@ const getUserRole = (role: string): string => {
   return roles[role] || role
 }
 
-// Hiển thị trạng thái người dùng
 const getUserStatus = (status?: string | null): string => {
   const statuses: Record<string, string> = {
     active: 'Đang hoạt động',
@@ -405,7 +403,7 @@ const getUserStatus = (status?: string | null): string => {
   }
   return statuses[status ?? ''] ?? 'Không xác định'
 }
-// Chuyển đổi dữ liệu người dùng để hiển thị
+
 const mapUser = (user: User, idx: number) => ({
   stt: idx + 1 + pageInfo.value.number * pageInfo.value.size,
   tenNguoiDung: user.full_name?.trim() || user.email || '—',
@@ -414,7 +412,6 @@ const mapUser = (user: User, idx: number) => ({
   ngaySinh: user.birth_date ? formatDate(user.birth_date) : 'Chưa xác định',
   raw: user,
 })
-
 
 const fetchUsers = async (page = 0) => {
   loading.value = true
@@ -440,8 +437,6 @@ const fetchUsers = async (page = 0) => {
   }
 }
 
-
-
 // Xử lý khi thay đổi trang
 const onPageChange = (page: number) => {
   fetchUsers(page - 1)
@@ -453,7 +448,6 @@ const filteredData = computed(() =>
     row.tenNguoiDung.toLowerCase().includes(searchKeyword.value.toLowerCase()),
   ),
 )
-
 
 // Xem chi tiết người dùng
 const handleView = async (user: any) => {

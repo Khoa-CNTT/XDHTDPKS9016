@@ -111,7 +111,7 @@ const form = ref({
   description: '',
 })
 
-// Load dữ liệu ban đầu từ props.service
+
 watch(
   () => props.service,
   (newVal) => {

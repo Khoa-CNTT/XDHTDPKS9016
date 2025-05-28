@@ -79,7 +79,6 @@ const handleFileUpload = async (event: Event) => {
 
   try {
     const uploadedPath = await uploadImageApi(file)
-    console.log('anh:',uploadedPath);
     
     form.value.image = uploadedPath.trim()
     previewImage.value = form.value.image.startsWith('http')

@@ -8,16 +8,10 @@
           alt="Banner khách sạn"
           class="w-full h-full object-cover object-center"
         />
-        <!-- Lớp overlay để làm tối hình ảnh -->
-        <!-- <div class="absolute inset-0 bg-black bg-opacity-40"></div> -->
       </div>
 
       <!-- Nội dung hero -->
       <div class="relative z-10 pt-12">
-        <!-- <h1 class="text-3xl text-white font-bold uppercase">
-          Rong chơi bốn phương, giá vẫn "yêu thương"
-        </h1> -->
-
         <div class="search-box w-full md:w-4/5 lg:w-3/4 mx-auto z-20 relative mt-36">
           <!-- Tabs chọn loại dịch vụ -->
           <div class="flex overflow-x-auto bg-white rounded-t-lg shadow-md">
@@ -34,24 +28,6 @@
             </div>
           </div>
 
-          <!-- Form tìm kiếm -->
-          <!-- <div class="bg-white p-6 rounded-b-lg shadow-xl">
-            <div class="grid grid-cols-1 md:grid-cols-1 gap-6">
-           
-              <div class="flex items-center bg-gray-50 border border-gray-200 rounded-lg p-4 w-full">
-                <span class="mr-3 text-xl">🔍</span>
-                <input type="text" placeholder="Sea Sand 2 Hotel Da Nang"
-                  class="w-full bg-transparent outline-none text-lg" v-model="location" />
-              </div>
-            </div>
-          
-            <div class="flex justify-center mt-6">
-              <button
-                class="bg-blue-500 text-white font-bold py-4 px-16 rounded-md text-xl uppercase hover:bg-blue-600 transition duration-300">
-                TÌM
-              </button>
-            </div>
-          </div> -->
           <div class="bg-white p-6 rounded-b-lg shadow-xl">
             <div class="grid grid-cols-1 md:grid-cols-1 gap-6">
               <!-- Ô input tìm kiếm -->
@@ -69,12 +45,7 @@
             </div>
 
             <!-- Nút tìm kiếm -->
-            <div class="flex justify-center mt-6">
-              <!-- <button @click="handleSearch"
-                class="bg-blue-500 text-white font-bold py-4 px-16 rounded-md text-xl uppercase hover:bg-blue-600 transition duration-300">
-                TÌM
-              </button> -->
-            </div>
+            <div class="flex justify-center mt-6"></div>
 
             <!-- Kết quả tìm kiếm -->
             <div
@@ -328,9 +299,8 @@ const fetchHotelList = async () => {
   try {
     const response = await getHotelListApi()
     hotelList.value = response.content
-    console.log('Hotel list response:', response.content)
   } catch (error) {
-    console.error('Error fetching hotel list:', error)
+    void error
   }
 }
 
@@ -348,13 +318,11 @@ const toggleView = () => {
 }
 
 const viewHotelDetail = (hotelId) => {
-  console.log('Hotel ID clicked:', hotelId)
   router.push({ name: 'HotelDetail', params: { id: hotelId } })
 }
 
-// Biến chứa từ khóa tìm kiếm và kết quả
 const location = ref('')
-const searchResults = ref([]) // Kết quả từ API
+const searchResults = ref([])
 let debounceTimer = null
 watch(location, (newVal) => {
   if (debounceTimer) clearTimeout(debounceTimer)
@@ -367,10 +335,9 @@ watch(location, (newVal) => {
   debounceTimer = setTimeout(async () => {
     try {
       const resp = await searchHotelsApi(newVal.trim())
-      // Nếu API trả về resp.content thì dùng resp.content
       searchResults.value = resp.content || resp || []
     } catch (err) {
-      console.error('Lỗi khi tìm kiếm khách sạn:', err)
+      void err
     }
   }, 300)
 })

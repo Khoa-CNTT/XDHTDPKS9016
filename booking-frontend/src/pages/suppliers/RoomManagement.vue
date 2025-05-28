@@ -99,11 +99,9 @@ const states = [{ value: 'PAID', label: 'Chờ xác nhận' }]
 const fetchBookings = async () => {
   try {
     const res = await getBookingsManager();
-    console.log('Dữ liệu đặt phòng:', res);
     bookings.value = res.content;
-    console.log('Dữ liệu đặt phòng:',bookings.value );
   } catch (error) {
-    console.error('Lỗi khi lấy danh sách đặt phòng:', error);
+    void error
   }
 };
 onMounted(() => {

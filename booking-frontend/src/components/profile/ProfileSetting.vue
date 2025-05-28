@@ -24,12 +24,8 @@ const { errors, handleSubmit, defineField } = useForm({
 const [firstName, firstNameAttrs] = defineField('first_name')
 const [lastName, lastNameAttrs] = defineField('last_name')
 
-onBeforeMount(() => {
-  console.log(authStore.getUser)
-})
 
 const onSubmit = handleSubmit(async (values) => {
-  console.log('value', values)
   try {
     await updateProfileApi({
       first_name: String(values.first_name),
@@ -56,7 +52,6 @@ defineEmits<{
   >
     <div class="flex gap-5">
       <div class="flex-auto">
-        <!-- INPUT field -->
         <div class="flex flex-col gap-2">
           <label for="username">Email</label>
           <InputText

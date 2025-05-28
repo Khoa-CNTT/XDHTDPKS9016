@@ -14,8 +14,6 @@ function toggleChat() {
 
 const sendChat = async () => {
   if (!chatMessage.value.trim()) return
-
-  // Thêm tin nhắn người dùng vào lịch sử
   chatHistory.value.push({ from: 'user', message: chatMessage.value })
 
   const currentMessage = chatMessage.value

@@ -30,22 +30,7 @@ export const useAuthStore = defineStore({
     setUser(user: any) {
       this.user = user
     },
-    // async setupAuth() {
-    //   try {
-    //     const access_token = localStorage.getItem('access_token') as string
-
-    //     if (access_token) {
-    //       this.token.access = access_token
-    //       const user = await getInfoApi()
-    //       console.log('LOG user', user)
-    //       user && (this.user = user)
-    //       this.isLoggedIn = true
-    //       console.log('Login state:', this.isLoggedIn, this.user)
-    //     }
-    //   } catch (error) {
-    //     console.log('Setup auth error', error)
-    //   }
-    // },
+ 
     async setupAuth() {
       try {
         console.log('Bắt đầu gọi setupAuth') // Log khi bắt đầu thực thi
@@ -63,7 +48,7 @@ export const useAuthStore = defineStore({
           if (user) {
             this.user = user
             this.isLoggedIn = true
-            console.log('Thông tin người dùng đã được lưu vào store:', this.user)
+           
           }
         } else {
           console.log('Không tìm thấy token trong localStorage')

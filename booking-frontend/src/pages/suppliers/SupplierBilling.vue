@@ -136,14 +136,14 @@ const isLoading = ref(true);
 // Phân trang
 const totalElements = ref(0);
 const totalPages = ref(0);
-const size = ref(5);          // số phần tử trên 1 trang (để trùng với dữ liệu page.size)
-const currentPage = ref(0);   // page bắt đầu từ 0
+const size = ref(5);          
+const currentPage = ref(0);  
 
 // Hàm load dữ liệu theo trang
 const loadPaymentHistory = async (page = 0) => {
   isLoading.value = true;
   try {
-    // Gọi API có tham số page (nếu API hỗ trợ)
+  
     const res = await fetchPaymentHistory(page, size.value);
 
     paymentList.value = res.content;
@@ -160,7 +160,6 @@ const loadPaymentHistory = async (page = 0) => {
 };
 
 const handlePageChange = (page: number) => {
-  // page bắt đầu từ 1, đổi về index 0-based
   loadPaymentHistory(page - 1);
 };
 
