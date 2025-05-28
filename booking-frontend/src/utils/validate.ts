@@ -61,7 +61,8 @@ function validPass(pass: string) {
     }
   } else {
     // password phải chứa chữ hoa, chữ thường, số, ký tự đặc biệt, không có khoảng trắng, từ 8 đến 32 ký tự
-    const re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,32}$/;
+ const re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}\[\]:;"'<>,.?\\|`~\/\-])[A-Za-z\d!@#$%^&*()_+{}\[\]:;"'<>,.?\\|`~\/\-]{8,32}$/;
+
     if (!re.test(pass)) {
       return {
         mess: t('validation.ps_format'),

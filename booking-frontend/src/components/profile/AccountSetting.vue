@@ -38,7 +38,7 @@ const [confirmationPassword, confirmationPasswordAttrs] = defineField('confirmat
 const messageError = ref('')
 
 const onSubmit = handleSubmit(async (values) => {
-  console.log('value', values)
+
   try {
     await changePasswordApi({
       old_password: String(values.old_password),

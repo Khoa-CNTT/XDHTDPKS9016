@@ -84,28 +84,26 @@
   
   async function verifyOtp() {
     if (!otp.value || otp.value.length !== 6) {
-      toast.error('Mã OTP phải gồm 6 chữ số.')
+      toast.error('Mã OTP phải gồm 6 chữ số.', { autoClose: 5000, position: 'top-right' })
       return
     }
   
     if (!email) {
-      toast.error('Không tìm thấy email để xác minh.')
+      toast.error('Không tìm thấy email để xác minh.', { autoClose: 5000, position: 'top-right' })
       return
     }
   
     try {
       const res = await confirmOtpApi(otp.value, email)
-      console.log('Phản hồi xác minh:', res)
   
-      toast.success('Xác minh thành công!')
+      toast.success('Xác minh thành công!', { autoClose: 5000, position: 'top-right' })
   
       router.push({
         name: 'password-reset',
         query: { email }
       })
     } catch (err) {
-      console.error('Lỗi xác minh OTP:', err)
-      toast.error('Mã OTP không chính xác hoặc đã hết hạn.')
+      toast.error('Mã OTP không chính xác hoặc đã hết hạn.', { autoClose: 5000, position: 'top-right' })
     }
   }
   </script>

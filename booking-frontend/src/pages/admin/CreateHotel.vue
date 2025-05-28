@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50"
-  >
+  <div class="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
     <div class="bg-white p-6 rounded-lg w-full max-w-md shadow-lg relative">
       <!-- Nút Đóng -->
       <button
@@ -12,22 +10,24 @@
         ✕
       </button>
 
-      <h2 class="text-xl font-semibold mb-6 text-blue-600">
-        Tạo mới khách sạn
-      </h2>
+      <h2 class="text-xl font-semibold mb-6 text-blue-600">Tạo mới khách sạn</h2>
 
       <!-- Step indicator -->
       <div class="flex justify-between mb-6 border-b border-gray-300">
         <div
           class="pb-2 cursor-pointer"
-          :class="step === 1 ? 'border-b-4 border-blue-600 font-semibold text-blue-600' : 'text-gray-500'"
+          :class="
+            step === 1 ? 'border-b-4 border-blue-600 font-semibold text-blue-600' : 'text-gray-500'
+          "
           @click="goStep(1)"
         >
           Bước 1: Nhập thông tin
         </div>
         <div
           class="pb-2 cursor-pointer"
-          :class="step === 2 ? 'border-b-4 border-blue-600 font-semibold text-blue-600' : 'text-gray-500'"
+          :class="
+            step === 2 ? 'border-b-4 border-blue-600 font-semibold text-blue-600' : 'text-gray-500'
+          "
           @click="goStep(2)"
         >
           Bước 2: Thiết lập mật khẩu
@@ -40,31 +40,57 @@
         <div v-if="step === 1">
           <div class="mb-3">
             <label class="block font-medium mb-1">Tên khách sạn</label>
-            <input v-model="form.name" type="text" class="input" required />
+            <input
+              v-model="form.name"
+              type="text"
+              class="input"
+              required
+            />
           </div>
 
           <div class="mb-3">
             <label class="block font-medium mb-1">Email</label>
-            <input v-model="form.email" type="email" class="input" required />
+            <input
+              v-model="form.email"
+              type="email"
+              class="input"
+              required
+            />
           </div>
 
           <div class="mb-3">
             <label class="block font-medium mb-1">Địa chỉ</label>
-            <textarea v-model="form.address" class="input" rows="2"></textarea>
+            <textarea
+              v-model="form.address"
+              class="input"
+              rows="2"
+            ></textarea>
           </div>
 
           <div class="mb-3">
             <label class="block font-medium mb-1">Hotline</label>
-            <input v-model="form.hotline" type="text" class="input" />
+            <input
+              v-model="form.hotline"
+              type="text"
+              class="input"
+            />
           </div>
 
           <div class="mb-3">
             <label class="block font-medium mb-1">Mô tả</label>
-            <textarea v-model="form.description" class="input" rows="3"></textarea>
+            <textarea
+              v-model="form.description"
+              class="input"
+              rows="3"
+            ></textarea>
           </div>
 
           <div class="flex justify-end mt-6 gap-2">
-            <button type="button" @click="close" class="btn btn-gray">
+            <button
+              type="button"
+              @click="close"
+              class="btn btn-gray"
+            >
               Hủy
             </button>
             <button
@@ -82,27 +108,57 @@
         <div v-if="step === 2">
           <div class="mb-3">
             <label class="block font-medium mb-1">Tên đăng nhập (username)</label>
-            <input v-model="form.username" type="text" class="input" readonly />
+            <input
+              v-model="form.username"
+              type="text"
+              class="input"
+              readonly
+            />
           </div>
 
           <div class="mb-3">
             <label class="block font-medium mb-1">Mật khẩu (password)</label>
-            <input v-model="form.password" type="text" class="input" readonly />
-            <button type="button" class="text-blue-600 underline mt-1" @click="generatePassword">
+            <input
+              v-model="form.password"
+              type="text"
+              class="input"
+              readonly
+            />
+            <button
+              type="button"
+              class="text-blue-600 underline mt-1"
+              @click="generatePassword"
+            >
               Tạo mật khẩu mới
             </button>
           </div>
 
           <div class="mb-3 flex items-center gap-2">
-            <input v-model="form.sendEmail" type="checkbox" id="sendEmail" />
-            <label for="sendEmail" class="font-medium">Gửi email thông báo</label>
+            <input
+              v-model="form.sendEmail"
+              type="checkbox"
+              id="sendEmail"
+            />
+            <label
+              for="sendEmail"
+              class="font-medium"
+              >Gửi email thông báo</label
+            >
           </div>
 
           <div class="flex justify-between mt-6 gap-2">
-            <button type="button" @click="prevStep" class="btn btn-gray">
+            <button
+              type="button"
+              @click="prevStep"
+              class="btn btn-gray"
+            >
               Quay lại
             </button>
-            <button type="submit" class="btn btn-green" :disabled="!canSubmit">
+            <button
+              type="submit"
+              class="btn btn-green"
+              :disabled="!canSubmit"
+            >
               Hoàn thành
             </button>
           </div>
@@ -135,11 +191,14 @@ const form = reactive({
   sendEmail: true,
 })
 
-watch(() => form.email, (newEmail) => {
-  const usernamePart = newEmail.split('@')[0] || ''
-  form.username = usernamePart
-  generatePassword()
-})
+watch(
+  () => form.email,
+  (newEmail) => {
+    const usernamePart = newEmail.split('@')[0] || ''
+    form.username = usernamePart
+    generatePassword()
+  },
+)
 
 function generatePassword() {
   const length = 12
@@ -220,20 +279,16 @@ const onSubmit = async () => {
     password: form.password,
     sendEmail: form.sendEmail,
   }
-  console.log('Submit data:', body)
 
   try {
     const response = await createHotel(body)
-    console.log('Create hotel success:', response)
     emit('refresh')
     emit('close')
   } catch (error) {
-    console.error('Error creating hotel:', error)
-    // Bạn có thể thêm hiển thị thông báo lỗi ở đây
+    void error
   }
 }
 </script>
-
 
 <style scoped>
 .input {

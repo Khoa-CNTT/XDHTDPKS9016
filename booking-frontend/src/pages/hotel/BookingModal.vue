@@ -52,6 +52,7 @@
                   type="time"
                   v-model="body.checkInTime"
                   class="w-full border rounded px-3 py-2"
+                  readonly
                 />
               </div>
               <div>
@@ -75,6 +76,7 @@
                   type="time"
                   v-model="body.checkOutTime"
                   class="w-full border rounded px-3 py-2"
+                  readonly
                 />
               </div>
             </div>
@@ -101,7 +103,7 @@
                   <div class="flex-1">
                     <div class="text-sm text-gray-500 mb-1">Số phòng</div>
                     <div class="border rounded px-3 py-2 bg-gray-100 text-sm">
-                      {{ room.id_room }}
+                    {{ room.number_rooms }}
                     </div>
                   </div>
                 </div>
@@ -229,6 +231,7 @@
 import { ref, watch, onMounted } from 'vue'
 import { initializeBookingApi, contactInfoPaymentApi } from '@/services/booking'
 import { toast } from 'vue3-toastify'
+
 const props = defineProps({
   show: Boolean,
   room: Object,
@@ -236,6 +239,13 @@ const props = defineProps({
   roomType: Object,
 })
 
+watch(
+  () => props.room,
+  (newRoom) => {
+    console.log('room.number_rooms (watch):', newRoom?.number_rooms)
+  },
+  { immediate: true }
+)
 const emit = defineEmits(['close'])
 
 const step = ref(1)
@@ -257,8 +267,8 @@ const loading = ref(false)
 const body = ref({
   checkInDate: '',
   checkOutDate: '',
-  checkInTime: '',
-  checkOutTime: '',
+  checkInTime: '14:00:00',
+  checkOutTime: '12:00:00',
   numberOfPeople: 1,
   roomSelections: [
     {
@@ -310,7 +320,7 @@ watch(
     if (newRoomType?.room_type_id) {
       body.value.roomSelections[0].roomTypeId = newRoomType.room_type_id
     }
-    console.log('✅ roomSelections đã được cập nhật:', body.value.roomSelections)
+
   },
   { immediate: true },
 )
@@ -328,7 +338,6 @@ const stepClass = (s) => {
 }
 
 async function handleNextStep() {
-  console.log('handleNextStep được gọi')
   if (!body.value.checkInDate) errorCheckInDate.value = 'Ngày nhận phòng không được để trống.'
   else errorCheckInDate.value = ''
 
@@ -353,12 +362,9 @@ async function handleNextStep() {
       return
     }
 
-    console.log('Dữ liệu gửi initializeBookingApi:', JSON.stringify(body.value, null, 2))
-
     loading.value = true
     try {
       const res = await initializeBookingApi(body.value)
-      console.log('API trả về:', res)
 
       // Gán bookingId từ API cho biến contact
       if (res && res.bookingId) {
@@ -368,7 +374,7 @@ async function handleNextStep() {
         console.error('Không nhận được bookingId từ API')
       }
     } catch (error) {
-      console.error('Lỗi khi gọi initializeBookingApi:', error)
+      void error
     } finally {
       loading.value = false
     }
@@ -381,24 +387,22 @@ async function submitBooking() {
     const res = await contactInfoPaymentApi(contact.value)
 
     if (res && res.paymentUrl) {
-      // ✅ Hiển thị toast thành công
       toast.success('🎉 Đặt phòng thành công! Đang chuyển hướng đến trang thanh toán...', {
         autoClose: 1500, // thời gian hiển thị toast
         position: 'top-center',
       })
 
-      // ✅ Sau 1.5s thì mở paymentUrl và đóng modal
       setTimeout(() => {
-        window.open(res.paymentUrl, '_blank') // mở tab mới
+        window.open(res.paymentUrl, '_blank') 
         resetForm()
         emit('close') // đóng modal
       }, 1500)
     } else {
-      toast.error('Không nhận được link thanh toán từ hệ thống.')
+      toast.error('Không nhận được link thanh toán từ hệ thống.', { autoClose: 5000, position: 'top-right' })
     }
   } catch (err) {
     console.error('Lỗi khi gọi contactInfoPaymentApi:', err)
-    toast.error('❌ Đặt phòng thất bại. Vui lòng thử lại sau.')
+    toast.error('❌ Đặt phòng thất bại. Vui lòng thử lại sau.', { autoClose: 5000, position: 'top-right' })
   } finally {
     loading.value = false
   }

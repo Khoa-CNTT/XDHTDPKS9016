@@ -44,7 +44,7 @@ var uPlot = (function () {
 	}
 
 	function getMinMax(data, _i0, _i1, sorted) {
-	//	console.log("getMinMax()");
+
 
 		let _min = inf;
 		let _max = -inf;
@@ -70,7 +70,7 @@ var uPlot = (function () {
 	}
 
 	function getMinMaxLog(data, _i0, _i1) {
-	//	console.log("getMinMax()");
+
 
 		let _min = inf;
 		let _max = -inf;
@@ -184,8 +184,6 @@ var uPlot = (function () {
 		return lh == null ? rh : lh;
 	}
 
-	// checks if given index range in an array contains a non-null value
-	// aka a range-bounded Array.some()
 	function hasData(data, idx0, idx1) {
 		idx0 = ifNull(idx0, 0);
 		idx1 = ifNull(idx1, data.length - 1);
@@ -217,17 +215,10 @@ var uPlot = (function () {
 
 		let delta        = _max - _min;
 
-		// this handles situations like 89.7, 89.69999999999999
-		// by assuming 0.001x deltas are precision errors
-	//	if (delta > 0 && delta < abs(_max) / 1e3)
-	//		delta = 0;
-
-		// treat data as flat if delta is less than 1 billionth
 		if (delta < 1e-9) {
 			delta = 0;
 
-			// if soft mode is 2 and all vals are flat at 0, avoid the 0.1 * 1e3 fallback
-			// this prevents 0,0,0 from ranging to -100,100 when softMin/softMax are -1,1
+	
 			if (_min == 0 || _max == 0) {
 				delta = 1e-9;
 

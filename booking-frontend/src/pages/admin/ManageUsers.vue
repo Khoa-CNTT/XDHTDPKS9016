@@ -73,6 +73,9 @@
                 Giới tính
               </th>
               <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">
+                Phân quyền
+              </th>
+              <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">
                 Trạng thái
               </th>
               <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">
@@ -121,6 +124,10 @@
               <td class="px-4 py-3 whitespace-nowrap">
                 <div class="text-sm">{{ user.raw.gender || '—' }}</div>
               </td>
+              <!-- Phân quyền -->
+              <td class="px-4 py-3 whitespace-nowrap">
+                <div class="text-sm">{{ user.raw.role_id || '—' }}</div>
+              </td>
 
               <!-- Trạng thái -->
               <td class="px-4 py-3 whitespace-nowrap">
@@ -156,7 +163,11 @@
                     class="p-2 bg-red-500 hover:bg-red-600 text-white rounded transition"
                     title="Xóa"
                   >
-                    <Icon icon="mdi:trash-can" width="20" height="20"/>
+                    <Icon
+                      icon="mdi:trash-can"
+                      width="20"
+                      height="20"
+                    />
                   </button>
                 </div>
               </td>
@@ -347,7 +358,6 @@ const isViewModalVisible = ref(false)
 const showDeleteConfirm = ref(false)
 const userToView = ref<User | null>(null)
 const userToDelete = ref<any>(null)
-
 // Format ngày tháng
 const formatDate = (dateString: string) => {
   if (!dateString) return '—'
@@ -358,27 +368,9 @@ const formatDate = (dateString: string) => {
   return `${d}/${m}/${y}`
 }
 
-// Format ngày giờ đầy đủ
-// const formatDateTime = (dateTimeString: string) => {
-//   if (!dateTimeString) return '—'
-
-//   const date = new Date(dateTimeString)
-//   if (isNaN(date.getTime())) return dateTimeString
-
-//   const day = date.getDate().toString().padStart(2, '0')
-//   const month = (date.getMonth() + 1).toString().padStart(2, '0')
-//   const year = date.getFullYear()
-//   const hours = date.getHours().toString().padStart(2, '0')
-//   const minutes = date.getMinutes().toString().padStart(2, '0')
-
-//   return `${day}/${month}/${year} ${hours}:${minutes}`
-// }
-
-// Format số điện thoại
 const formatPhone = (phone: string): string => {
   if (!phone || phone === '—') return '—'
 
-  // Loại bỏ các ký tự không phải số
   phone = phone.replace(/\D/g, '')
 
   if (phone.length === 10) {
@@ -387,14 +379,12 @@ const formatPhone = (phone: string): string => {
   return phone
 }
 
-// Hiển thị tên người dùng
 const getUserDisplayName = (user: User): string => {
   if (user.full_name?.trim()) return user.full_name.trim()
   if (user.email) return user.email
   return 'Người dùng'
 }
 
-// Hiển thị vai trò người dùng
 const getUserRole = (role: string): string => {
   const roles: Record<string, string> = {
     admin: 'Quản trị viên',
@@ -404,7 +394,6 @@ const getUserRole = (role: string): string => {
   return roles[role] || role
 }
 
-// Hiển thị trạng thái người dùng
 const getUserStatus = (status?: string | null): string => {
   const statuses: Record<string, string> = {
     active: 'Đang hoạt động',
@@ -414,7 +403,7 @@ const getUserStatus = (status?: string | null): string => {
   }
   return statuses[status ?? ''] ?? 'Không xác định'
 }
-// Chuyển đổi dữ liệu người dùng để hiển thị
+
 const mapUser = (user: User, idx: number) => ({
   stt: idx + 1 + pageInfo.value.number * pageInfo.value.size,
   tenNguoiDung: user.full_name?.trim() || user.email || '—',
@@ -424,30 +413,6 @@ const mapUser = (user: User, idx: number) => ({
   raw: user,
 })
 
-// Lấy dữ liệu người dùng từ API
-// const fetchUsers = async (page = 0) => {
-//   loading.value = true
-//   try {
-//     const res = await getUsersApi(
-//       page,
-//       pageInfo.value.size,
-//       searchKeyword.value,
-//       selectedGender.value,
-//     )
-//     if (res?.content) {
-//       tableData.value = res.content.map(mapUser)
-//       pageInfo.value = {
-//         number: res.page.number,
-//         size: res.page.size,
-//         totalElements: res.page.totalElements,
-//       }
-//     }
-//   } catch (error) {
-//     console.error('Lỗi khi tải dữ liệu người dùng:', error)
-//   } finally {
-//     loading.value = false
-//   }
-// }
 const fetchUsers = async (page = 0) => {
   loading.value = true
   try {
@@ -472,19 +437,6 @@ const fetchUsers = async (page = 0) => {
   }
 }
 
-// // Lấy thông tin chi tiết người dùng
-// const getResultsLabel = (): string => {
-//   if (pageInfo.value.totalElements === 0) return 'Không có kết quả'
-
-//   const start = pageInfo.value.number * pageInfo.value.size + 1
-//   const end = Math.min(
-//     (pageInfo.value.number + 1) * pageInfo.value.size,
-//     pageInfo.value.totalElements,
-//   )
-
-//   return `Hiển thị ${start}-${end} trên ${pageInfo.value.totalElements} người dùng`
-// }
-
 // Xử lý khi thay đổi trang
 const onPageChange = (page: number) => {
   fetchUsers(page - 1)
@@ -496,25 +448,6 @@ const filteredData = computed(() =>
     row.tenNguoiDung.toLowerCase().includes(searchKeyword.value.toLowerCase()),
   ),
 )
-
-// Xử lý tìm kiếm với debounce
-// const debounceTimeout = ref<number | null>(null)
-// const onSearchInput = () => {
-//   pageInfo.value.number = 0
-//   if (debounceTimeout.value) {
-//     clearTimeout(debounceTimeout.value)
-//   }
-
-//   debounceTimeout.value = window.setTimeout(() => {
-//     fetchUsers(0)
-//   }, 300)
-// }
-
-// Thêm mới người dùng
-// const openCreateUser = () => {
-//   // Implement later
-//   alert('Chức năng đang được phát triển')
-// }
 
 // Xem chi tiết người dùng
 const handleView = async (user: any) => {

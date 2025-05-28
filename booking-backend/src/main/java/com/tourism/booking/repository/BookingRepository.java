@@ -39,7 +39,10 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
               (SELECT COUNT(*)
                  FROM booking_management.account a
-                WHERE YEAR(a.created_at) = :year    
+                 JOIN booking_management.role_account rl
+                   ON a.account_id = rl.account_id
+                WHERE (rl.role_id   = 2 OR rl.role_id   = 3)
+                    AND YEAR(a.created_at) = :year
                   AND QUARTER(a.created_at) = :quarter
               ) AS accountCount,
 
@@ -56,7 +59,17 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                 WHERE rl.role_id   = 2
                   AND YEAR(a.created_at) = :year
                   AND QUARTER(a.created_at) = :quarter
+              ) AS accountUser,
+        
+               (SELECT COUNT(*)
+                 FROM booking_management.account a
+                 JOIN booking_management.role_account rl
+                   ON a.account_id = rl.account_id
+                WHERE rl.role_id   = 3
+                  AND YEAR(a.created_at) = :year
+                  AND QUARTER(a.created_at) = :quarter
               ) AS accountHotel
+            
             """, nativeQuery = true)
     StatisticalDTO getStatisticalByQuarter(
             @Param("year") int year,

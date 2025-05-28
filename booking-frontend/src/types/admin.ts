@@ -151,6 +151,7 @@ export interface HotelDetail {
 
 // thong ke
 export interface DashboardStats {
+  accountUser: number;
   accountHotel: number;
   accountCount: number;
   bookingCount: number;

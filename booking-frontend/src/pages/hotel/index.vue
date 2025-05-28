@@ -3,7 +3,9 @@
     <div class="container mx-auto px-4">
       <main class="grid grid-cols-1 md:grid-cols-4 gap-6">
         <!-- Sidebar -->
-        <aside class="col-span-1 bg-white rounded-3xl shadow-lg p-5 border border-blue-200 overflow-auto">
+        <aside
+          class="col-span-1 bg-white rounded-3xl shadow-lg p-5 border border-blue-200 overflow-auto"
+        >
           <h2 class="text-xl font-bold text-blue-700 mb-5">Tìm kiếm theo địa điểm</h2>
 
           <!-- Thanh tìm kiếm -->
@@ -15,7 +17,10 @@
           />
 
           <!-- Kết quả tìm kiếm -->
-          <div class="space-y-4" v-if="searchResults.length">
+          <div
+            class="space-y-4"
+            v-if="searchResults.length"
+          >
             <div
               v-for="(hotel, index) in searchResults"
               :key="index"
@@ -39,9 +44,7 @@
                 <p class="text-xs text-gray-600 whitespace-normal break-words mt-1">
                   {{ hotel.description }}
                 </p>
-                <p class="text-xs text-indigo-600 mt-1">
-                  Địa điểm: {{ hotel.address }}
-                </p>
+                <p class="text-xs text-indigo-600 mt-1">Địa điểm: {{ hotel.address }}</p>
               </div>
             </div>
           </div>
@@ -72,12 +75,12 @@
               >
                 {{ hotel.name }}
               </h2>
-              <p class="text-gray-600 text-sm mt-2 italic whitespace-normal break-words">
+              <p class="text-gray-600 text-sm mt-2 itSalic line-clamp-3">
                 {{ hotel.description }}
               </p>
               <p class="mt-2 text-indigo-600 font-medium">
                 Địa điểm: {{ hotel.address }}
-              </p>
+              </p> 
 
               <!-- Badge tiện ích -->
               <div class="mt-3 flex flex-wrap gap-2">
@@ -129,7 +132,6 @@
   </div>
 </template>
 
-
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
 import { defineComponent } from 'vue'
@@ -140,7 +142,7 @@ import { Navigation, Autoplay } from 'swiper/modules'
 import 'swiper/css/autoplay'
 import { useRouter } from 'vue-router'
 import { getHotelListApi, searchHotelsApi } from '@/services/home'
-  import {BASE_URL} from '@/utils/imageHelper'
+import { BASE_URL } from '@/utils/imageHelper'
 const hotelList = ref([])
 const displayCount = ref(6)
 const isExpanded = ref(false)
@@ -148,13 +150,12 @@ const router = useRouter()
 
 const fetchHotelList = async () => {
   try {
-    const response = await getHotelListApi();
-    hotelList.value = response.content;
-    console.log('Hotel list response:', response.content);
+    const response = await getHotelListApi()
+    hotelList.value = response.content
   } catch (error) {
-    console.error('Error fetching hotel list:', error);
+    void error
   }
-};
+}
 
 // Biến chứa từ khóa tìm kiếm và kết quả
 const location = ref('')
@@ -175,9 +176,7 @@ watch(location, (newVal) => {
   debounceTimer = setTimeout(async () => {
     try {
       const response = await searchHotelsApi(newVal.trim())
-      // Nếu API trả về response.content thì dùng response.content
       searchResults.value = response.content || response || []
-      console.log('Search API response:', searchResults.value)
     } catch (error) {
       console.error('Lỗi khi tìm kiếm khách sạn:', error)
     }
@@ -194,16 +193,13 @@ const handleSearch = async () => {
 
   try {
     const response = await searchHotelsApi(query)
-    console.log('Search API response:', response)
     searchResults.value = response.content || response || []
-    console.log('Search API response:', searchResults.value)
   } catch (error) {
     console.error('Lỗi khi tìm kiếm khách sạn:', error)
   }
 }
 
 const viewHotelDetail = (hotelId) => {
-  console.log('Hotel ID clicked:', hotelId)
   router.push({ name: 'HotelDetail', params: { id: hotelId } })
 }
 
@@ -262,4 +258,3 @@ const services = ref([
   },
 ])
 </script>
-
