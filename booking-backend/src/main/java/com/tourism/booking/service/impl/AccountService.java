@@ -36,25 +36,21 @@ public class AccountService implements IAccountService {
         if (userProfileRepository.existsByEmail(accountRequest.getEmail())) {
             throw new RuntimeException("Email is exists");
         }
-        // Mã hóa password
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         String encodedPassword = passwordEncoder.encode(accountRequest.getPassword());
 
-        // Tạo account
         Account account = new Account();
         account.setUsername(accountRequest.getUsername());
         account.setPassword(encodedPassword);
         account.setEmail(accountRequest.getEmail());
         account.setCreated_at(LocalDateTime.now());
-        // Set vai trò mặc định USER
+
         Role userRole = roleRepository.findByRoleName("USER")
                 .orElseThrow(() -> new RuntimeException("Role USER not found"));
         account.setRoles(Set.of(userRole));
 
-        // Lưu account để có ID
         Account savedAccount = accountRepository.save(account);
 
-        // Tạo và lưu UserProfile
         UserProfile userProfile = new UserProfile();
         userProfile.setEmail(accountRequest.getEmail());
         userProfile.setAccount(savedAccount);

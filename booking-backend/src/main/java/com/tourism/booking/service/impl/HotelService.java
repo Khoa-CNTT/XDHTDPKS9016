@@ -63,11 +63,9 @@ public class HotelService implements IHotelService {
         account.setCreated_at(LocalDateTime.now());
 
         Set<Role> roles = new HashSet<>();
-        // Lấy role có ID là 3 từ database
         roleRepository.findById(3).ifPresent(roles::add);
         account.setRoles(roles);
         Account savedAccount = accountRepository.save(account);
-        // Create new hotel
         Hotel hotel = new Hotel();
         hotel.setName(request.getName());
         hotel.setAddress(request.getAddress());
@@ -96,7 +94,6 @@ public class HotelService implements IHotelService {
     }
 
     private void sendAccountCreationEmail(String email, String username, String password) {
-        // Gọi EmailService để gửi email
         emailService.sendAccountCreationEmail(email, username, password);
     }
 
@@ -105,7 +102,6 @@ public class HotelService implements IHotelService {
     public Page<HotelInfoResponse> getHotels(Pageable pageable) {
         return hotelRepository.findAll(pageable)
                 .map(hotel -> {
-                    // For each hotel in the page, fetch its details
                     Optional<Hotel> hotelWithDetails = hotelRepository.findByIdWithDetails(hotel.getHotel_id());
                     return hotelWithDetails.map(hotelInfoMapper::toDto).orElse(hotelInfoMapper.toDto(hotel));
                 });
@@ -121,7 +117,6 @@ public class HotelService implements IHotelService {
     @Override
     @Transactional
     public Hotel save(Hotel hotel) {
-        // Validate required fields
         if (hotel.getName() == null || hotel.getName().trim().isEmpty()) {
             throw new ApiException(ErrorCode.USER_NOT_EXIST);
         }
@@ -132,16 +127,12 @@ public class HotelService implements IHotelService {
             throw new ApiException(ErrorCode.USER_NOT_EXIST);
         }
 
-        // Validate and set account
         Account account = accountRepository.findById(Math.toIntExact(hotel.getAccount().getAccount_id()))
                 .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_EXIST));
         hotel.setAccount(account);
-
-        // Handle services
         if (hotel.getServices() != null) {
             Set<Services> services = new HashSet<>();
             for (Services service : hotel.getServices()) {
-                // Validate required fields for service
                 if (service.getService_name() == null || service.getService_name().trim().isEmpty()) {
                     throw new ApiException(ErrorCode.USER_NOT_EXIST);
                 }
@@ -150,17 +141,14 @@ public class HotelService implements IHotelService {
                 }
 
                 service.setHotel(hotel);
-                service.setBookings(new HashSet<>()); // Initialize empty bookings set
+                service.setBookings(new HashSet<>());
                 services.add(service);
             }
             hotel.setServices(services);
         }
-
-        // Handle room types
         if (hotel.getRoomTypes() != null) {
             Set<RoomType> roomTypes = new HashSet<>();
             for (RoomType roomType : hotel.getRoomTypes()) {
-                // Validate required fields for room type
                 if (roomType.getType_name() == null || roomType.getType_name().trim().isEmpty()) {
                     throw new ApiException(ErrorCode.USER_NOT_EXIST);
                 }
@@ -217,11 +205,9 @@ public class HotelService implements IHotelService {
     @Override
     @Transactional
     public HotelResponse updateBasicHotelInfo(Long hotelId, UpdateHotelRequest request) {
-        // Find existing hotel
         Hotel existingHotel = hotelRepository.findById(hotelId)
                 .orElseThrow(() -> new ApiException(ErrorCode.HOTEL_NOT_EXIST));
 
-        // Update only the basic fields, preserve all relationships and other data
         existingHotel.setName(request.getName());
         existingHotel.setAddress(request.getAddress());
         existingHotel.setHotline(request.getHotline());

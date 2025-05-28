@@ -50,7 +50,6 @@ public class ManagementUserController {
         UserProfile existingProfile = userProfileService.findUserProfileEntityById(id)
                 .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_EXIST));
 
-        // Cập nhật thông tin từ request vào đối tượng hiện có
         existingProfile.setFull_name(userProfileRequest.getFull_name());
         existingProfile.setGender(userProfileRequest.getGender());
         existingProfile.setAddress(userProfileRequest.getAddress());
@@ -59,7 +58,6 @@ public class ManagementUserController {
         existingProfile.setBirth_date(userProfileRequest.getBirth_date());
         existingProfile.setStatus(userProfileRequest.getStatus());
 
-        // Lưu thông tin đã cập nhật
         UserProfile savedProfile = userProfileService.save(existingProfile);
         UserProfileResponse response = userProfileMapper.UserProfileToUserProfileResponse(savedProfile);
         response.setUsername(existingProfile.getAccount().getUsername());

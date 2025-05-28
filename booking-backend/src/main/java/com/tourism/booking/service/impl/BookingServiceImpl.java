@@ -43,7 +43,6 @@ public class BookingServiceImpl implements IBookingService {
     @Override
     @Transactional
     public BookingResponseDTO createBooking(BookingRequestDTO bookingRequest) {
-        // Create new booking
         Booking booking = new Booking();
         booking.setCheck_in_date(bookingRequest.getCheckInDate());
         booking.setCheck_out_date(bookingRequest.getCheckOutDate());
@@ -58,23 +57,16 @@ public class BookingServiceImpl implements IBookingService {
         booking.setContact_phone(bookingRequest.getContactPhone());
         booking.setContact_address(bookingRequest.getContactAddress());
         booking.setSpecial_requests(bookingRequest.getSpecialRequests());
-
-        // Set user if provided
         if (bookingRequest.getUserId() != null) {
             UserProfile user = userRepository.findById(bookingRequest.getUserId())
                     .orElseThrow(() -> new ApiException(ErrorCode.USER_NOT_FOUND));
             booking.setUser_profile(user);
         }
-
-        // Save the booking to get an ID
         booking = bookingRepository.save(booking);
-
-        // Process room selections
         List<BookedRoomDTO> bookedRooms = new ArrayList<>();
         BigDecimal totalAmount = BigDecimal.ZERO;
 
         for (RoomSelectionDTO roomSelection : bookingRequest.getRoomSelections()) {
-            // Verify room exists and belongs to the specified room type
             Room room = roomRepository.findById(roomSelection.getRoomId())
                     .orElseThrow(() -> new ApiException(ErrorCode.ROOM_NOT_FOUND));
 
@@ -82,7 +74,6 @@ public class BookingServiceImpl implements IBookingService {
                 throw new ApiException(ErrorCode.ROOM_TYPE_MISMATCH);
             }
 
-            // Check if room is available for the requested dates
             List<Room> availableRooms = roomRepository.findAvailableRoomsByDateRange(
                     roomSelection.getRoomTypeId(),
                     bookingRequest.getCheckInDate(),
@@ -92,17 +83,14 @@ public class BookingServiceImpl implements IBookingService {
                 throw new ApiException(ErrorCode.ROOM_NOT_AVAILABLE);
             }
 
-            // Create booking room
             BookingRoom bookingRoom = new BookingRoom();
             bookingRoom.setBooking(booking);
             bookingRoom.setRoom(room);
             bookingRoom.setRoomTypeId(room.getRoom_type().getRoom_type_id());
             booking.getBookingRooms().add(bookingRoom);
 
-            // Add to total amount
             totalAmount = totalAmount.add(room.getPrice());
 
-            // Create DTO for response
             BookedRoomDTO bookedRoomDTO = new BookedRoomDTO();
             bookedRoomDTO.setRoomId(room.getId_room());
             bookedRoomDTO.setRoomTypeId(room.getRoom_type().getRoom_type_id());
@@ -114,10 +102,8 @@ public class BookingServiceImpl implements IBookingService {
             bookedRooms.add(bookedRoomDTO);
         }
 
-        // Update and save booking
         booking = bookingRepository.save(booking);
 
-        // Create response DTO
         BookingResponseDTO responseDTO = new BookingResponseDTO();
         responseDTO.setBookingId(booking.getId_booking());
         responseDTO.setCheckInDate(booking.getCheck_in_date());
@@ -222,55 +208,47 @@ public class BookingServiceImpl implements IBookingService {
             LocalDate checkInFrom, LocalDate checkInTo,
             LocalDate checkOutFrom, LocalDate checkOutTo,
             String status) {
-        // Implementation needed
         return new ArrayList<>();
     }
 
     @Override
     public BookingResponseDTO initializeBooking(BookingRequestDTO request, Principal principal) {
-        // Implementation needed
         return new BookingResponseDTO();
     }
 
     @Override
     public BookingResponseDTO updateContactInfo(ContactInfoDTO contactInfo) {
-        // Implementation needed
+
         return new BookingResponseDTO();
     }
 
     @Override
     public Page<BookingResponseDTO> getBookingsByHotelId(Pageable pageable, Long hotelId) {
-        // Implementation needed
         return null;
     }
 
     @Override
     public List<BookingResponseDTO> getBookingsByHotelIdAndStatus(Long hotelId, String status) {
-        // Implementation needed
         return new ArrayList<>();
     }
 
     @Override
     public BookingResponseDTO updateBookingStatus(Long id, String status) {
-        // Implementation needed
         return new BookingResponseDTO();
     }
 
     @Override
     public boolean isBookingInTemporaryStorage(Long bookingId) {
-        // Implementation needed
         return false;
     }
 
     @Override
     public BookingResponseDTO finalizeBooking(Long bookingId, Principal principal) {
-        // Implementation needed
         return new BookingResponseDTO();
     }
 
     @Override
     public List<BookingResponseDTO> getRecentBookings(int limit) {
-        // Implementation needed
         return new ArrayList<>();
     }
 }

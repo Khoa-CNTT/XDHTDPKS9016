@@ -68,9 +68,8 @@ public class RoomService implements IRoomService {
         dto.setHotelName(room.getRoom_type().getHotel().getName());
         dto.setStatus(room.getStatus());
 
-        // These values would typically come from a rating service or calculation
-        dto.setAverageRating(0.0); // Placeholder
-        dto.setTotalRatings(0); // Placeholder
+        dto.setAverageRating(0.0);
+        dto.setTotalRatings(0);
 
         return dto;
     }

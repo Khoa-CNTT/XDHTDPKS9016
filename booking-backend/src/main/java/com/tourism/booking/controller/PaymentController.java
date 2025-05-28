@@ -79,19 +79,15 @@ public class PaymentController {
                 return ResponseEntity.badRequest().body("Error: bookingId must not be null");
             }
 
-            // Get booking information
             BookingResponseDTO booking = bookingService.getBookingById(bookingId);
             if (booking == null) {
                 return ResponseEntity.notFound().build();
             }
 
-            // Get payment amount (deposit or full amount)
             long amount = getPaymentAmount(booking);
             if (amount <= 0) {
                 return ResponseEntity.badRequest().body("Error: Invalid payment amount");
             }
-
-            // Create VNPay payment URL
             String paymentUrl = createVNPayUrl(bookingId, amount);
             logger.info("Payment URL created successfully for booking: {}", bookingId);
 
@@ -114,12 +110,11 @@ public class PaymentController {
         logger.info("Payment callback received for booking {}: {}", bookingId, queryParams);
 
         try {
-            // 2. Check if transaction already processed
             String vnp_TransactionNo = queryParams.get("vnp_TransactionNo");
             if (isTransactionProcessed(vnp_TransactionNo)) {
                 logger.info("Transaction already processed: {}", vnp_TransactionNo);
                 try {
-                    // Get booking information for the success page
+
                     BookingResponseDTO booking = bookingService.getBookingById(bookingId);
                     if (booking != null) {
                         model.addAttribute("contactName", booking.getContactName());
@@ -127,7 +122,6 @@ public class PaymentController {
                         model.addAttribute("paymentTime",
                                 new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
 
-                        // Add hotel information if available
                         if (booking.getHotel() != null) {
                             model.addAttribute("hotelName", booking.getHotel().getName());
                             model.addAttribute("hotelAddress", booking.getHotel().getAddress());
@@ -146,7 +140,6 @@ public class PaymentController {
                 }
             }
 
-            // 1. Validate required parameters
             String[] requiredParams = {
                     "vnp_Amount",
                     "vnp_BankCode",
@@ -167,25 +160,21 @@ public class PaymentController {
                 }
             }
 
-            // 3. Process based on response code
             String vnp_ResponseCode = queryParams.get("vnp_ResponseCode");
             String vnp_TransactionStatus = queryParams.get("vnp_TransactionStatus");
 
-            // Log transaction details
             logger.info("Processing transaction: ResponseCode={}, Status={}, Amount={}, BookingId={}",
                     vnp_ResponseCode, vnp_TransactionStatus, queryParams.get("vnp_Amount"), bookingId);
 
             if ("00".equals(vnp_ResponseCode) && "00".equals(vnp_TransactionStatus)) {
                 try {
-                    // 1. Get the temporary booking with services
+
                     BookingResponseDTO tempBookingDTO = bookingService.getBookingById(bookingId);
                     if (tempBookingDTO == null) {
                         throw new BookingProcessingException("Không tìm thấy thông tin đặt phòng: " + bookingId);
                     }
 
-                    // Get services before finalizing
                     Set<Services> services = bookingService.getServicesByBookingId(bookingId);
-                    // Handle null or empty services set
                     if (services != null) {
                         logger.info("Retrieved {} services for booking {}", services.size(), bookingId);
                     } else {
@@ -193,24 +182,19 @@ public class PaymentController {
                         services = Collections.emptySet(); // Initialize as empty set to avoid null pointer
                     }
 
-                    // 2. Create a mock Principal with userId
                     Principal mockPrincipal = createMockPrincipal(userId);
 
-                    // 3. Finalize booking with mock Principal
                     BookingResponseDTO finalizedBooking = bookingService.finalizeBooking(bookingId, mockPrincipal);
                     logger.info("Booking finalized successfully: {}", finalizedBooking.getBookingId());
 
-                    // 4. Get the finalized booking entity and update its status
                     Booking booking = bookingService.getBookingEntityById(finalizedBooking.getBookingId());
                     booking.setStatus("PAID");
 
-                    // 5. Save services if any
                     if (services != null && !services.isEmpty()) {
                         booking.setServices(services);
                         logger.info("Added {} services to finalized booking", services.size());
                     }
 
-                    // 6. Save the updated booking
                     try {
                         booking = bookingService.saveBooking(booking);
                         logger.info("Booking saved with status PAID and services attached");
@@ -218,7 +202,6 @@ public class PaymentController {
                         throw new BookingProcessingException("Lỗi khi lưu thông tin đặt phòng", e);
                     }
 
-                    // 7. Create payment record
                     try {
                         PaymentRequestDTO paymentRequest = createPaymentRequest(finalizedBooking, queryParams);
                         paymentRequest.setStatus("SUCCESS");
@@ -230,10 +213,8 @@ public class PaymentController {
                         logger.info("Payment processed successfully: {}", payment.getPaymentId());
                     } catch (Exception e) {
                         logger.error("Error processing payment record: {}", e.getMessage(), e);
-                        // Continue to show success page even if payment record creation fails
                     }
 
-                    // 8. Prepare success view
                     model.addAttribute("contactName", finalizedBooking.getContactName());
                     model.addAttribute("amount", Long.parseLong(queryParams.get("vnp_Amount")) / 100);
                     model.addAttribute("paymentTime", new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
@@ -278,14 +259,11 @@ public class PaymentController {
             Long bookingId, Map<String, String> queryParams, TransactionStatus status, Principal principal) {
 
         try {
-            // 1. Finalize booking
             BookingResponseDTO finalizedBooking = bookingService.finalizeBooking(bookingId, principal);
 
-            // 2. Create payment record
             PaymentRequestDTO paymentRequest = createPaymentRequest(finalizedBooking, queryParams);
             PaymentResponseDTO payment = paymentService.processPayment(paymentRequest);
 
-            // 3. Commit transaction
             transactionManager.commit(status);
 
             return createSuccessResponse(payment, finalizedBooking);
@@ -301,27 +279,22 @@ public class PaymentController {
         request.setBookingId(booking.getBookingId());
         request.setBillId(booking.getBill().getBillId());
 
-        // Process amount
         String vnp_Amount = queryParams.get("vnp_Amount");
         if (vnp_Amount != null) {
             long amount = Long.parseLong(vnp_Amount) / 100; // VNPay amount is in VND * 100
             request.setAmount(new BigDecimal(amount));
         }
 
-        // Set payment method and transaction details
         request.setPaymentMethod("VNPAY");
         request.setTransactionId(queryParams.get("vnp_TransactionNo"));
 
-        // Set additional VNPay information
         request.setBankCode(queryParams.get("vnp_BankCode"));
         request.setBankTranNo(queryParams.get("vnp_BankTranNo"));
         request.setCardType(queryParams.get("vnp_CardType"));
 
-        // Set payment date from VNPay
         String vnp_PayDate = queryParams.get("vnp_PayDate");
         if (vnp_PayDate != null && vnp_PayDate.length() >= 14) {
             try {
-                // Parse VNPay date format (yyyyMMddHHmmss)
                 int year = Integer.parseInt(vnp_PayDate.substring(0, 4));
                 int month = Integer.parseInt(vnp_PayDate.substring(4, 6));
                 int day = Integer.parseInt(vnp_PayDate.substring(6, 8));

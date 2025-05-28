@@ -57,7 +57,6 @@ public class PaymentServiceImpl implements IPaymentService {
         payment.setStatus(status);
         payment = paymentRepository.save(payment);
 
-        // Nếu trạng thái thanh toán là thành công, cập nhật trạng thái của booking
         if ("SUCCESS".equals(status)) {
             updateBookingStatus(payment.getBooking().getId_booking(), "PAID");
         }
@@ -69,10 +68,8 @@ public class PaymentServiceImpl implements IPaymentService {
     @Transactional
     public PaymentResponseDTO processPaymentWithBookingFinalization(PaymentRequestDTO request, Long bookingId,
                                                                     Principal principal) {
-        // Finalize booking first
-        bookingService.finalizeBooking(bookingId, principal);
 
-        // Then process payment
+        bookingService.finalizeBooking(bookingId, principal);
         return processPayment(request);
     }
 
@@ -82,12 +79,10 @@ public class PaymentServiceImpl implements IPaymentService {
         logger.info("Processing payment for booking: {}", request.getBookingId());
 
         try {
-            // Get the booking
             Booking booking = bookingRepository.findById(request.getBookingId())
                     .orElseThrow(
                             () -> new EntityNotFoundException("Booking not found with id: " + request.getBookingId()));
 
-            // Get or create bill if not exists
             Bill bill;
             if (request.getBillId() != null) {
                 bill = billRepository.findById(request.getBillId())
@@ -99,26 +94,19 @@ public class PaymentServiceImpl implements IPaymentService {
                     throw new EntityNotFoundException("Bill not found for booking: " + request.getBookingId());
                 }
             }
-
-            // Create payment entity
             Payment payment = new Payment();
 
-            // Thiết lập trực tiếp trường bookingId
             logger.info("Setting bookingId directly: {}", booking.getId_booking());
             payment.setBookingId(booking.getId_booking());
 
-            // Thiết lập mối quan hệ cho tham chiếu trong code
             payment.setBooking(booking);
             payment.setBill(bill);
 
             payment.setAmount(request.getAmount());
             payment.setPayment_method(request.getPaymentMethod());
             payment.setTransaction_id(request.getTransactionId());
-
-            // Set status from request or default to SUCCESS
             payment.setStatus(request.getStatus() != null ? request.getStatus() : "SUCCESS");
 
-            // Set date/time
             if (request.getPaymentDate() != null) {
                 payment.setPayment_date(request.getPaymentDate());
                 payment.setPayment_time(request.getPaymentTime() != null ? request.getPaymentTime() : LocalTime.now());
@@ -130,8 +118,6 @@ public class PaymentServiceImpl implements IPaymentService {
             payment = paymentRepository.save(payment);
             logger.info("Payment saved successfully with id: {} for booking: {}",
                     payment.getPayment_id(), payment.getBookingId());
-
-            // Double-check if bookingId was saved correctly, if not try to fix it
             if (payment.getBookingId() == null) {
                 logger.warn("BookingId missing in saved payment, attempting to fix");
                 payment.setBookingId(booking.getId_booking());
@@ -139,7 +125,6 @@ public class PaymentServiceImpl implements IPaymentService {
                 logger.info("Fixed payment with updated bookingId: {}", payment.getBookingId());
             }
 
-            // Update booking status if payment is successful
             if ("SUCCESS".equals(payment.getStatus())) {
                 updateBookingStatus(booking.getId_booking(), "PAID");
             }
@@ -169,13 +154,12 @@ public class PaymentServiceImpl implements IPaymentService {
             return false;
         }
 
-        // Calculate total paid amount
         double totalPaid = payments.stream()
                 .filter(p -> "SUCCESS".equals(p.getStatus()))
                 .mapToDouble(p -> p.getAmount().doubleValue())
                 .sum();
 
-        // Compare with bill total
+
         return totalPaid >= bill.getTotal_amount().doubleValue();
     }
 
@@ -188,15 +172,10 @@ public class PaymentServiceImpl implements IPaymentService {
         dto.setStatus(payment.getStatus());
         dto.setPaymentDate(payment.getPayment_date());
         dto.setPaymentTime(payment.getPayment_time());
-
-        // Đặt bookingId trực tiếp từ entity
         dto.setBookingId(payment.getBookingId());
 
-        // Set billId if available
         if (payment.getBill() != null) {
             dto.setBillId(payment.getBill().getBill_id());
-
-            // Lấy thông tin khách hàng từ booking
             if (payment.getBooking() != null) {
                 Booking booking = payment.getBooking();
                 String customerName;
@@ -211,10 +190,7 @@ public class PaymentServiceImpl implements IPaymentService {
             }
         }
 
-        // Đảm bảo có accountNumber
         dto.setAccountNumber(payment.getTransaction_id());
-
-        // Set status display
         if ("SUCCESS".equals(payment.getStatus()) || "PROCESSED".equals(payment.getStatus())) {
             dto.setStatusDisplay("Thành công");
         } else if ("PAID".equals(payment.getStatus())) {

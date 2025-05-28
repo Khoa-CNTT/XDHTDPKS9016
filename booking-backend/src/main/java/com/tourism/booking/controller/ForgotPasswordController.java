@@ -44,7 +44,7 @@ public class ForgotPasswordController {
                 .orElseThrow(() -> new ApiException(ErrorCode.EMAIL_EXISTS));
 
         int otp = otpGenerator();
-        Date expires = new Date(System.currentTimeMillis() + 5 * 60 * 1000); // 5 phút
+        Date expires = new Date(System.currentTimeMillis() + 5 * 60 * 1000);
 
         MailBody mailBody = MailBody.builder()
                 .to(email)
